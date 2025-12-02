@@ -1,0 +1,439 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block csslib %}
+{% endblock %}
+{% block title %}Página Inicial | OBD - Organização Brasileira de Dardos{% endblock %}
+{% block styles %}
+{% endblock %}
+{% block content %}
+
+<div class="container fade-in">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+
+            <!-- Hero Banner -->
+            <div class="mb-4 text-center">
+                <img src="{% static '/media/logos/new_banner_obd.png' %}" class="img-fluid rounded shadow-lg"
+                    alt="OBD Banner">
+            </div>
+
+            <!-- Welcome Card -->
+            <div class="card card-dartboard text-center mb-5">
+                <div class="card-header card-header-dartboard">
+                    <i class="bi bi-bullseye"></i> Bem-vindo ao Portal OBD
+                </div>
+                <div class="card-body py-5">
+                    <h2 class="card-title mb-3 fw-bold">Organização Brasileira de Dardos</h2>
+                    <p class="card-text lead text-muted mb-4">Sua liga online de dardos. Venha se divertir conosco!</p>
+                    <div class="d-flex justify-content-center gap-3 flex-wrap">
+                        <a href="{% url 'players:login' %}" class="btn btn-dartboard-secondary btn-lg"><i
+                                class="bi bi-box-arrow-in-right"></i> Login</a>
+                        <a href="/subscribe/" class="btn btn-dartboard-primary btn-lg"><i
+                                class="bi bi-pencil-square"></i>
+                            Cadastrar-se</a>
+                        <a href="#obd-stats" class="btn btn-dartboard-outline btn-lg"><i class="bi bi-graph-up"></i> Ver
+                            Estatísticas</a>
+                    </div>
+                </div>
+                <div class="card-footer card-footer-dartboard text-muted small">
+                    <div class="d-flex justify-content-between align-items-center flex-wrap">
+                        <span>Versão 1.0 | Status: <span class="text-dartboard-green fw-bold">Online</span> <span
+                                class="spinner-grow spinner-grow-sm text-success" role="status"></span></span>
+                        <span>
+                            <a href="/updates/" class="text-decoration-none me-3">Atualizações</a>
+                            <a href="https://scoutapm.com/shares/0c8dd79b-283a-458b-b399-39d0476b1329" target="_blank"
+                                class="text-decoration-none">Status do Servidor</a>
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Content Grid -->
+            <div class="row g-4 mb-5">
+                <!-- Recent Games -->
+                <div class="col-lg-8">
+                    <div class="card card-dartboard h-100">
+                        <div class="card-header card-header-dartboard green">
+                            <i class="bi bi-clock-history"></i> Informes OBD
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <!-- News Column -->
+                                <div class="col-md-6 mb-3 mb-md-0">
+                                    <h5 class="card-title fw-bold mb-3"><i
+                                            class="bi bi-newspaper text-dartboard-green"></i> Notícias</h5>
+                                    {% if news %}<div class="list-group list-group-flush">
+                                        {% for item in news %}
+                                        <a href="{{ item.link }}"
+                                            class="list-group-item list-group-item-action flex-column align-items-start"
+                                            target="_blank">
+                                            <div class="d-flex w-100 justify-content-between">
+                                                <h6 class="mb-1 fw-bold">{{ item.title }}</h6>
+                                                <small class="text-muted">{{ item.published_date|date:'d/m/Y' }}</small>
+                                            </div>
+                                            <p class="mb-1 small text-muted">{{ item.summary|truncatechars:60 }}</p>
+                                        </a>
+                                        {% endfor %}
+                                    </div>
+                                    <div class="mt-3 text-center">
+                                        <a href="{% url 'news' %}" class="btn btn-sm btn-outline-secondary">Ver
+                                            todas</a>
+                                    </div>
+                                    {% else %}
+                                    <p class="text-muted text-center my-4">Nenhuma notícia recente.</p>
+                                    {% endif %}
+                                </div>
+
+                                <!-- Documents Column -->
+                                <div class="col-md-6">
+                                    <h5 class="card-title fw-bold mb-3"><i
+                                            class="bi bi-file-earmark-text text-dartboard-red"></i> Documentos</h5>
+                                    {% if documents %}<div class="list-group list-group-flush">
+                                        {% for doc in documents %}
+                                        <div class="list-group-item d-flex justify-content-between align-items-center">
+                                            <div>
+                                                <h6 class="mb-0">{{ doc.title }}</h6>
+                                                <small class="text-muted">{{ doc.get_category_display }} • {{
+                                                    doc.publish_date|date:'d/m/Y' }}</small>
+                                            </div>
+                                            <a href="{{ doc.file.url }}" class="btn btn-sm btn-dartboard-outline"
+                                                target="_blank" download>
+                                                <i class="bi bi-download"></i>
+                                            </a>
+                                        </div>
+                                        {% endfor %}
+                                    </div>
+                                    <div class="mt-3 text-center">
+                                        <a href="{% url 'documents' %}" class="btn btn-sm btn-outline-secondary">Ver
+                                            todos</a>
+                                    </div>
+                                    {% else %}
+                                    <p class="text-muted text-center my-4">Nenhum documento recente.</p>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Sponsors Carousel -->
+                <div class="col-lg-4">
+                    <div class="card card-dartboard h-100">
+                        <div class="card-header card-header-dartboard gold">
+                            <i class="bi bi-star"></i> Apoiadores
+                        </div>
+                        <div class="card-body p-0 d-flex align-items-center bg-white rounded-bottom">
+                            <div id="sponsorsCarousel" class="carousel slide w-100" data-bs-ride="carousel">
+                                <div class="carousel-inner">
+                                    <div class="carousel-item active">
+                                        <a href="https://www.petraagregados.com/" target="_blank">
+                                            <img src="{% static '/media/sponsors/petra.png' %}" class="d-block w-100"
+                                                style="height: 300px; object-fit: contain;" alt="Petra">
+                                        </a>
+                                    </div>
+                                    <div class="carousel-item">
+                                        <a href="https://ongclubeup.org/" target="_blank">
+                                            <img src="{% static '/media/sponsors/clube_up.png' %}" class="d-block w-100"
+                                                style="height: 300px; object-fit: contain;" alt="Clube Up">
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Player Stats -->
+            <div class="mb-5">
+                <h3 class="text-center mb-4 fw-bold"><i class="bi bi-person-lines-fill text-dartboard-red"></i>
+                    Estatísticas
+                    dos Jogadores</h3>
+                <div class="row g-4">
+                    <!-- Best Averages -->
+                    <div class="col-md-4">
+                        <div class="card card-dartboard h-100">
+                            <div
+                                class="card-header card-header-dartboard d-flex justify-content-between align-items-center">
+                                <span>Melhores Médias</span> <i class="bi bi-award"></i>
+                            </div>
+                            <ul class="list-group list-group-flush">
+                                {% for line in stats_avg %}
+                                <li class="list-group-item d-flex justify-content-between align-items-center">
+                                    {% if line.user.profile.pin and line.user.first_name and line.user.last_name %}<a
+                                        href="{% url 'profiles:publicprofile' pin=line.user.profile.pin first=line.user.first_name last=line.user.last_name %}">
+                                        <span class="fw-bold text-muted me-2">{{ forloop.counter }}º</span>
+                                        {{ line.user.first_name }} {{ line.user.last_name }}
+                                    </a>
+                                    {% else %}
+                                    <span>
+                                        <span class="fw-bold text-muted me-2">{{ forloop.counter }}º</span>
+                                        {{ line.user.first_name }} {{ line.user.last_name }}
+                                    </span>
+                                    {% endif %}
+                                    <span class="badge badge-dartboard badge-red rounded-pill">{{ line.bcmAvg |
+                                        floatformat:"2"}}</span>
+                                </li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- Best Checkouts -->
+                    <div class="col-md-4">
+                        <div class="card card-dartboard h-100">
+                            <div
+                                class="card-header card-header-dartboard green d-flex justify-content-between align-items-center">
+                                <span>Melhores Fechadas</span> <i class="bi bi-calculator"></i>
+                            </div>
+                            <ul class="list-group list-group-flush">
+                                {% for line in stats_out %}
+                                <li class="list-group-item d-flex justify-content-between align-items-center">
+                                    {% if line.user.profile.pin and line.user.first_name and line.user.last_name %}<a
+                                        href="{% url 'profiles:publicprofile' pin=line.user.profile.pin first=line.user.first_name last=line.user.last_name %}">
+                                        <span class="fw-bold text-muted me-2">{{ forloop.counter }}º</span>
+                                        {{ line.user.first_name }} {{ line.user.last_name }}
+                                    </a>
+                                    {% else %}
+                                    <span>
+                                        <span class="fw-bold text-muted me-2">{{ forloop.counter }}º</span>
+                                        {{ line.user.first_name }} {{ line.user.last_name }}
+                                    </span>
+                                    {% endif %}
+                                    <span class="badge badge-dartboard badge-green rounded-pill">{{ line.bcmOut
+                                        }}</span>
+                                </li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- Top 180s -->
+                    <div class="col-md-4">
+                        <div class="card card-dartboard h-100">
+                            <div
+                                class="card-header card-header-dartboard d-flex justify-content-between align-items-center">
+                                <span>Top 180s</span> <i class="bi bi-lightning-charge-fill"></i>
+                            </div>
+                            <ul class="list-group list-group-flush">
+                                {% for line in stats_180 %}
+                                <li class="list-group-item d-flex justify-content-between align-items-center">
+                                    {% if line.user.profile.pin and line.user.first_name and line.user.last_name %}<a
+                                        href="{% url 'profiles:publicprofile' pin=line.user.profile.pin first=line.user.first_name last=line.user.last_name %}">
+                                        <span class="fw-bold text-muted me-2">{{ forloop.counter }}º</span>
+                                        {{ line.user.first_name }} {{ line.user.last_name }}
+                                    </a>
+                                    {% else %}
+                                    <span>
+                                        <span class="fw-bold text-muted me-2">{{ forloop.counter }}º</span>
+                                        {{ line.user.first_name }} {{ line.user.last_name }}
+                                    </span>
+                                    {% endif %}
+                                    <span class="badge badge-dartboard badge-gold rounded-pill">{{ line.bcmTon80
+                                        }}</span>
+                                </li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- OBD Stats -->
+            <div class="mb-5" id="obd-stats">
+                <h3 class="text-center mb-4 fw-bold"><i class="bi bi-graph-up text-accent"></i> Estatísticas OBD {% if
+                    tournament_stats %}<small class="text-muted fs-6">({{ tournament_stats.name }})</small>{% endif %}
+                </h3>
+                <div class="row g-4">
+                    <div class="col-md-4">
+                        <div class="card h-100">
+                            <div class="card-header bg-secondary text-white">Dados Gerais</div>
+                            <ul class="list-group list-group-flush">
+                                <li class="list-group-item d-flex justify-content-between align-items-center">Média
+                                    Geral <span class="badge bg-primary rounded-pill">{% if tournament_stats %}{{
+                                        tournament_stats.average|floatformat:"2" }}{% else %}{% if boa.average %}{{
+                                        boa.average|floatformat:"2" }}{% else %}0{% endif %}{% endif %}</span></li>
+                                <li class="list-group-item d-flex justify-content-between align-items-center">Partidas
+                                    <span class="badge bg-primary rounded-pill">{% if tournament_stats %}{{
+                                        tournament_stats.matches }}{% else %}{{ games|default:"0" }}{% endif %}</span>
+                                </li>
+                                <li class="list-group-item d-flex justify-content-between align-items-center">Legs <span
+                                        class="badge bg-primary rounded-pill">{% if tournament_stats %}{{
+                                        tournament_stats.legs }}{% else %}{{ boa.legs|default:"0" }}{% endif %}</span>
+                                </li>
+                                <li class="list-group-item d-flex justify-content-between align-items-center">Jogadores
+                                    <span class="badge bg-primary rounded-pill">{% if tournament_stats %}{{
+                                        tournament_stats.players }}{% else %}{{ members|default:"0" }}{% endif %}</span>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card h-100">
+                            <div class="card-header bg-secondary text-white">Scores</div>
+                            <ul class="list-group list-group-flush">
+                                <li class="list-group-item d-flex justify-content-between align-items-center">100+ <span
+                                        class="badge bg-primary rounded-pill">{% if tournament_stats %}{{
+                                        tournament_stats.ton }}{% else %}{{ boa.ton|default:"0" }}{% endif %}</span>
+                                </li>
+                                <li class="list-group-item d-flex justify-content-between align-items-center">140+ <span
+                                        class="badge bg-primary rounded-pill">{% if tournament_stats %}{{
+                                        tournament_stats.ton40 }}{% else %}{{ boa.ton40|default:"0" }}{% endif %}</span>
+                                </li>
+                                <li class="list-group-item d-flex justify-content-between align-items-center">170+ <span
+                                        class="badge bg-primary rounded-pill">{% if tournament_stats %}{{
+                                        tournament_stats.ton70 }}{% else %}{{ boa.ton70|default:"0" }}{% endif %}</span>
+                                </li>
+                                <li class="list-group-item d-flex justify-content-between align-items-center">180s <span
+                                        class="badge bg-danger rounded-pill">{% if tournament_stats %}{{
+                                        tournament_stats.ton80 }}{% else %}{{ boa.ton80|default:"0" }}{% endif %}</span>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card h-100">
+                            {% if tournament_stats %}<div class="card-header bg-secondary text-white">Recordes</div>
+                            <ul class="list-group list-group-flush">
+                                <li class="list-group-item d-flex justify-content-between align-items-center">Maior
+                                    Fechamento <span class="badge bg-primary rounded-pill">{{
+                                        tournament_stats.highest_out }}</span></li>
+                                <li class="list-group-item d-flex justify-content-between align-items-center">Melhor Leg
+                                    (Dardos)
+                                    <span class="badge bg-primary rounded-pill">{{ tournament_stats.best_leg }}</span>
+                                </li>
+                                <li class="list-group-item d-flex justify-content-between align-items-center">Melhor
+                                    Média <span class="badge bg-primary rounded-pill">{{
+                                        tournament_stats.best_avg|floatformat:"2" }}</span></li>
+                            </ul>
+                            {% else %}
+                            <div class="card-header bg-secondary text-white">Servidores</div>
+                            <ul class="list-group list-group-flush">
+
+                                <li class="list-group-item d-flex justify-content-between align-items-center">Nakka
+                                    <span class="badge bg-primary rounded-pill">{{ server.nakka }}</span>
+                                </li>
+                                <li class="list-group-item d-flex justify-content-between align-items-center">Manual
+                                    <span class="badge bg-primary rounded-pill">{{ server.manual }}</span>
+                                </li>
+                            </ul>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tournament Champion Highlight -->
+            {% if tournament_stats.champion_name %}<div class="mb-5">
+                <div class="card card-dartboard border-warning shadow-lg">
+                    <div class="card-header card-header-dartboard gold text-center py-3">
+                        <h4 class="mb-0"><i class="bi bi-trophy-fill text-warning"></i> Campeão do Campeonato Brasileiro
+                            de Dardos OBD 2025</h4>
+                    </div>
+                    <div class="card-body text-center py-5 bg-gradient">
+                        <h1 class="display-3 fw-bold text-dartboard-gold mb-4">{{ tournament_stats.champion_name|upper
+                            }}</h1>
+                        <div class="row justify-content-center">
+                            <div class="col-md-3">
+                                <div class="p-3">
+                                    <i class="bi bi-graph-up fs-2 text-dartboard-red"></i>
+                                    <h5 class="mt-2 mb-1 text-muted">Média</h5>
+                                    <h3 class="fw-bold">{{ tournament_stats.champion_avg|floatformat:"2" }}</h3>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="p-3">
+                                    <i class="bi bi-trophy fs-2 text-dartboard-green"></i>
+                                    <h5 class="mt-2 mb-1 text-muted">Partidas Vencidas</h5>
+                                    <h3 class="fw-bold">{{ tournament_stats.champion_matches_won }}</h3>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="p-3">
+                                    <i class="bi bi-check-circle fs-2 text-dartboard-gold"></i>
+                                    <h5 class="mt-2 mb-1 text-muted">Legs Vencidos</h5>
+                                    <h3 class="fw-bold">{{ tournament_stats.champion_legs_won }}</h3>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- League Summary -->
+            <div class="mb-5">
+                <h3 class="text-center mb-4 fw-bold"><i class="bi bi-trophy text-accent"></i> Resumo das Ligas</h3>
+                <div class="table-responsive">
+                    <table
+                        class="table table-dark table-striped table-hover text-center align-middle rounded overflow-hidden">
+                        <thead>
+                            <tr>
+                                <th>Total</th>
+                                <th>Inscrição</th>
+                                <th>Formação</th>
+                                <th>Andamento</th>
+                                <th>Playoffs</th>
+                                <th>Finais</th>
+                                <th>Encerradas</th>
+                                <th>Anuladas</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <th class="fs-4">{{ total }}</th>
+                                <td>{{ opens }}</td>
+                                <td>{{ formations }}</td>
+                                <td>{{ starts}}</td>
+                                <td>{{ playoffs }}</td>
+                                <td>{{ finals }}</td>
+                                <td>{{ ends }}</td>
+                                <td>{{ canceled }}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Videos -->
+            <div class="row g-4 mb-5">
+                <div class="col-md-6">
+                    <div class="card h-100">
+                        <div class="card-header bg-danger text-white"><i class="bi bi-youtube"></i> OBD TV</div>
+                        <div class="card-body p-0">
+                            <div class="ratio ratio-16x9">
+                                <iframe src="https://www.youtube.com/embed/JNej-H_dYjw" title="OBD TV"
+                                    allowfullscreen></iframe>
+                            </div>
+                        </div>
+                        <div class="card-footer text-center">
+                            <a href="https://youtube.com/channel/UCfuq0wQ2xzUnv3S75iN4vNg" target="_blank"
+                                class="btn btn-sm btn-danger">Inscrever-se</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card h-100">
+                        <div class="card-header bg-danger text-white"><i class="bi bi-youtube"></i> Diogo Portela TV
+                        </div>
+                        <div class="card-body p-0">
+                            <div class="ratio ratio-16x9">
+                                <iframe src="https://www.youtube.com/embed/3iw_-KbZB-k" title="Diogo Portela TV"
+                                    allowfullscreen></iframe>
+                            </div>
+                        </div>
+                        <div class="card-footer text-center">
+                            <a href="https://www.youtube.com/channel/UC6spzS1PJkv9rw9UfyZTpGg" target="_blank"
+                                class="btn btn-sm btn-danger">Inscrever-se</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+{% block jslib %}
+{% endblock %}

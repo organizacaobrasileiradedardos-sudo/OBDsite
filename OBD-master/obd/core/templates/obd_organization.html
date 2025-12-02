@@ -1,0 +1,80 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}OBD - Organização Brasileira de Dardos{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-10">
+            <div class="card shadow-lg border-0">
+                <div class="card-header bg-dark text-white text-center py-4">
+                    <h2 class="mb-0" style="color: #FFD700; font-family: 'Playfair Display', serif;">Organização
+                        Brasileira de Dardos</h2>
+                </div>
+                <div class="card-body p-5" style="background-color: #f8f9fa;">
+
+                    <!-- Diretoria -->
+                    <div class="mb-5">
+                        <h3 class="text-center mb-4 text-uppercase"
+                            style="color: #006400; border-bottom: 2px solid #b91d47; display: inline-block; padding-bottom: 10px;">
+                            Diretoria</h3>
+                        <div class="row mt-4">
+                            <div class="col-md-6 mb-3">
+                                <div class="p-3 bg-white rounded shadow-sm h-100 border-start border-4 border-warning">
+                                    <h5 class="text-muted mb-1">PRESIDENTE</h5>
+                                    <p class="h4 fw-bold text-dark">Erick Vinicius Barbosa Moser</p>
+                                </div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <div class="p-3 bg-white rounded shadow-sm h-100 border-start border-4 border-warning">
+                                    <h5 class="text-muted mb-1">Vice-Presidente</h5>
+                                    <p class="h4 fw-bold text-dark">Guilherme Altomar</p>
+                                </div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <div class="p-3 bg-white rounded shadow-sm h-100 border-start border-4 border-warning">
+                                    <h5 class="text-muted mb-1">Secretário Geral</h5>
+                                    <p class="h4 fw-bold text-dark">Claudio Eduardo Barbosa Domingues</p>
+                                </div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <div class="p-3 bg-white rounded shadow-sm h-100 border-start border-4 border-warning">
+                                    <h5 class="text-muted mb-1">Diretor Técnico</h5>
+                                    <p class="h4 fw-bold text-dark">Ivan Trevisan Wippel</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Sócios Fundadores -->
+                    <div class="mt-5">
+                        <h3 class="text-center mb-4 text-uppercase"
+                            style="color: #006400; border-bottom: 2px solid #b91d47; display: inline-block; padding-bottom: 10px;">
+                            Sócios Fundadores</h3>
+                        <p class="text-center text-muted fst-italic mb-4">Nos termos do art. 5º do Estatuto</p>
+
+                        <div class="row justify-content-center">
+                            <div class="col-md-8">
+                                <ul class="list-group list-group-flush bg-transparent">
+                                    <li class="list-group-item bg-transparent text-center fs-5 py-3 border-bottom"><i
+                                            class="bi bi-person-badge me-2 text-success"></i> David de Oliveira Luppi
+                                    </li>
+                                    <li class="list-group-item bg-transparent text-center fs-5 py-3 border-bottom"><i
+                                            class="bi bi-person-badge me-2 text-success"></i> Mauricio Pedrassi</li>
+                                    <li class="list-group-item bg-transparent text-center fs-5 py-3 border-bottom"><i
+                                            class="bi bi-person-badge me-2 text-success"></i> Alex Sávio Santos Sá</li>
+                                    <li class="list-group-item bg-transparent text-center fs-5 py-3"><i
+                                            class="bi bi-person-badge me-2 text-success"></i> Roger Lee Freitas Costa
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

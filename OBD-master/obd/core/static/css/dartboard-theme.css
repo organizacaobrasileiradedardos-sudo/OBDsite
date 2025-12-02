@@ -122,7 +122,7 @@ h6 {
     background: linear-gradient(135deg, var(--dartboard-black) 0%, var(--dartboard-gray-dark) 100%);
     border-bottom: 3px solid var(--dartboard-red);
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
-    padding: 0.75rem 0;
+    padding: 0.5rem 0;
 }
 
 .navbar-dartboard .navbar-brand {
@@ -147,7 +147,7 @@ h6 {
     text-transform: uppercase;
     font-size: 0.9rem;
     letter-spacing: 1px;
-    padding: 0.5rem 1rem !important;
+    padding: 0.4rem 1rem !important;
     transition: all var(--transition-base);
     position: relative;
 }
@@ -308,7 +308,7 @@ h6 {
 .card-header-dartboard {
     background: linear-gradient(135deg, var(--dartboard-red) 0%, var(--dartboard-red-dark) 100%);
     color: var(--dartboard-white);
-    padding: 16px 24px;
+    padding: 10px 24px;
     font-family: var(--font-heading);
     font-weight: 700;
     font-size: 1.25rem;
@@ -331,7 +331,7 @@ h6 {
 .card-footer-dartboard {
     background: var(--dartboard-off-white);
     border-top: 2px solid var(--dartboard-gray-lighter);
-    padding: 16px 24px;
+    padding: 8px 24px;
 }
 
 /* ==========================================================================

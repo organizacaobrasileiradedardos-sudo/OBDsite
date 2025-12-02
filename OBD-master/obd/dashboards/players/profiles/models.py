@@ -17,7 +17,7 @@ class Profile(models.Model):
     """Profile Class on OneToOne with User models"""
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     nickname = models.CharField(max_length=40, null=False, blank=True)
-    photo = models.ImageField(default='https://res.cloudinary.com/hvnnhpdtd/image/upload/v1625926909/logo_black_gold_boa_2.png')
+    photo = models.ImageField(default='/static/media/defaults/default_profile.png')
     birth_date = models.DateField(blank=True, null=True)
     pin = models.CharField(max_length=10, null=False, blank=True)
     slug = models.CharField(max_length=180, null=False, blank=True)
@@ -28,13 +28,9 @@ class Profile(models.Model):
     site = models.CharField(max_length=150, null=False, blank=True)
     facebook = models.CharField(max_length=150, null=False, blank=True)
     twitter = models.CharField(max_length=150, null=False, blank=True)
-    webcamdarts = models.CharField(max_length=80, null=False, blank=True)
+
+
     nakka = models.CharField(max_length=80, null=False, blank=True)
-    lidarts = models.CharField(max_length=80, null=False, blank=True)
-    dartconnect = models.CharField(max_length=80, null=False, blank=True)
-    godartspro = models.CharField(max_length=80, null=False, blank=True)
-    nationalfederation = models.CharField(max_length=40, null=False, blank=True)
-    localfederation = models.CharField(max_length=40, null=False, blank=True)
     created_at = models.DateTimeField('Created at', auto_now_add=True)
 
     class Meta:

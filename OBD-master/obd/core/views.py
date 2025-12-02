@@ -13,7 +13,7 @@ from obd.core.models import TournamentResult, PlayerTournamentStat
 def index(request):
 
     # Existing logic for legacy compatibility or other parts of the site
-    server = ('WED', 'N01', 'OTH',)
+    server = ('N01', 'OTH',)
     games = Fixture.objects.filter(validation=1, server__in=server).count()
 
     matches = Count('enabled', filter=Q(validation=1))
@@ -44,10 +44,17 @@ def index(request):
         t_stats = latest_tournament.stats.all()
         
         # General Data
-        tournament_stats['average'] = t_stats.aggregate(Avg('average_3_dart'))['average_3_dart__avg'] or 0
+        # General Data
         tournament_stats['matches'] = t_stats.aggregate(Sum('matches_played'))['matches_played__sum'] or 0
         tournament_stats['legs'] = t_stats.aggregate(Sum('legs_played'))['legs_played__sum'] or 0
         tournament_stats['players'] = t_stats.count()
+
+        # Weighted Average Calculation (Average * Legs / Total Legs)
+        if tournament_stats['legs'] > 0:
+            weighted_sum = t_stats.aggregate(w_sum=Sum(F('average_3_dart') * F('legs_played')))['w_sum'] or 0
+            tournament_stats['average'] = weighted_sum / tournament_stats['legs']
+        else:
+            tournament_stats['average'] = 0
         
         # Scores
         tournament_stats['ton'] = t_stats.aggregate(Sum('count_100_plus'))['count_100_plus__sum'] or 0
@@ -57,9 +64,22 @@ def index(request):
         
         # Records/Highlights
         tournament_stats['highest_out'] = t_stats.aggregate(Max('high_finish'))['high_finish__max'] or 0
-        tournament_stats['best_leg'] = t_stats.filter(best_leg__gt=0).aggregate(Min('best_leg'))['best_leg__min'] or 0
+        tournament_stats['best_leg'] = t_stats.filter(best_leg__gte=9).aggregate(Min('best_leg'))['best_leg__min'] or 0
         tournament_stats['best_avg'] = t_stats.aggregate(Max('average_3_dart'))['average_3_dart__max'] or 0
         tournament_stats['name'] = latest_tournament.name
+        
+        # Champion (player with rank 1)
+        champion = t_stats.filter(rank=1).first()
+        if champion:
+            tournament_stats['champion_name'] = champion.player_name
+            tournament_stats['champion_avg'] = champion.average_3_dart
+            tournament_stats['champion_matches_won'] = champion.matches_won
+            tournament_stats['champion_legs_won'] = champion.legs_won
+
+        # Standings (Top 10)
+        tournament_standings = t_stats.order_by('rank')[:10]
+    else:
+        tournament_standings = []
 
     stats = Stat.objects.all()
 
@@ -70,7 +90,6 @@ def index(request):
     matches = Fixture.objects.filter(status=1).order_by('-on_date')[:6]
 
     server = Fixture.objects.filter(status=1).values('server').aggregate(
-        webcamdarts=Count('server', filter=Q(server='WED')),
         nakka=Count('server', filter=Q(server='N01')),
         manual=Count('server', filter=Q(server='OTH'))
     )
@@ -115,16 +134,13 @@ def index(request):
                 'games': games,
                 'news': recent_news,
                 'documents': recent_documents,
-                'tournament_stats': tournament_stats # New context variable
+                'documents': recent_documents,
+                'tournament_stats': tournament_stats,
+                'tournament_standings': tournament_standings, # Top 10 standings
                 }
 
     return render(request, 'index.html', response)
 
-
-def brdardos(request):
-    brdardos = 'https://brdardos.mercadoshops.com.br/lista/jogos-salao-jogo-dardos/'
-    link = brdardos + request.GET['brsearch']
-    return redirect(link)
 
 
 def public_players(request):
@@ -251,7 +267,11 @@ def public_audit(request):
 # New views for Events, News, and Documents
 from .models import Event, News, Document
 from django.utils import timezone
+import json
+from django.core.serializers.json import DjangoJSONEncoder
 
+
+from datetime import timedelta
 
 def events_list(request):
     """Display upcoming and past events"""
@@ -259,9 +279,46 @@ def events_list(request):
     upcoming_events = Event.objects.filter(is_active=True, event_date__gte=now).order_by('event_date')
     past_events = Event.objects.filter(is_active=True, event_date__lt=now).order_by('-event_date')[:10]
     
+    # Serialize events for FullCalendar
+    calendar_events = []
+    for event in upcoming_events:
+        # Check if it's a multi-day event
+        # Check if it's a multi-day event
+        if event.end_date and event.end_date.date() > event.event_date.date():
+            current_date = event.event_date.date()
+            end_date = event.end_date.date()
+            # Iterate through each day of the event
+            while current_date <= end_date:
+                calendar_events.append({
+                    'title': event.title,
+                    'start': current_date.isoformat(),
+                    'allDay': True, # Force all-day rendering for each block
+                    'description': event.description,
+                    'location': event.location,
+                    'extendedProps': {
+                        'location': event.location,
+                        'description': event.description
+                    }
+                })
+                current_date += timedelta(days=1)
+        else:
+            # Single day event
+            calendar_events.append({
+                'title': event.title,
+                'start': event.event_date.isoformat(),
+                'allDay': True,
+                'description': event.description,
+                'location': event.location,
+                'extendedProps': {
+                    'location': event.location,
+                    'description': event.description
+                }
+            })
+    
     context = {
         'upcoming_events': upcoming_events,
         'past_events': past_events,
+        'calendar_events_json': json.dumps(calendar_events, cls=DjangoJSONEncoder),
     }
     return render(request, 'events.html', context)
 
@@ -292,3 +349,8 @@ def documents_list(request):
         'documents_by_category': documents_by_category,
     }
     return render(request, 'documents.html', context)
+
+
+def obd_organization(request):
+    """Display OBD Organization page"""
+    return render(request, 'obd_organization.html')

@@ -35,93 +35,6 @@
 
 <h5><strong><i class="bi bi-list-stars"></i> Liga do OBD | {{ division.name }}</strong></h5>
 
-{% if not html.validated %}
-
-<form action="{% url 'results:setserver' slug=division.slug match=match.id %}" method="post">
-    {% csrf_token %}
-    <p> Informações Gerais da Partida</p>
-    <div class="row mb-3">
-        <div class="input-group">
-            <span class="input-group-text col-sm-2">Liga/Divisão</span><br>
-            <div class="col-sm-4">
-                <select class="form-select" id="{{ form.division.id_for_label }}" name="{{ form.division.html_name }}">
-                    <option value="{{ division.id }}">{{ division.name }}</option>
-                </select>
-            </div>
-        </div>
-
-
-        <div class="input-group">
-            <span class="input-group-text col-sm-2">#ID Partida</span><br>
-            <div class="col-sm-4">
-                <select class="form-select" id="{{ form.match.id_for_label }}" name="{{ form.match.html_name }}">
-                    <option value="{{ match.id }}">{{ match.id }}</option>
-                </select>
-            </div>
-        </div>
-
-        <div class="input-group">
-            <span class="input-group-text col-sm-2">Jogador(a) 1</span><br>
-            <div class="col-sm-4">
-                <select class="form-select" id="{{ form.player1.id_for_label }}" name="{{ form.player1.html_name }}">
-                    <option value="{{match.result_set.first.player.id}}">{{match.result_set.first.player.first_name}}
-                        {{match.result_set.first.player.last_name}}</option>
-                </select>
-            </div>
-        </div>
-
-        <div class="input-group">
-            <span class="input-group-text col-sm-2">Jogador(a) 2</span><br>
-            <div class="col-sm-4">
-                <select class="form-select" id="{{ form.player2.id_for_label }}" name="{{ form.player2.html_name }}">
-                    <option value="{{match.result_set.last.player.id}}">{{match.result_set.last.player.first_name}}
-                        {{match.result_set.last.player.last_name}}</option>
-                </select>
-            </div>
-        </div>
-
-        <p></p>
-        <p></p>
-        <p> <strong>*** Informar</strong> dados do servidor.</p>
-        <div class="input-group">
-            <span class="input-group-text col-sm-2">Servidor</span><br>
-            <div class="col-sm-4">
-                <select class="form-select" id="{{ form.server.id_for_label }}" name="{{ form.server.html_name }}"
-                    required>
-
-                    <optgroup label="Aplicativou ou Evento">
-                        <option {% if form.server.value=="N01" %} selected {% endif %} value="N01">NAKKA</option>
-                        <option {% if form.server.value=="WED" %} selected {% endif %} value="WED">WEBCAMDARTS</option>
-                        <option {% if form.server.value=="OTH" %} selected {% endif %} value="OTH">MANUAL</option>
-                    </optgroup>
-                </select>
-            </div>
-        </div>
-
-        <div class="input-group">
-            <span class="input-group-text col-sm-2">Link da partida</span><br>
-            <div class="col-sm-4">
-                <input type="url" id="{{ form.link.id_for_label }}" name="{{ form.link.html_name }}" {% if
-                    form.link.value is not None %} value="{{ form.link.value }}" {% else %} value="" {% endif %}
-                    aria-label="Link" class="form-control">
-            </div>
-        </div>
-
-        <div class="input-group">
-            <span class="input-group-text col-sm-2">Comentários</span><br>
-            <div class="col-sm-4">
-                <input type="text" id="{{ form.comment.id_for_label }}" name="{{ form.comment.html_name }}" {% if
-                    form.comment.value is not None %} value="{{ form.comment.value }}" {% else %} value="" {% endif %}
-                    aria-label="Comment" class="form-control">
-            </div>
-        </div>
-    </div>
-    <button type="submit" class="btn {{html.color_submit}} mb-3"><i class="bi bi-box-arrow-in-right">
-        </i>{{html.text_submit}}</button>
-</form>
-
-{% else %}
-
 <form action="{% url 'results:submit' slug=division.slug match=match.id %}" enctype="multipart/form-data" method="post">
     {% csrf_token %}
     <p> Informações Gerais da Partida</p>
@@ -162,37 +75,6 @@
                     <option value="{{match.result_set.last.player.id}}">{{match.result_set.last.player.first_name}}
                         {{match.result_set.last.player.last_name}}</option>
                 </select>
-            </div>
-        </div>
-
-        <p></p>
-        <p></p>
-        <p> <strong>*** Informar</strong> dados do servidor.</p>
-        <div class="input-group">
-            <span class="input-group-text col-sm-2">Servidor</span><br>
-            <div class="col-sm-4">
-                <select class="form-select" id="{{ form.server.id_for_label }}" name="{{ form.server.html_name }}"
-                    required>
-                    {% if form.server.value is None %}
-                    {% if server.code == 'WED' %}<option value="WED">WEBCAMDARTS</option>{% endif %}
-                    {% if server.code == 'N01' %}<option value="N01">NAKKA</option>{% endif %}
-                    {% if server.code == 'OTH' %}<option value="OTH">MANUAL</option>{% endif %}
-                    {% else %}
-                    {% if form.server.value == 'WED' %}<option value="WED">WEBCAMDARTS</option>{% endif %}
-                    {% if form.server.value == 'N01' %}<option value="N01">NAKKA</option>{% endif %}
-                    {% if form.server.value == 'OTH' %}<option value="OTH">MANUAL</option>{% endif %}
-
-                    {% endif %}
-                </select>
-            </div>
-        </div>
-
-        <div class="input-group">
-            <span class="input-group-text col-sm-2">Link da partida</span><br>
-            <div class="col-sm-4">
-                <input {{ html.readonly_server }} type="url" id="{{ form.link.id_for_label }}"
-                    name="{{ form.link.html_name }}" {% if form.link.value is not None %} value="{{ form.link.value }}"
-                    {% else %} value="{{ server.link }}" {% endif %} aria-label="Link" class="form-control" required>
             </div>
         </div>
 
@@ -356,8 +238,7 @@
     <div class="input-group">
         <span class="input-group-text col-sm-2">Anexo</span>
         <div class="col-sm-4">
-            <input type="file" {% if form.server.value=='OTH' or server.code=='OTH' %} required {% endif %}
-                class="form-control" id="{{ form.photo.id_for_label }}" name="{{ form.photo.html_name}}"
+            <input type="file" class="form-control" id="{{ form.photo.id_for_label }}" name="{{ form.photo.html_name}}"
                 value="{{ form.photo.value }}">
         </div>
     </div>
@@ -369,10 +250,6 @@
         </i>{{html.text_submit}}</button>
 
 </form>
-
-
-{% endif %}
-
 
 
 <p></p>

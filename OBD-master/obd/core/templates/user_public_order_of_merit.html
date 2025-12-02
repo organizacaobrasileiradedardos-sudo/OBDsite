@@ -39,8 +39,11 @@ Description: This is the page where main data will remains.
                     class="card-img figure-img img-fluid rounded" alt="...">
                 <div class="card-body">
                     <p><br></p>
-                    <h2><strong><i class="bi bi-bookmark-star-fill"></i> OBD Order Of Merit</strong></h2>
-                    <p class="card-text"><small class="text-muted">Ranking geral dos jogadores do OBD.</small></p>
+                    <h1 class="text-center"
+                        style="font-size: 2.7rem; font-weight: bold; letter-spacing: 2px; color: #003d7a;">OBD ORDER
+                        OF MERIT</h1>
+                    <p class="card-text text-center"><small class="text-muted">Ranking geral dos jogadores do
+                            OBD.</small></p>
                 </div>
             </div>
 
@@ -114,82 +117,6 @@ Description: This is the page where main data will remains.
                 </tbody>
             </table>
 
-
-            <table class="table table-striped table-bordered caption-top">
-                <caption>Saiba aqui quantos pontos cada jogador pode ganhar:</caption>
-                <thead>
-                    <tr>
-                        <th scope="col">Liga / Divisão</th>
-                        <th scope="col">Empate/Derrota</th>
-                        <th scope="col">Vitória</th>
-                        <th scope="col">Bônus Campeão</th>
-                        <th scope="col">Bônus 2º Lugar</th>
-                        <th scope="col">Bônus 3º Lugar</th>
-                        <th scope="col">Criado em</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for division in divisions%}
-                    <tr>
-                        <th scope="row">{{ division.league.name}} - Divisão {{ division.get_formation_display }}</th>
-                        <td>
-                            <h6 style="font-size: small" align="center">1</h6>
-                        </td>
-                        {% if division.formation == 1 %}
-                        <td>
-                            <h6 style="font-size: small" align="center">{{ division.league.enviroment.meritDivAPoints}}
-                            </h6>
-                        </td>
-                        <td>
-                            <h6 style="font-size: small" align="center">{{ division.league.enviroment.meritChampionBonus
-                                }}</h6>
-                        </td>
-                        <td>
-                            <h6 style="font-size: small" align="center">{{ division.league.enviroment.meritSecondBonus
-                                }}</h6>
-                        </td>
-                        <td>
-                            <h6 style="font-size: small" align="center">{{ division.league.enviroment.meritThirdBonus }}
-                            </h6>
-                        </td>
-
-                        {% else %}
-                        {% if division.formation == 2 %}
-                        <td>
-                            <h6 style="font-size: small" align="center">{{ division.league.enviroment.meritDivBPoints}}
-                            </h6>
-                        </td>
-                        {% endif %}
-                        {% if division.formation == 3 %}
-                        <td>
-                            <h6 style="font-size: small" align="center">{{ division.league.enviroment.meritDivCPoints}}
-                            </h6>
-                        </td>
-                        {% endif %}
-                        {% if division.formation > 3 %}
-                        <td>
-                            <h6 style="font-size: small" align="center">{{
-                                division.league.enviroment.meritDivOthersPoints}}</h6>
-                        </td>
-                        {% endif %}
-                        <td>
-                            <h6 style="font-size: small" align="center">0</h6>
-                        </td>
-                        <td>
-                            <h6 style="font-size: small" align="center">0</h6>
-                        </td>
-                        <td>
-                            <h6 style="font-size: small" align="center">0</h6>
-                        </td>
-                        {% endif %}
-                        <td>
-                            <h6 style="font-size: small" align="center">{{ division.league.created_at | date:"d/M/y" }}
-                            </h6>
-                        </td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
 
         </div>
     </div>

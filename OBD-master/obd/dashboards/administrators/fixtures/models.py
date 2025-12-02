@@ -6,7 +6,6 @@ from django.contrib.auth.models import User
 class Fixture(models.Model):
 
     SERVER = [
-        ('WED', 'WEBCAMDARTS'),
         ('N01', 'NAKKA'),
         ('LID', 'LIDARTS'),
         ('DAC', 'DARTCONNECT'),

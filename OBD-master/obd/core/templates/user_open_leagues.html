@@ -1,9 +1,9 @@
 {% extends 'baseuser.html' %}
 {% block csslib %}
 {% endblock %}
-{% block title %} Ligas OBD {% now "Y" %} {% endblock %}
+{% block title %} Meus Torneios {% now "Y" %} {% endblock %}
 {% block styles %} {% endblock %}
-{% block page %}Ligas em aberto/andamento do OBD {% now "Y" %}{% endblock %}
+{% block page %}Meus Torneios{% endblock %}
 {% block content %}
 <p><br></p>
 
@@ -16,31 +16,15 @@
 {% endfor %}
 {% endif %}
 
-{% if form.errors %}
-{% for field in form %}
-{% for error in field.errors %}
-<div class="alert alert-danger alert-dismissible fade show" role="alert">
-    <strong>{{ error|escape }}</strong>
-    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-</div>
-{% endfor %}
-{% endfor %}
-{% for error in form.non_field_errors %}
-<div class="alert alert-danger">
-    <strong>{{ error|escape }}</strong>
-</div>
-{% endfor %}
-{% endif %}
-
-<h5><strong><i class="bi bi-list-stars"></i> Minhas participações (ligas em andamento)</strong>
-    {% if starts %}
-    <span class="badge bg-warning ">{{ starts | length }}</span></a>
+<h5><strong><i class="bi bi-list-stars"></i> Minhas Competições</strong>
+    {% if tournaments %}
+    <span class="badge bg-warning ">{{ tournaments | length }}</span></a>
     {% else %}
     <span class="badge bg-danger">0</span></a>
     {% endif %}
 </h5>
 
-{% if starts %}
+{% if tournaments %}
 <p><br></p>
 <table class="table">
     <thead>
@@ -54,13 +38,13 @@
         </tr>
     </thead>
     <tbody>
-        {% for started in starts %}
+        {% for tournament in tournaments %}
         <tr>
-            <td>{{ started.league.name }}</td>
-            <td>Divisão {{ started.get_formation_display }}</td>
-            <td>{{ started.league.get_phase_display }}</td>
-            <td>{{ started.league.start_date | date:'d/m/Y'}}</td>
-            <td>{{ started.league.end_date | date:'d/m/Y'}}</td>
+            <td>{{ tournament.league.name }}</td>
+            <td>Divisão {{ tournament.get_formation_display }}</td>
+            <td>{{ tournament.league.get_phase_display }}</td>
+            <td>{{ tournament.league.start_date | date:'d/m/Y'}}</td>
+            <td>{{ tournament.league.end_date | date:'d/m/Y'}}</td>
             <td>
                 <div class="dropdown">
                     <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton2"
@@ -68,9 +52,9 @@
                         <i class="bi bi-shield-exclamation"></i> Minhas Ações Disponíveis
                     </button>
                     <ul class="dropdown-menu dropdown-menu-dark" aria-labelledby="dropdownMenuButton2">
-                        <li><a class="dropdown-item " href="{% url 'results:ranking' slug=started.slug %}"><i
+                        <li><a class="dropdown-item " href="{% url 'results:ranking' slug=tournament.slug %}"><i
                                     class="bi bi-ui-radios"></i> Ver Classificação</a></li>
-                        <li><a class="dropdown-item" href="{% url 'fixtures:player' slug=started.slug %}"><i
+                        <li><a class="dropdown-item" href="{% url 'fixtures:player' slug=tournament.slug %}"><i
                                     class="bi bi-person-lines-fill"></i> Ver Meus Jogos</a></li>
                         <li><a class="dropdown-item" href="#"><i class="bi bi-graph-up"></i> Minhas Estatísticas</a>
                         </li>
@@ -88,92 +72,8 @@
 </table>
 <p><br></p>
 {% else %}
-<p>Você não está jogando em nenhuma liga no momento, {{ user.first_name }}.</p>
+<p>Você não está participando de nenhuma competição no momento, {{ user.first_name }}.</p>
 <p><br></p>
-{% endif %}
-
-<h5><strong><i class="bi bi-list-stars"></i> Ligas com incrições abertas</strong>
-    {% if opens %}
-    <span class="badge bg-primary ">{{ opens | length }}</span></a>
-    {% else %}
-    <span class="badge bg-danger">0</span></a>
-    {% endif %}
-</h5>
-
-{% if opens %}
-<p><br></p>
-<table class="table">
-    <thead>
-        <tr>
-            <th scope="col">Criado por</th>
-            <th scope="col">Nome</th>
-            <th scope="col">Data de Início</th>
-            <th scope="col">Data de Fim</th>
-            <th scope="col">Abrangência</th>
-            <th scope="col">Inscrição</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for open in opens %}
-        <tr>
-            <th scope="row">{{ open.created_by.first_name }} {{ open.created_by.last_name }}</th>
-            <td>{{ open.name }}</td>
-            <td>{{ open.start_date | date:'d/m/Y'}}</td>
-            <td>{{ open.end_date | date:'d/m/Y'}}</td>
-            <td>{{ open.get_scope_display }}</td>
-            <td>
-                <a class="btn btn-primary" href="{% url 'players:signup' slug=open.slug %}" role="button">Inscrever</a>
-        </tr>
-
-        {% endfor %}
-    </tbody>
-</table>
-<p><br></p>
-{% else %}
-<p>Não há ligas com inscrições em aberto, {{ user.first_name }}.</p>
-<p><br></p>
-{% endif %}
-
-<h5><strong><i class="bi bi-list-stars"></i> Inscrições aplicadas </strong>
-    {% if subscriptions %}
-    <span class="badge bg-success">{{ subscriptions | length }}</span></a>
-    {% else %}
-    <span class="badge bg-danger">0</span></a>
-    {% endif %}
-</h5>
-
-{% if subscriptions %}
-<p><br></p>
-<table class="table">
-    <thead>
-        <tr>
-            <th scope="col">Liga</th>
-            <th scope="col">Divisão</th>
-            <th scope="col">Início</th>
-            <th scope="col">Final</th>
-            <th scope="col">Fase</th>
-            <th scope="col">Inscrição</th>
-        </tr>
-    </thead>
-    <tbody>
-
-        {% for subscription in subscriptions %}
-        <tr>
-            <th scope="row">{{ subscription.league.name }}</th>
-            <td>{{ subscription.get_formation_display }}</td>
-            <td>{{ subscription.league.start_date | date:'d/m/Y'}}</td>
-            <td>{{ subscription.league.end_date | date:'d/m/Y'}}</td>
-            <td>{{ subscription.league.get_scope_display }}</td>
-            <td>
-                <a class="btn btn-danger" href="{% url 'players:signoff' slug=subscription.slug %}"
-                    role="button">Cancelar</a>
-        </tr>
-        {% endfor %}
-    </tbody>
-</table>
-<p><br></p>
-{% else %}
-<p>Você não está inscrito em nenhuma liga aberta no momento, {{ user.first_name }}.</p>
 {% endif %}
 
 

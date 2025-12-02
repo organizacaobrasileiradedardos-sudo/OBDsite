@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Plano de Implementação – Atualizar “Ver Campeões” após Captura de Estatísticas</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            line-height: 1.6;
+            max-width: 1000px;
+            margin: 40px auto;
+            padding: 0 20px;
+            color: #333;
+        }
+
+        h1 {
+            color: #1a1a1a;
+            border-bottom: 4px solid #007bff;
+            padding-bottom: 15px;
+            margin: 30px 0 20px;
+            font-size: 2.5em;
+        }
+
+        h2 {
+            color: #2c3e50;
+            border-bottom: 2px solid #6c757d;
+            padding-bottom: 10px;
+            margin-top: 40px;
+            margin-bottom: 20px;
+            font-size: 2em;
+        }
+
+        h3 {
+            color: #495057;
+            margin-top: 30px;
+            margin-bottom: 15px;
+            font-size: 1.5em;
+        }
+
+        h4 {
+            color: #6c757d;
+            margin-top: 20px;
+            margin-bottom: 10px;
+            font-size: 1.2em;
+        }
+
+        p {
+            margin: 10px 0;
+            text-align: justify;
+        }
+
+        table {
+            border-collapse: collapse;
+            width: 100%;
+            margin: 25px 0;
+            background-color: white;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        th,
+        td {
+            border: 1px solid #dee2e6;
+            padding: 12px 15px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #007bff;
+            color: white;
+            font-weight: 600;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f8f9fa;
+        }
+
+        tr:hover {
+            background-color: #e9ecef;
+        }
+
+        ul {
+            margin: 15px 0;
+            padding-left: 30px;
+        }
+
+        li {
+            margin: 8px 0;
+        }
+
+        .warning {
+            background-color: #fff3cd;
+            border-left: 5px solid #ffc107;
+            padding: 20px;
+            margin: 25px 0;
+            border-radius: 4px;
+        }
+
+        .important {
+            background-color: #d1ecf1;
+            border-left: 5px solid #0dcaf0;
+            padding: 20px;
+            margin: 25px 0;
+            border-radius: 4px;
+        }
+
+        blockquote {
+            border-left: 4px solid #6c757d;
+            padding-left: 20px;
+            margin: 20px 0;
+            color: #495057;
+            font-style: italic;
+        }
+
+        a {
+            color: #007bff;
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        footer {
+            margin-top: 60px;
+            padding-top: 30px;
+            border-top: 2px solid #dee2e6;
+            text-align: center;
+            color: #6c757d;
+            font-size: 0.9em;
+        }
+
+        @media print {
+            body {
+                background-color: white;
+                margin: 0;
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Plano de Implementação – Atualizar “Ver Campeões” após Captura de Estatísticas</h1>
+    <h2>1️⃣ Objetivo</h2>
+    <p>Garantir que, ao concluir a captura de estatísticas de um campeonato (ex.: <strong>Campeonato Brasileiro de
+            Dardos OBD 2025</strong>), a página <em>“Ver Campeões”</em> seja atualizada automaticamente com o nome do
+        campeão (<strong>Roberto Wentz</strong>) e demais informações do torneio.</p>
+    <h2>2️⃣ Visão Geral da Solução</h2>
+    <ol>
+        <li>Criar/Atualizar dados necessários (usuário, liga, divisão, registro <code>Champion</code>).</li>
+        <li>Estender o scraper para detectar o vencedor (rank = 1) e persistir os objetos.</li>
+        <li>Como a página já consulta a tabela <code>Champion</code>, basta garantir que o registro exista; o próximo
+            request exibirá o campeão.</li>
+    </ol>
+    <h2>3️⃣ Tarefas Detalhadas</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>Tarefa</th>
+                <th>Descrição</th>
+                <th>Arquivo(s) Impactados</th>
+                <th>Responsável</th>
+                <th>Estimativa</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>1</td>
+                <td>Criar usuário Roberto</td>
+                <td>Usuario + Profile com nome, email, PIN, etc.</td>
+                <td>models.py (já existente)</td>
+                <td>Dev</td>
+                <td>15 min</td>
+            </tr>
+            <tr>
+                <td>2</td>
+                <td>Criar Liga/Divisão</td>
+                <td>Liga “Campeonato Brasileiro OBD 2025”, Divisão “Principal”.</td>
+                <td>leagues/models.py</td>
+                <td>Dev</td>
+                <td>20 min</td>
+            </tr>
+            <tr>
+                <td>3</td>
+                <td>Criar registro Champion</td>
+                <td>Relacionar liga, divisão e jogadores (p1 = Roberto, p2‑p4 = None).</td>
+                <td>champions/models.py</td>
+                <td>Dev</td>
+                <td>15 min</td>
+            </tr>
+            <tr>
+                <td>4</td>
+                <td>Adicionar função de salvamento no scraper</td>
+                <td>Detectar vencedor no HTML baixado, criar/atualizar objetos.</td>
+                <td>obd/core/obdlib/webscraping/n01.py (ou script equivalente)</td>
+                <td>Dev</td>
+                <td>45 min</td>
+            </tr>
+            <tr>
+                <td>5</td>
+                <td>Testes unitários</td>
+                <td>Mock do HTML de torneio, asserts que Champion é criado.</td>
+                <td>champions/tests/</td>
+                <td>QA</td>
+                <td>30 min</td>
+            </tr>
+            <tr>
+                <td>6</td>
+                <td>Atualizar documentação</td>
+                <td>README e docstrings explicando novo fluxo.</td>
+                <td>README.md, docstrings</td>
+                <td>Docs</td>
+                <td>10 min</td>
+            </tr>
+            <tr>
+                <td>7</td>
+                <td>Deploy & Verificação</td>
+                <td>Rodar captura manual, acessar página e confirmar exibição.</td>
+                <td>-</td>
+                <td>Dev/QA</td>
+                <td>20 min</td>
+            </tr>
+        </tbody>
+    </table>
+    <h2>4️⃣ Passo‑a‑Passo de Implementação</h2>
+    <h3>4.1 Criação de Usuário e Perfil</h3>
+    <pre><code>def get_or_create_player(name, pin):
+    first, *last = name.split()
+    last = ' '.join(last) if last else ''
+    user, created = User.objects.get_or_create(
+        username=pin,
+        defaults={'first_name': first, 'last_name': last, 'email': f'{pin}@example.com'}
+    )
+    if created:
+        Profile.objects.create(user=user, pin=pin, nickname=name)
+    return user
+</code></pre>
+    <h3>4.2 Criação de Liga e Divisão</h3>
+    <pre><code>def get_or_create_league(name, start_date):
+    league, _ = League.objects.get_or_create(
+        name=name,
+        defaults={'slug': name.lower().replace(' ', '-'), 'start_date': start_date}
+    )
+    division, _ = Division.objects.get_or_create(
+        league=league,
+        name='Principal',
+        defaults={'formation': 1}
+    )
+    return league, division
+</code></pre>
+    <h3>4.3 Inserção do Campeão</h3>
+    <pre><code>def register_champion(league, division, champion_user):
+    champ, created = Champion.objects.get_or_create(
+        league=league,
+        division=division,
+        defaults={'p1': champion_user}
+    )
+    if not created:
+        champ.p1 = champion_user
+        champ.save()
+    return champ
+</code></pre>
+    <h3>4.4 Extensão do Scraper (n01.py)</h3>
+    <p>1. Parsear HTML → localizar a tabela de classificação.<br>
+        2. Identificar linha rank = 1 → extrair nome e PIN.<br>
+        3. Chamar as funções acima para garantir que todos os objetos existam.<br>
+        4. Log de sucesso/falha.</p>
+    <pre><code># dentro da função principal do scraper
+winner_name = ...  # extraído do HTML
+winner_pin = ...   # opcional, pode ser slug do nome
+user = get_or_create_player(winner_name, winner_pin)
+league, division = get_or_create_league('Campeonato Brasileiro OBD 2025', datetime.date(2025, 11, 23))
+register_champion(league, division, user)
+</code></pre>
+    <h3>4.5 Testes</h3>
+    <ul>
+        <li>Mock HTML contendo tabela de classificação com um vencedor.</li>
+        <li>Verificar que <code>Champion.objects.filter(p1__first_name='Roberto').exists()</code> retorna
+            <code>True</code>.</li>
+        <li>Cobertura mínima: 80 %.</li>
+    </ul>
+    <h3>4.6 Migrações (se necessário)</h3>
+    <p>Nenhuma alteração de modelo é requerida; apenas criação de instâncias. Portanto, sem migrações.</p>
+    <h2>5️⃣ Riscos &amp; Mitigações</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Risco</th>
+                <th>Impacto</th>
+                <th>Mitigação</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>Nome/PIN duplicado</td>
+                <td>Criação de usuário errado</td>
+                <td><code>get_or_create</code> garante idempotência.</td>
+            </tr>
+            <tr>
+                <td>Liga já existente com dados diferentes</td>
+                <td>Conflito de datas</td>
+                <td>Verificar <code>start_date</code> antes de criar; atualizar se necessário.</td>
+            </tr>
+            <tr>
+                <td>Scraper falha ao mudar layout</td>
+                <td>Não registrar campeão</td>
+                <td>Implementar fallback e logs; monitorar alertas.</td>
+            </tr>
+            <tr>
+                <td>Falha de permissão ao salvar objetos</td>
+                <td>Exceção no runtime</td>
+                <td>Envolver <code>try/except</code> e registrar erro no log.</td>
+            </tr>
+        </tbody>
+    </table>
+    <h2>6️⃣ Verificação Pós‑Implementação</h2>
+    <ol>
+        <li>Executar captura (ex.: <code>python manage.py capture_stats n01</code>).</li>
+        <li>Acessar <code>http://127.0.0.1:8000/boa/league/all/champions</code>.</li>
+        <li>Confirmar que a linha da tabela exibe:<ul>
+                <li>Ano = 2025</li>
+                <li>Campeonato / Divisão = “Campeonato Brasileiro OBD 2025 / Principal”</li>
+                <li>Campeão = “Roberto Wentz”</li>
+            </ul>
+        </li>
+        <li>Rodar testes: <code>python manage.py test obd.dashboards.administrators.champions</code>.</li>
+    </ol>
+    <h2>7️⃣ Cronograma (tempo total ≈ 2 h)</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Etapa</th>
+                <th>Duração</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>Preparação (criar utils, funções auxiliares)</td>
+                <td>30 min</td>
+            </tr>
+            <tr>
+                <td>Extensão do scraper</td>
+                <td>45 min</td>
+            </tr>
+            <tr>
+                <td>Criação de dados iniciais (usuário, liga)</td>
+                <td>20 min</td>
+            </tr>
+            <tr>
+                <td>Testes unitários</td>
+                <td>30 min</td>
+            </tr>
+            <tr>
+                <td>Verificação manual e documentação</td>
+                <td>15 min</td>
+            </tr>
+            <tr>
+                <td>Buffer / ajustes</td>
+                <td>10 min</td>
+            </tr>
+        </tbody>
+    </table>
+    <footer>
+        <p><strong>OBD - Organização Brasileira de Dardos</strong></p>
+        <p>Documento gerado em: 24 de Novembro de 2025</p>
+    </footer>
+</body>
+
+</html>

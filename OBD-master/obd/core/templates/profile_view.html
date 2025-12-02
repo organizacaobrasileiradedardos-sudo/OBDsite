@@ -7,200 +7,56 @@
 {% block page %}Configurações de Perfil do Jogador{% endblock %}
 {% block content %}
 
-           {% if messages %}
-                    {% for message in messages %}
-                            <div class="alert alert-success alert-dismissible fade show" role="alert">
-                                {{ message}}{{ user.first_name }}!
-                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                            </div>
-                    {% endfor %}
-          {% endif %}
+{% if messages %}
+{% for message in messages %}
+<div class="alert alert-success alert-dismissible fade show" role="alert">
+    {{ message }}{{ user.first_name }}!
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+</div>
+{% endfor %}
+{% endif %}
 
-        {% if form.errors %}
-            {% for field in form %}
-                {% for error in field.errors %}
-                    <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                    <strong>{{ error|escape }}</strong>
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                    </div>
-                {% endfor %}
-            {% endfor %}
-            {% for error in form.non_field_errors %}
-                <div class="alert alert-danger">
-                <strong>{{ error|escape }}</strong>
-                </div>
-            {% endfor %}
-        {% endif %}
-
-
-    <p>
-    </p>
+{% if form.errors %}
+{% for field in form %}
+{% for error in field.errors %}
+<div class="alert alert-danger alert-dismissible fade show" role="alert">
+    <strong>{{ error|escape }}</strong>
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+</div>
+{% endfor %}
+{% endfor %}
+{% for error in form.non_field_errors %}
+<div class="alert alert-danger">
+    <strong>{{ error|escape }}</strong>
+</div>
+{% endfor %}
+{% endif %}
 
 
-          <form action="." enctype="multipart/form-data" method="post">
-          {% csrf_token %}
+<p>
+</p>
 
-    <h5><strong><i class="bi bi-list-stars"></i>  Dados cadastrais:</strong></h5>
 
-        <div class="row mb-3">
+<form action="." enctype="multipart/form-data" method="post">
+    {% csrf_token %}
+
+    <h5><strong><i class="bi bi-list-stars"></i> Dados cadastrais:</strong></h5>
+
+    <div class="row mb-3">
         <label for="{{ form.photo.id_for_label }}" class="col-sm-2 col-form-label">{{ form.photo.label }}</label>
         <div class="col-sm-4">
-        <div class="input-group mb-3">
-        <input type="file" class="form-control" id="{{ form.photo.id_for_label }}" name="{{ form.photo.html_name}}" value="{{ form.photo.value }}">
+            <div class="input-group mb-3">
+                <input type="file" class="form-control" id="{{ form.photo.id_for_label }}"
+                    name="{{ form.photo.html_name }}" value="{{ form.photo.value }}">
+            </div>
         </div>
-        </div>
-        </div>
+    </div>
 
-        <div class="row mb-3">
+    <div class="row mb-3">
         <label for="{{ form.birthdate.id_for_label }}" class="col-sm-2 col-form-label">{{ form.birthdate.label }}</label>
         <div class="col-sm-4">
-        <input class="datetime" type="date" id="{{ form.birthdate.id_for_label }}" name="{{ form.birthdate.html_name}}"
-        {% if form.birthdate.value is not None %} value="{{ form.birthdate.value}}" {% else %} value="{{ profile.birth_date | date:'Y-m-d' }}" {% endif %}>
-        </div>
-        </div>
-
-        <div class="row mb-3">
-        <label for="{{ form.country.id_for_label }}" class="col-sm-2 col-form-label">{{ form.country.label }}</label>
-        <div class="col-sm-4">
-        <input class="form-control" type="text"  id="{{ form.country.id_for_label }}" name="{{ form.country.html_name }}" minlength="3"
-        {% if form.country.value is not None %} value="{{ form.country.value }}" {% else %} value="{{ profile.country }}" {% endif %} required>
-        </div>
-        </div>
-
-        <div class="row mb-3">
-        <label for="{{ form.state.id_for_label }}" class="col-sm-2 col-form-label">{{ form.state.label }}</label>
-        <div class="col-sm-4">
-        <input class="form-control" type="text"  id="{{ form.state.id_for_label }}" name="{{ form.state.html_name }}" minlength="3"
-        {% if form.state.value is not None %} value="{{ form.state.value }}" {% else %} value="{{ profile.state}}" {% endif %}>
-        </div>
-        </div>
-
-        <div class="row mb-3">
-        <label for="{{ form.bio.id_for_label }}" class="col-sm-2 col-form-label">{{ form.bio.label }}</label>
-        <div class="col-sm-8">
-        <input class="form-control" type="text"  id="{{ form.bio.id_for_label }}" name="{{ form.bio.html_name }}" minlength="3"
-        {% if form.bio.value is None %} value="{{ profile.bio }}" {% else %} value="{{ form.bio.value }}" {% endif %}>
-        <input class="form-control" type="hidden"  id="{{ form.current.id_for_label }}" name="{{ form.current.html_name }}" value="{{ user.username }}" required>
-        </div>
-        </div>
-
-        <div class="row mb-3">
-        <label for="{{ form.nickname.id_for_label }}" class="col-sm-2 col-form-label">{{ form.nickname.label }}</label>
-        <div class="col-sm-4">
-        <input class="form-control" type="text"  id="{{ form.nickname.id_for_label }}" name="{{ form.nickname.html_name }}" minlength="2"
-        {% if form.nickname.value is None %} value="{{ profile.nickname }}" {% else %} value="{{ form.nickname.value }}" {% endif %}>
-        </div>
-        </div>
-
-        <div class="row mb-3">
-        <label for="{{ form.darts.id_for_label }}" class="col-sm-2 col-form-label">{{ form.darts.label }}</label>
-        <div class="col-sm-4">
-        <input class="form-control" type="text"  id="{{ form.darts.id_for_label }}" name="{{ form.darts.html_name }}" minlength="2"
-        {% if form.darts.value is None %} value="{{ profile.darts }}" {% else %} value="{{ form.darts.value }}" {% endif %}>
-        </div>
-        </div>
-        <br>
-
-
-        <h5><strong><i class="bi bi-list-stars"></i>  Redes Sociais:</strong></h5>
-
-        <div class="row mb-3">
-        <label for="{{ form.facebook.id_for_label }}" class="col-sm-2 col-form-label">{{ form.facebook.label }}</label>
-        <div class="col-sm-6">
-        <input class="form-control" type="text"  id="{{ form.facebook.id_for_label }}" name="{{ form.facebook.html_name }}"
-        {% if form.facebook.value is None %} value="{{ profile.facebook }}" {% else %} value="{{ form.facebook.value }}" {% endif %}>
-        </div>
-        </div>
-
-        <div class="row mb-3">
-        <label for="{{ form.social.id_for_label }}" class="col-sm-2 col-form-label">{{ form.social.label }}</label>
-        <div class="col-sm-6">
-        <input class="form-control" type="text"  id="{{ form.social.id_for_label }}" name="{{ form.social.html_name }}"
-        {% if form.social.value is None %} value="{{ profile.social }}" {% else %} value="{{ form.social.value }}" {% endif %}>
-        </div>
-        </div>
-
-        <div class="row mb-3">
-        <label for="{{ form.site.id_for_label }}" class="col-sm-2 col-form-label">{{ form.site.label }}</label>
-        <div class="col-sm-6">
-        <input class="form-control" type="text"  id="{{ form.site.id_for_label }}" name="{{ form.site.html_name }}"
-        {% if form.site.value is None %} value="{{ profile.site }}" {% else %} value="{{ form.site.value }}" {% endif %}>
-        </div>
-        </div>
-        <br>
-
-
-        <h5><strong><i class="bi bi-list-stars"></i>  Contas Dardos Online:</strong></h5>
-
-        <div class="row mb-3">
-        <label for="{{ form.webcamdarts.id_for_label }}" class="col-sm-2 col-form-label">{{ form.webcamdarts.label }}</label>
-        <div class="col-sm-4">
-        <input class="form-control" type="text"  id="{{ form.webcamdarts.id_for_label }}" name="{{ form.webcamdarts.html_name }}"
-        {% if form.webcamdarts.value is None %} value="{{ profile.webcamdarts }}" {% else %} value="{{ form.webcamdarts.value }}" {% endif %} required>
-        </div>
-        </div>
-
-        <div class="row mb-3">
-        <label for="{{ form.nakka.id_for_label }}" class="col-sm-2 col-form-label">{{ form.nakka.label }}</label>
-        <div class="col-sm-4">
-        <input class="form-control" type="text"  id="{{ form.nakka.id_for_label }}" name="{{ form.nakka.html_name }}"
-        {% if form.nakka.value is None %} value="{{ profile.nakka }}" {% else %} value="{{ form.nakka.value }}" {% endif %} required>
-        </div>
-        </div>
-
-        <div class="row mb-3">
-        <label for="{{ form.lidarts.id_for_label }}" class="col-sm-2 col-form-label">{{ form.lidarts.label }}</label>
-        <div class="col-sm-4">
-        <input class="form-control" type="text"  id="{{ form.lidarts.id_for_label }}" name="{{ form.lidarts.html_name }}"
-        {% if form.lidarts.value is None %} value="{{ profile.lidarts }}" {% else %} value="{{ form.lidarts.value }}" {% endif %}>
-        </div>
-        </div>
-
-
-        <div class="row mb-3">
-        <label for="{{ form.dartconnect.id_for_label }}" class="col-sm-2 col-form-label">{{ form.dartconnect.label }}</label>
-        <div class="col-sm-4">
-        <input class="form-control" type="text"  id="{{ form.dartconnect.id_for_label }}" name="{{ form.dartconnect.html_name }}"
-        {% if form.dartconnect.value is None %} value="{{ profile.dartconnect }}" {% else %} value="{{ form.dartconnect.value }}" {% endif %}>
-        </div>
-        </div>
-
-
-        <div class="row mb-3">
-        <label for="{{ form.godartspro.id_for_label }}" class="col-sm-2 col-form-label">{{ form.godartspro.label }}</label>
-        <div class="col-sm-4">
-        <input class="form-control" type="text"  id="{{ form.godartspro.id_for_label }}" name="{{ form.godartspro.html_name }}" minlength="3"
-        {% if form.godartspro.value is None %} value="{{ profile.godartspro }}" {% else %} value="{{ form.godartspro.value }}" {% endif %}>
-        </div>
-        </div>
-        <br>
-        <h5><strong><i class="bi bi-list-stars"></i>  Vinculo com federaçoes:</strong></h5>
-
-        <div class="row mb-3">
-        <label for="{{ form.nationalfederation.id_for_label }}" class="col-sm-2 col-form-label">{{ form.nationalfederation.label }}</label>
-        <div class="col-sm-4">
-        <input class="form-control" type="text" id="{{ form.nationalfederation.id_for_label }}" name="{{ form.nationalfederation.html_name }}"
-        {% if form.nationalfederation.value is None %} value="{{ profile.nationalfederation }}" {% else %} value="{{ form.nationalfederation.value }}" {% endif %}>
-        </div>
-        </div>
-
-
-        <div class="row mb-3">
-        <label for="{{ form.localfederation.id_for_label }}" class="col-sm-2 col-form-label">{{ form.localfederation.label }}</label>
-        <div class="col-sm-4">
-        <input class="form-control" type="text" id="{{ form.localfederation.id_for_label }}" name="{{ form.localfederation.html_name }}"
-        {% if form.localfederation.value is None %} value="{{ profile.localfederation }}" {% else %} value="{{ form.localfederation.value }}" {% endif %}>
-        </div>
-        </div>
-
-        <br>
-        <button type="submit" class="btn btn-warning mb-3"><i class="bi bi-save2-fill"></i> Atualizar</button>
-        <br>
-
-      </form>
-
-
-{% endblock %}
+            <input class="datetime" type="date" id="{{ form.birthdate.id_for_label }}"
+                name="{{ form.birthdate.html_name }}" {% if form.birthdate.value is not None %} value="{{ form.birthdate.value }}" {% else %} value="{{ profile.birth_date | date:'Y-m-d' }}" {% endif %}></div></div><div class="row mb-3"><label for="{{ form.country.id_for_label }}" class="col-sm-2 col-form-label">{{ form.country.label }}</label><div class="col-sm-4"><input class="form-control" type="text" id="{{ form.country.id_for_label }}"name="{{ form.country.html_name }}" minlength="3" {% if form.country.value is not None %} value="{{ form.country.value }}" {% else %} value="{{ profile.country }}" {% endif %} required></div></div><div class="row mb-3"><label for="{{ form.state.id_for_label }}" class="col-sm-2 col-form-label">{{ form.state.label }}</label><div class="col-sm-4"><input class="form-control" type="text" id="{{ form.state.id_for_label }}" name="{{ form.state.html_name }}"minlength="3" {% if form.state.value is not None %} value="{{ form.state.value }}" {% else %} value="{{ profile.state }}" {% endif %}></div></div><div class="row mb-3"><label for="{{ form.bio.id_for_label }}" class="col-sm-2 col-form-label">{{ form.bio.label }}</label><div class="col-sm-8"><input class="form-control" type="text" id="{{ form.bio.id_for_label }}" name="{{ form.bio.html_name }}"minlength="3" {% if form.bio.value is None %} value="{{ profile.bio }}" {% else %} value="{{ form.bio.value }}" {% endif %}><input class="form-control" type="hidden" id="{{ form.current.id_for_label }}"name="{{ form.current.html_name }}" value="{{ user.username }}" required></div></div><div class="row mb-3"><label for="{{ form.nickname.id_for_label }}" class="col-sm-2 col-form-label">{{ form.nickname.label }}</label><div class="col-sm-4"><input class="form-control" type="text" id="{{ form.nickname.id_for_label }}"name="{{ form.nickname.html_name }}" minlength="2" {% if form.nickname.value is None %} value="{{ profile.nickname }}" {% else %} value="{{ form.nickname.value }}" {% endif %}></div></div><div class="row mb-3"><label for="{{ form.darts.id_for_label }}" class="col-sm-2 col-form-label">{{ form.darts.label }}</label><div class="col-sm-4"><input class="form-control" type="text" id="{{ form.darts.id_for_label }}" name="{{ form.darts.html_name }}"minlength="2" {% if form.darts.value is None %} value="{{ profile.darts }}" {% else %} value="{{ form.darts.value }}" {% endif %}></div></div><br><h5><strong><i class="bi bi-list-stars"></i> Redes Sociais:</strong></h5><div class="row mb-3"><label for="{{ form.facebook.id_for_label }}" class="col-sm-2 col-form-label">{{ form.facebook.label }}</label><div class="col-sm-6"><input class="form-control" type="text" id="{{ form.facebook.id_for_label }}"name="{{ form.facebook.html_name }}" {% if form.facebook.value is None %} value="{{ profile.facebook }}" {% else %} value="{{ form.facebook.value }}" {% endif %}></div></div><div class="row mb-3"><label for="{{ form.social.id_for_label }}" class="col-sm-2 col-form-label">{{ form.social.label }}</label><div class="col-sm-6"><input class="form-control" type="text" id="{{ form.social.id_for_label }}"name="{{ form.social.html_name }}" {% if form.social.value is None %} value="{{ profile.social }}" {% else %} value="{{ form.social.value }}" {% endif %}></div></div><div class="row mb-3"><label for="{{ form.site.id_for_label }}" class="col-sm-2 col-form-label">{{ form.site.label }}</label><div class="col-sm-6"><input class="form-control" type="text" id="{{ form.site.id_for_label }}" name="{{ form.site.html_name }}"{% if form.site.value is None %} value="{{ profile.site }}" {% else %} value="{{ form.site.value }}" {% endif %}></div></div><br><h5><strong><i class="bi bi-list-stars"></i> Contas Dardos Online:</strong></h5><div class="row mb-3"><label for="{{ form.nakka.id_for_label }}" class="col-sm-2 col-form-label">{{ form.nakka.label }}</label><div class="col-sm-4"><input class="form-control" type="text" id="{{ form.nakka.id_for_label }}" name="{{ form.nakka.html_name }}"{% if form.nakka.value is None %} value="{{ profile.nakka }}" {% else %} value="{{ form.nakka.value }}" {% endif %} required></div></div><br><button type="submit" class="btn btn-warning mb-3"><i class="bi bi-save2-fill"></i> Atualizar</button><br></form>{% endblock %}
 
 
 

@@ -4,6 +4,7 @@ from django.utils import timezone
 from obd.core.models import TournamentResult, PlayerTournamentStat
 import re
 import json
+from obd.dashboards.administrators.champions.utils import get_or_create_player, get_or_create_league, register_champion
 
 class N01TournamentScraper:
     def __init__(self, url):
@@ -126,13 +127,32 @@ class N01TournamentScraper:
         )
 
         PlayerTournamentStat.objects.filter(tournament=tournament).delete()
-        
+        champion_user = None  # rank 1
+        runner_up_user = None # rank 2
+        third_place_user = None # rank 3 (or first encountered rank 3)
         count = 0
         for pid, stat in stats_data.items():
             if pid not in player_map:
                 continue
-                
             name = player_map[pid]
+            # Determine rank
+            rank_val = stat.get('rank', 0)
+            if rank_val > 0 and rank_val <= 3:
+                # Simple PIN derived from name (lowercase, no spaces)
+                pin = name.replace(' ', '').lower()
+                user_obj = get_or_create_player(name, pin)
+                
+                if rank_val == 1:
+                    champion_user = user_obj
+                elif rank_val == 2:
+                    runner_up_user = user_obj
+                elif rank_val == 3:
+                    # If we haven't found a 3rd place yet, take this one.
+                    # Note: In some tournaments there are two 3rd places.
+                    # For now, we just take the first one encountered or overwrite.
+                    # Ideally we'd fill p3 and p4, but let's stick to p3 for now as requested.
+                    if not third_place_user:
+                        third_place_user = user_obj
             
             # Calculate averages
             # 3 Dart Avg = (score / darts) * 3
@@ -160,7 +180,7 @@ class N01TournamentScraper:
             PlayerTournamentStat.objects.create(
                 tournament=tournament,
                 player_name=name,
-                rank=stat.get('rank', 0) if stat.get('rank', 0) > 0 else 999, # 0 usually means unranked or not finished
+                rank=rank_val if rank_val > 0 else 999, # 0 usually means unranked or not finished
                 matches_played=matches_played,
                 matches_won=matches_won,
                 legs_played=legs_played,
@@ -182,4 +202,9 @@ class N01TournamentScraper:
             )
             count += 1
 
+        # Register champion if we captured rank 1
+        if champion_user:
+            league, division = get_or_create_league('Campeonato Brasileiro OBD 2025', timezone.now().date())
+            register_champion(league, division, champion_user, p2_user=runner_up_user, p3_user=third_place_user)
         return True, f"Successfully captured {count} player stats for '{tournament_name}'"
+

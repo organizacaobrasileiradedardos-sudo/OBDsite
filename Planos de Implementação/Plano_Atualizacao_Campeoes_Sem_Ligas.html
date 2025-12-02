@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<title>Plano de Implementação – Atualizar “Ver Campeões” (Sem Ligas)</title>
+<style>
+body {font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; line-height:1.6; max-width:1000px; margin:40px auto; padding:0 20px; color:#333;}
+h1, h2, h3, h4 {color:#2c3e50; margin-top:30px;}
+h1 {font-size:2.5em; border-bottom:4px solid #007bff; padding-bottom:10px;}
+h2 {font-size:2em; border-bottom:2px solid #6c757d; padding-bottom:8px;}
+h3 {font-size:1.5em;}
+h4 {font-size:1.2em;}
+pre {background:#f8f9fa; padding:15px; border-left:4px solid #007bff; overflow:auto;}
+code {background:#f4f4f4; padding:2px 4px; border-radius:4px;}
+ul {margin-left:20px;}
+table {border-collapse:collapse; width:100%; margin:20px 0;}
+th, td {border:1px solid #dee2e6; padding:8px;}
+th {background:#007bff; color:#fff;}
+tr:nth-child(even) {background:#f8f8f8;}
+blockquote {border-left:4px solid #6c757d; padding-left:15px; color:#555; font-style:italic;}
+hr {border:none; border-top:2px solid #dee2e6; margin:30px 0;}
+</style>
+</head>
+<body>
+<h1>Plano de Implementação – Atualizar “Ver Campeões” após Captura de Estatísticas (sem criação de ligas)</h1>
+<h2>1️⃣ Objetivo</h2>
+Garantir que, ao concluir a captura de estatísticas de um campeonato (ex.: <strong>Campeonato Brasileiro de Dardos OBD 2025</strong>), a página <strong>“Ver Campeões”</strong> seja atualizada automaticamente com o nome do campeão (<strong>Roberto Wentz</strong>) e demais informações do torneio, <strong>sem criar novas ligas</strong>.
+<h2>2️⃣ Visão Geral da Solução</h2>
+1. <strong>Persistir o usuário</strong> (já existente ou criado previamente) e seu perfil.
+2. <strong>Utilizar uma liga já existente</strong> (por exemplo, uma liga genérica “Campeonato‑Genérico”) para associar o registro <code>Champion</code>.
+3. <strong>Estender o scraper</strong> para detectar o vencedor (rank = 1) e criar/atualizar o objeto <code>Champion</code> apontando para a liga genérica.
+4. Como a página já consulta a tabela <code>Champion</code>, basta garantir que o registro exista; o próximo request exibirá o campeão.
+<h2>3️⃣ Tarefas Detalhadas</h2>
+<table>
+<thead><tr>
+<th>#</th>
+<th>Tarefa</th>
+<th>Descrição</th>
+<th>Arquivo(s) Impactados</th>
+<th>Responsável</th>
+<th>Estimativa</th>
+</tr></thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>Criar/validar usuário Roberto</td>
+<td><code>User</code> + <code>Profile</code> com nome, email, PIN etc. (se ainda não existir).</td>
+<td><code>obd/dashboards/players/profiles/models.py</code> (já existente)</td>
+<td>Dev</td>
+<td>15 min</td>
+</tr>
+<tr>
+<td>2</td>
+<td>Registrar Champion</td>
+<td>Relacionar o campeão ao torneio usando a liga genérica existente.</td>
+<td><code>obd/dashboards/administrators/champions/models.py</code></td>
+<td>Dev</td>
+<td>20 min</td>
+</tr>
+<tr>
+<td>3</td>
+<td>Extensão do scraper</td>
+<td>Detectar vencedor no HTML baixado, chamar funções auxiliares para garantir usuário e criar <code>Champion</code>.</td>
+<td><code>obd/core/obdlib/webscraping/n01.py</code> (ou script equivalente)</td>
+<td>Dev</td>
+<td>45 min</td>
+</tr>
+<tr>
+<td>4</td>
+<td>Testes unitários</td>
+<td>Mock do HTML de torneio, asserts que <code>Champion</code> é criado com <code>p1</code> = Roberto.</td>
+<td><code>obd/dashboards/administrators/champions/tests/</code></td>
+<td>QA</td>
+<td>30 min</td>
+</tr>
+<tr>
+<td>5</td>
+<td>Atualizar documentação</td>
+<td>README e docstrings explicando o novo fluxo (sem criação de liga).</td>
+<td><code>README.md</code>, docstrings</td>
+<td>Docs</td>
+<td>10 min</td>
+</tr>
+<tr>
+<td>6</td>
+<td>Deploy &amp; Verificação</td>
+<td>Executar captura manual, acessar <code>/boa/league/all/champions</code> e confirmar exibição.</td>
+<td>-</td>
+<td>Dev/QA</td>
+<td>20 min</td>
+</tr>
+</tbody></table>
+<h2>4️⃣ Passo‑a‑Passo de Implementação</h2>
+<h3>4.1 Criação/Validação de Usuário e Perfil</h3>
+``<code>python
+from django.contrib.auth.models import User
+from obd.dashboards.players.profiles.models import Profile
+<p>def get_or_create_player(name, pin):
+    first, *last = name.split()
+    last = ' '.join(last) if last else ''
+    user, created = User.objects.get_or_create(
+        username=pin,
+        defaults={'first_name': first, 'last_name': last, 'email': f'{pin}@example.com'}
+    )
+    if created:
+        Profile.objects.create(user=user, pin=pin, nickname=name)
+    return user
+</code>`<code></p>
+<h3>4.2 Registro de Champion (usando liga genérica)</h3>
+</code>`<code>python
+from obd.dashboards.administrators.champions.models import Champion
+from obd.dashboards.administrators.leagues.models import League
+<h1>Supondo que exista uma liga chamada "Campeonato‑Genérico"</h1>
+GENERIC_LEAGUE_SLUG = 'campeonato-generico'
+<p>def get_generic_league():
+    return League.objects.get(slug=GENERIC_LEAGUE_SLUG)</p>
+<p>def register_champion(generic_league, division, champion_user):
+    champ, created = Champion.objects.get_or_create(
+        league=generic_league,
+        division=division,
+        defaults={'p1': champion_user}
+    )
+    if not created:
+        champ.p1 = champion_user
+        champ.save()
+    return champ
+</code>`<code></p>
+<h3>4.3 Extensão do Scraper (</code>n01.py<code>)</h3>
+</code>`<code>python
+<h1>Dentro da função principal do scraper</h1>
+winner_name = ...   # extraído do HTML
+winner_pin = ...    # opcional, pode ser slug do nome
+user = get_or_create_player(winner_name, winner_pin)
+<p>league = get_generic_league()          # liga genérica existente
+<h1>Supondo que a divisão "Principal" já exista na liga genérica</h1>
+division = league.division_set.get(name='Principal')</p>
+<p>register_champion(league, division, user)
+</code>`<code></p>
+<h3>4.4 Testes</h3>
+<ul>
+<li>Mock HTML contendo tabela de classificação com um vencedor.</li>
+<li>Verificar que </code>Champion.objects.filter(p1__first_name='Roberto').exists()<code> retorna </code>True<code>.</li>
+<li>Cobertura mínima: 80 %.</li>
+</ul>
+<h2>5️⃣ Riscos &amp; Mitigações</h2>
+<table>
+<thead><tr>
+<th>Risco</th>
+<th>Impacto</th>
+<th>Mitigação</th>
+</tr></thead>
+<tbody>
+<tr>
+<td>Usuário já existente com PIN diferente</td>
+<td>Duplicação ou sobrescrita</td>
+<td></code>get_or_create<code> garante idempotência.</td>
+</tr>
+<tr>
+<td>Liga genérica não encontrada</td>
+<td>Falha ao registrar champion</td>
+<td>Criar a liga genérica previamente (script de seed) ou abortar com mensagem clara.</td>
+</tr>
+<tr>
+<td>Mudança no layout do site fonte</td>
+<td>Scraper não identifica vencedor</td>
+<td>Implementar fallback e logs; monitorar alertas.</td>
+</tr>
+<tr>
+<td>Falha de permissão ao salvar objetos</td>
+<td>Exceção no runtime</td>
+<td>Envolver </code>try/except<code> e registrar erro no log.</td>
+</tr>
+</tbody></table>
+<h2>6️⃣ Verificação Pós‑Implementação</h2>
+1. Executar captura (</code>python manage.py capture_stats n01<code>).
+2. Acessar </code>http://127.0.0.1:8000/boa/league/all/champions<code>.
+3. Confirmar que a linha da tabela exibe:
+<ul>
+   <li>Ano = 2025</li>
+   <li>Campeonato / Divisão = “Campeonato‑Genérico / Principal”</li>
+   <li>Campeão = “Roberto Wentz”</li>
+</ul>
+4. Rodar testes (</code>python manage.py test obd.dashboards.administrators.champions`).
+<h2>7️⃣ Cronograma (tempo total ≈ 2 h)</h2>
+<table>
+<thead><tr>
+<th>Etapa</th>
+<th>Duração</th>
+</tr></thead>
+<tbody>
+<tr>
+<td>Preparação (criar utils, funções auxiliares)</td>
+<td>30 min</td>
+</tr>
+<tr>
+<td>Extensão do scraper</td>
+<td>45 min</td>
+</tr>
+<tr>
+<td>Criação/validação de usuário e liga genérica</td>
+<td>20 min</td>
+</tr>
+<tr>
+<td>Testes unitários</td>
+<td>30 min</td>
+</tr>
+<tr>
+<td>Verificação manual e documentação</td>
+<td>15 min</td>
+</tr>
+<tr>
+<td>Buffer / ajustes</td>
+<td>10 min</td>
+</tr>
+</tbody></table>
+</body>
+</html>

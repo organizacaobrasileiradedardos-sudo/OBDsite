@@ -49,13 +49,9 @@ def updateconfig(request):
     profile.facebook = form.cleaned_data['facebook']
     profile.site = form.cleaned_data['site']
     profile.twitter = form.cleaned_data['social']
-    profile.webcamdarts = form.cleaned_data['webcamdarts']
+
+
     profile.nakka = form.cleaned_data['nakka']
-    profile.lidarts = form.cleaned_data['lidarts']
-    profile.dartconnect = form.cleaned_data['dartconnect']
-    profile.godartspro = form.cleaned_data['godartspro']
-    profile.nationalfederation = form.cleaned_data['nationalfederation']
-    profile.localfederation = form.cleaned_data['localfederation']
     profile.save()
 
     # Success feedback

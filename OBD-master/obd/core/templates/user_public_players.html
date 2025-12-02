@@ -59,10 +59,16 @@ Description: This is the page where main data will remains.
         {% for player in players %}
         <div class="col">
           <div class="card h-100">
+            {% if player.profile.pin and player.first_name and player.last_name %}
             <a href="{% url 'profiles:publicprofile' pin=player.profile.pin first=player.first_name last=player.last_name %}"
               class="list-group-item list-group-item-action active" aria-current="true">
               {{ player.first_name }} {{ player.last_name }} | Div. {{ player.stat.get_bcmDiv_display }}
             </a>
+            {% else %}
+            <div class="list-group-item list-group-item-action active" aria-current="true">
+              {{ player.first_name }} {{ player.last_name }} | Div. {{ player.stat.get_bcmDiv_display }}
+            </div>
+            {% endif %}
             <div class="rect-img-container">
               <img class="rect-img figure-img img-fluid rounded" src="{{ player.profile.photo }}" align="center"
                 title="{{ profile.nickname }}" alt="{{ profile.nickname }}">
@@ -71,9 +77,13 @@ Description: This is the page where main data will remains.
               <p class="card-text">
               <div class="list-group" align="center">
               </div>
-              <li class="list-group-item">{{ player.profile.bio | truncatechars:120 }}...<a
+              <li class="list-group-item">{{ player.profile.bio | truncatechars:120 }}...
+                {% if player.profile.pin and player.first_name and player.last_name %}
+                <a
                   href="{% url 'profiles:publicprofile' pin=player.profile.pin first=player.first_name last=player.last_name %}">ver
-                  perfil.</a></li>
+                  perfil.</a>
+                {% endif %}
+              </li>
               <li class="list-group-item">{{ player.profile.country }} - {{ player.profile.state }}</li>
               <li class="list-group-item">{{ player.profile.darts }}</li>
 

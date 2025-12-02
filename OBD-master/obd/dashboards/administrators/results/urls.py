@@ -4,7 +4,7 @@ from . import views
 
 app_name = 'results'
 urlpatterns = [
-    path('dashboard/admin/results/<slug:slug>/server/<int:match>/validate', views.setserver, name='setserver'),
+
     path('dashboard/admin/league/match/<int:match>/validate', views.validate, name='validate'),
     path('dashboard/admin/league/match/<int:match>/invalidate', views.invalidate, name='invalidate'),
     path('dashboard/admin/results/<slug:slug>/match/<int:match>/submit', views.index, name='submit'),

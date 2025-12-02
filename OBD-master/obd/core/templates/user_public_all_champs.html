@@ -35,41 +35,70 @@ Description: This is the page where main data will remains.
         <div class="col-6 col-md-10">
 
             <div class="card mb-3">
-                <img src="{% static '/media/logos/1230x200-banner-fundo-escuro.jpg' %}"
+                <img src="{% static '/media/logos/1230x200-banner-fundo-escuro-new.jpg' %}"
                     class="card-img figure-img img-fluid rounded" alt="...">
                 <div class="card-body">
                     <p><br></p>
                     <h2><strong><i class="bi bi-trophy"></i> Hall dos Campeões do OBD</strong></h2>
-                    <p class="card-text"><small class="text-muted">Confira aqui as estrelas dos OBD que já fizeram
-                            história!</small></p>
+                    <p class="card-text"><small class="text-muted">Confira aqui as estrelas que já deixaram seus nomes
+                            na história dos campeonatos da OBD</small></p>
                 </div>
             </div>
 
+            <style>
+                .thead-obd {
+                    background-color: #343a40 !important;
+                    color: #ffffff !important;
+                }
+
+                .table-obd thead th {
+                    color: #ffffff !important;
+                    background-color: #343a40 !important;
+                    vertical-align: middle;
+                    text-align: center;
+                    border-top: none;
+                }
+
+                .table-obd td {
+                    vertical-align: middle;
+                    white-space: nowrap;
+                }
+
+                .col-year {
+                    text-align: center;
+                    font-weight: bold;
+                }
+            </style>
+
             {% if champions %}
-            <table class="table">
-                <thead>
-                    <tr>
-                        <th scope="col">Data</th>
-                        <th scope="col">Liga / Divisão</th>
-                        <th scope="col"><i class="bi bi-trophy"></i> Campeão</th>
-                        <th scope="col"><i class="bi bi-star"></i><i class="bi bi-star"></i> Segundo lugar</th>
-                        <th scope="col"><i class="bi bi-star"></i> Terceiro lugar</th>
-                    </tr>
-                </thead>
-                <tbody>
+            <div class="table-responsive">
+                <table class="table table-striped table-hover table-bordered table-obd">
+                    <thead class="thead-obd">
+                        <tr>
+                            <th scope="col" width="5%">Ano</th>
+                            <th scope="col" width="30%">Campeonato</th>
+                            <th scope="col" width="25%"><i class="bi bi-trophy"></i> Campeão</th>
+                            <th scope="col" width="20%"><i class="bi bi-star"></i><i class="bi bi-star"></i> Segundo
+                                lugar</th>
+                            <th scope="col" width="20%"><i class="bi bi-star"></i> Terceiro lugar</th>
+                        </tr>
+                    </thead>
+                    <tbody>
 
-                    {% for champ in champions.all %}
-                    <tr>
-                        <td>{{ champ.league.created_at | date:"M/y" }}</td>
-                        <td>{{ champ.league.name }} | Divisão {{ champ.division.get_formation_display }}</td>
-                        <td>{{ champ.p1.first_name }} {{ champ.p1.last_name }}</td>
-                        <td>{{ champ.p2.first_name }} {{ champ.p2.last_name }}</td>
-                        <td>{{ champ.p3.first_name }} {{ champ.p3.last_name }}</td>
+                        {% for champ in champions.all %}
+                        <tr>
+                            <td class="col-year">{{ champ.league.start_date | date:"Y" }}</td>
+                            <td><strong>{{ champ.league.name }}</strong></td>
+                            <td class="text-center"><strong>{{ champ.p1.first_name }} {{ champ.p1.last_name }}</strong>
+                            </td>
+                            <td class="text-center">{{ champ.p2.first_name }} {{ champ.p2.last_name }}</td>
+                            <td class="text-center">{{ champ.p3.first_name }} {{ champ.p3.last_name }}</td>
 
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
             <p><br></p>
 
 

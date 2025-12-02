@@ -18,7 +18,6 @@ from django.urls import include, path
 from django.views.generic.base import RedirectView
 from django.contrib.staticfiles.storage import staticfiles_storage
 import obd.core.views
-from obd.updates.views import updateinfo
 from obd.subscriptions.views import subscribe
 from obd.dashboards.administrators import urls
 from obd.dashboards.administrators.enviroments import urls
@@ -32,7 +31,6 @@ from obd.dashboards.administrators.champions import urls
 
 urlpatterns = [
     path('', obd.core.views.index, name='index'),
-    path('brdardos/go/', obd.core.views.brdardos, name='brdardos'),
     path('', include(obd.dashboards.players.urls, namespace='players')),
     path('', include(obd.dashboards.administrators.urls, namespace='administrators')),
     path('', include(obd.dashboards.administrators.enviroments.urls, namespace='enviroments')),
@@ -41,7 +39,6 @@ urlpatterns = [
     path('', include(obd.dashboards.administrators.fixtures.urls, namespace='fixtures')),
     path('', include(obd.dashboards.administrators.results.urls, namespace='results')),
     path('', include(obd.dashboards.administrators.champions.urls, namespace='champions')),
-    path('updates/', updateinfo),
     path('subscribe/', subscribe),
     path('admin/', admin.site.urls),
     path('boa/players/', obd.core.views.public_players, name='boaplayers'),
@@ -53,6 +50,7 @@ urlpatterns = [
     path('eventos/', obd.core.views.events_list, name='events'),
     path('noticias/', obd.core.views.news_list, name='news'),
     path('documentos/', obd.core.views.documents_list, name='documents'),
+    path('obd/', obd.core.views.obd_organization, name='obd_organization'),
     path('favicon.ico', RedirectView.as_view(url='/static/media/logos/LOGO_OBD.png')),
 ]
 

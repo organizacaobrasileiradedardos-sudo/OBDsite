@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Informações para Criação de Usuário</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            line-height: 1.6;
+            max-width: 1000px;
+            margin: 40px auto;
+            padding: 0 20px;
+            color: #333;
+        }
+
+        h1,
+        h2,
+        h3 {
+            color: #2c3e50;
+            margin-top: 30px;
+        }
+
+        h1 {
+            font-size: 2.5em;
+            border-bottom: 4px solid #007bff;
+            padding-bottom: 10px;
+        }
+
+        h2 {
+            font-size: 2em;
+            border-bottom: 2px solid #6c757d;
+            padding-bottom: 8px;
+        }
+
+        h3 {
+            font-size: 1.5em;
+        }
+
+        table {
+            border-collapse: collapse;
+            width: 100%;
+            margin: 20px 0;
+        }
+
+        th,
+        td {
+            border: 1px solid #dee2e6;
+            padding: 8px;
+            text-align: left;
+        }
+
+        th {
+            background: #007bff;
+            color: #fff;
+        }
+
+        tr:nth-child(even) {
+            background: #f8f8f8;
+        }
+
+        ul {
+            margin-left: 20px;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Criação de Usuário – Tabelas e Campos</h1>
+
+    <h2>1️⃣ Tabelas envolvidas</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Tabela</th>
+                <th>Papel</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>auth_user</td>
+                <td>Credenciais e informações básicas de autenticação (Django User).</td>
+            </tr>
+            <tr>
+                <td>obd_dashboards_players_profiles_profile</td>
+                <td>Extensão "one‑to‑one" com User; contém dados do jogador.</td>
+            </tr>
+            <tr>
+                <td>django_content_type</td>
+                <td>Necessário para permissões e signals (gerado automaticamente).</td>
+            </tr>
+            <tr>
+                <td>auth_permission</td>
+                <td>Permissões definidas no Meta.permissions do modelo Profile.</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <h2>2️⃣ Campos obrigatórios</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Campo</th>
+                <th>Localização</th>
+                <th>Valor típico</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>username</td>
+                <td>auth_user</td>
+                <td>Identificador único (ex.: roberto_wentz)</td>
+            </tr>
+            <tr>
+                <td>password</td>
+                <td>auth_user</td>
+                <td>Hash gerado por User.set_password()</td>
+            </tr>
+            <tr>
+                <td>pin</td>
+                <td>obd_dashboards_players_profiles_profile</td>
+                <td>Código de identificação usado no OBD (ex.: RW2025)</td>
+            </tr>
+            <tr>
+                <td>first_name</td>
+                <td>auth_user (opcional, mas recomendado)</td>
+                <td>Roberto</td>
+            </tr>
+            <tr>
+                <td>last_name</td>
+                <td>auth_user (opcional, mas recomendado)</td>
+                <td>Wentz</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <h2>3️⃣ Campos opcionais (blank / null ou com valores padrão)</h2>
+    <ul>
+        <li>email (auth_user)</li>
+        <li>nickname, photo, birth_date, slug, bio, country, state, darts, site, facebook, twitter, nakka (Profile)</li>
+        <li>is_active, is_staff, is_superuser (auth_user)</li>
+    </ul>
+
+    <h2>4️⃣ Fluxo típico de criação (pseudocódigo)</h2>
+    <pre><code>from django.contrib.auth.models import User
+from obd.dashboards.players.profiles.models import Profile
+
+def criar_usuario(nome_completo, pin, senha):
+    partes = nome_completo.split()
+    primeiro = partes[0]
+    ultimo = " ".join(partes[1:]) if len(partes) > 1 else ""
+    user, criado = User.objects.get_or_create(
+        username=pin,
+        defaults={
+            'first_name': primeiro,
+            'last_name' : ultimo,
+            'email'      : f'{pin}@example.com',
+        }
+    )
+    if criado:
+        user.set_password(senha)
+        user.save()
+    # O signal post_save cria o Profile automaticamente.
+    profile = Profile.objects.get(user=user)
+    profile.pin = pin
+    profile.save()
+    return user
+</code></pre>
+
+    <h2>5️⃣ Por que a liga ainda aparece no plano?</h2>
+    <p>O modelo <code>Champion</code> possui chaves estrangeiras para <code>League</code> e <code>Division</code>. Mesmo
+        usando uma liga genérica, precisamos de uma instância de <code>League</code> (e sua <code>Division</code>) para
+        que a FK seja válida. Crie a liga genérica uma única vez (ex.: “Campeonato‑Genérico”) e reutilize‑a nas
+        capturas.</p>
+
+    <footer style="margin-top:40px; text-align:center; color:#777; font-size:0.9em;">
+        <p>Gerado em: 24/11/2025 | OBD – Organização Brasileira de Dardos</p>
+    </footer>
+</body>
+
+</html>

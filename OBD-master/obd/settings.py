@@ -48,7 +48,6 @@ INSTALLED_APPS = [
     'obd.core',
     'obd.core.obdlib',
     'obd.core.obdlib.webscraping',
-    'obd.updates',
     'obd.dashboards',
     'obd.dashboards.players',
     'obd.dashboards.players.logins',

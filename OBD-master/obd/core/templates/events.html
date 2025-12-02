@@ -3,6 +3,142 @@
 
 {% block title %}Calendário de Eventos | OBD{% endblock %}
 
+{% block csslib %}
+<!-- FullCalendar CSS -->
+<link href='https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.css' rel='stylesheet' />
+{% endblock %}
+
+{% block styles %}
+<style>
+    /* Premium Dark Calendar Theme */
+    :root {
+        --fc-border-color: #444;
+        --fc-button-text-color: #fff;
+        --fc-button-bg-color: #2c3e50;
+        --fc-button-border-color: #2c3e50;
+        --fc-button-hover-bg-color: #1a252f;
+        --fc-button-hover-border-color: #1a252f;
+        --fc-button-active-bg-color: #1a252f;
+        --fc-button-active-border-color: #1a252f;
+        --fc-event-bg-color: #b91d47;
+        /* Dartboard Red */
+        --fc-event-border-color: #b91d47;
+        --fc-today-bg-color: rgba(255, 193, 7, 0.15);
+        /* Gold tint */
+        --fc-page-bg-color: #212529;
+        --fc-neutral-bg-color: #2c3034;
+        --fc-list-event-hover-bg-color: #343a40;
+    }
+
+    .fc {
+        background-color: var(--fc-page-bg-color);
+        color: #f8f9fa;
+        border-radius: 8px;
+        padding: 20px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    .fc-toolbar-title {
+        font-size: 1.5rem !important;
+        font-weight: 700;
+        color: #ffc107;
+        /* Gold */
+    }
+
+    .fc-col-header-cell-cushion {
+        color: #fff;
+        text-decoration: none;
+        text-transform: uppercase;
+        font-size: 0.85rem;
+        padding: 10px 0 !important;
+    }
+
+    .fc-daygrid-day-number {
+        color: #adb5bd;
+        text-decoration: none;
+        font-weight: 500;
+    }
+
+    .fc-day-today .fc-daygrid-day-number {
+        color: #ffc107;
+        font-weight: bold;
+    }
+
+    .fc-event {
+        cursor: pointer;
+        border-radius: 4px;
+        padding: 0;
+        /* Remove padding from container */
+        font-size: 0.85rem;
+        transition: transform 0.2s;
+        border: none !important;
+        background-color: transparent !important;
+        /* Transparent container */
+        box-shadow: none !important;
+    }
+
+    .fc-event:hover {
+        transform: translateY(-1px);
+        filter: brightness(1.1);
+    }
+
+    /* Style the title specifically */
+    .fc-event-title {
+        background-color: #b91d47;
+        /* Red background for title */
+        color: #fff;
+        border-radius: 4px;
+        padding: 2px 6px;
+        display: block;
+        text-align: center;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        width: 100%;
+    }
+
+    /* Event Details Panel */
+    #event-details-panel {
+        background-color: #2c3034;
+        border-radius: 8px;
+        padding: 20px;
+        height: 100%;
+        border-left: 4px solid #ffc107;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+    }
+
+    .detail-label {
+        color: #adb5bd;
+        font-size: 0.8rem;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        margin-bottom: 4px;
+    }
+
+    .detail-value {
+        color: #fff;
+        font-size: 1rem;
+        margin-bottom: 16px;
+        font-weight: 500;
+    }
+
+    .detail-title {
+        color: #ffc107;
+        font-size: 1.4rem;
+        font-weight: bold;
+        margin-bottom: 20px;
+        border-bottom: 1px solid #444;
+        padding-bottom: 10px;
+    }
+
+    .empty-state {
+        color: #6c757d;
+        text-align: center;
+        margin-top: 50px;
+        font-style: italic;
+    }
+</style>
+{% endblock %}
+
 {% block content %}
 <div class="container my-5">
     <div class="row mb-4">
@@ -10,81 +146,56 @@
             <h1 class="fw-bold text-center mb-2 text-dartboard-black">
                 <i class="bi bi-calendar-event text-dartboard-red"></i> Calendário de Eventos
             </h1>
-            <p class="text-center text-muted">Confira os próximos torneios, campeonatos e eventos da OBD</p>
+            <p class="text-center text-muted">Confira os próximos torneios, campeonatos e eventos da OBD e Clubes do
+                Brasil.</p>
         </div>
     </div>
 
-    <!-- Upcoming Events -->
+    <!-- Calendar Grid View -->
     <div class="row mb-5">
-        <div class="col-12">
-            <h2 class="h3 fw-bold mb-4">
-                <i class="bi bi-arrow-right-circle text-success"></i> Próximos Eventos
-            </h2>
+        <!-- Calendar Column -->
+        <div class="col-lg-9 mb-4 mb-lg-0">
+            <div id='calendar'></div>
+        </div>
 
-            {% if upcoming_events %}
-            <div class="row g-4">
-                {% for event in upcoming_events %}
-                <div class="col-md-6 col-lg-4">
-                    <div class="card card-dartboard h-100 hover-lift">
-                        <div class="card-header card-header-dartboard">
-                            <h5 class="card-title mb-0">{{ event.title }}</h5>
-                            <small>
-                                <i class="bi bi-tag"></i> {{ event.get_event_type_display }}
-                            </small>
-                        </div>
-                        <div class="card-body">
-                            <p class="card-text">{{ event.description|truncatewords:20 }}</p>
-                            <div class="mt-3">
-                                <p class="mb-2">
-                                    <i class="bi bi-calendar3 text-primary"></i>
-                                    <strong>Data:</strong> {{ event.event_date|date:"d/m/Y à\s H:i" }}
-                                </p>
-                                {% if event.end_date %}
-                                <p class="mb-2">
-                                    <i class="bi bi-calendar-check text-primary"></i>
-                                    <strong>Término:</strong> {{ event.end_date|date:" d/m/Y às H:i" }}
-                                </p>
-                                {% endif %}
-                                <p class="mb-2">
-                                    <i class="bi bi-geo-alt text-danger"></i>
-                                    <strong>Local:</strong> {{ event.location }}
-                                </p>
-                            </div>
-                        </div>
-                        {% if event.registration_link %}
-                        <div class="card-footer card-footer-dartboard">
-                            <a href="{{ event.registration_link }}" target="_blank"
-                                class="btn btn-dartboard-primary btn-sm w-100">
-                                <i class="bi bi-box-arrow-up-right"></i> Inscrever-se
-                            </a>
-                        </div>
-                        {% endif %}
-                    </div>
+        <!-- Details Column -->
+        <div class="col-lg-3">
+            <div id="event-details-panel">
+                <div id="event-content" style="display: none;">
+                    <div class="detail-title" id="detail-title">Título do Evento</div>
+
+                    <div class="detail-label"><i class="bi bi-calendar3"></i> Data</div>
+                    <div class="detail-value" id="detail-date"></div>
+
+                    <div class="detail-label"><i class="bi bi-geo-alt"></i> Local</div>
+                    <div class="detail-value" id="detail-location"></div>
+
+                    <div class="detail-label"><i class="bi bi-card-text"></i> Descrição</div>
+                    <div class="detail-value text-muted small" id="detail-description"></div>
                 </div>
-                {% endfor %}
+
+                <div id="empty-state" class="empty-state">
+                    <i class="bi bi-hand-index-thumb display-4 mb-3 d-block"></i>
+                    <p>Clique em um evento no calendário para ver os detalhes e o local.</p>
+                </div>
             </div>
-            {% else %}
-            <div class="alert alert-info" role="alert">
-                <i class="bi bi-info-circle"></i> Nenhum evento programado no momento. Fique atento!
-            </div>
-            {% endif %}
         </div>
     </div>
 
-    <!-- Past Events -->
+    <!-- Past Events (List View) -->
     {% if past_events %}
-    <div class="row">
+    <div class="row mt-5">
         <div class="col-12">
-            <h2 class="h3 fw-bold mb-4">
+            <h2 class="h3 fw-bold mb-4 border-bottom pb-2">
                 <i class="bi bi-clock-history text-secondary"></i> Eventos Passados
             </h2>
 
             <div class="list-group">
                 {% for event in past_events %}
-                <div class="list-group-item list-group-item-action">
+                <div class="list-group-item list-group-item-action bg-light">
                     <div class="d-flex w-100 justify-content-between align-items-center">
                         <div>
-                            <h6 class="mb-1">{{ event.title }}</h6>
+                            <h6 class="mb-1 fw-bold">{{ event.title }}</h6>
                             <p class="mb-1 text-muted small">{{ event.get_event_type_display }}</p>
                         </div>
                         <div class="text-end">
@@ -104,14 +215,89 @@
     </div>
     {% endif %}
 </div>
+{% endblock %}
 
-<style>
-    .hover-shadow {
-        transition: box-shadow 0.3s ease;
-    }
+{% block jslib %}
+<!-- FullCalendar JS -->
+<script src='https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.js'></script>
+<script src='https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/locales/pt-br.js'></script>
 
-    .hover-shadow:hover {
-        box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
-    }
-</style>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        var calendarEl = document.getElementById('calendar');
+        var events = {{ calendar_events_json|safe }};
+
+    var calendar = new FullCalendar.Calendar(calendarEl, {
+        initialView: 'dayGridMonth',
+        locale: 'pt-br',
+        themeSystem: 'standard',
+        headerToolbar: {
+            left: 'prev,next today',
+            center: 'title',
+            right: 'dayGridMonth,listMonth'
+        },
+        buttonText: {
+            today: 'Hoje',
+            month: 'Mês',
+            list: 'Lista'
+        },
+        events: events,
+        eventColor: '#b91d47', // Default color
+        height: 'auto',
+        aspectRatio: 1.5,
+
+        eventClick: function (info) {
+            // Hide empty state
+            document.getElementById('empty-state').style.display = 'none';
+
+            // Show content
+            var content = document.getElementById('event-content');
+            content.style.display = 'block';
+            content.style.opacity = 0;
+
+            // Populate data
+            document.getElementById('detail-title').textContent = info.event.title;
+
+            // Format date
+            var dateOptions = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' };
+            var dateStr = info.event.start.toLocaleDateString('pt-BR', dateOptions);
+            if (info.event.end) {
+                dateStr += ' até ' + info.event.end.toLocaleDateString('pt-BR', dateOptions);
+            }
+            document.getElementById('detail-date').textContent = dateStr;
+
+            document.getElementById('detail-location').textContent = info.event.extendedProps.location || 'Local não informado';
+            document.getElementById('detail-description').textContent = info.event.extendedProps.description || 'Sem descrição disponível.';
+
+            // Simple fade in animation
+            setTimeout(function () {
+                content.style.transition = 'opacity 0.3s ease';
+                content.style.opacity = 1;
+            }, 10);
+        },
+
+        eventDidMount: function (info) {
+            // Create dartboard icon element
+            var icon = document.createElement('img');
+            icon.src = "{% static 'media/dartboard_event_icon_v2.png' %}";
+            // Larger size and background matching calendar theme
+            icon.style.width = '40px';
+            icon.style.height = '40px';
+            icon.style.display = 'block';
+            icon.style.margin = '0 auto 4px';
+            icon.style.backgroundColor = 'transparent'; // Transparent to show grid background
+            // Insert icon above the event title
+            var titleEl = info.el.querySelector('.fc-event-title');
+            if (titleEl) {
+                // Insert icon before title element
+                titleEl.parentNode.insertBefore(icon, titleEl);
+            }
+            // Preserve existing tooltip
+            info.el.title = info.event.title + '\n' + (info.event.extendedProps.location || '');
+        }
+    });
+
+    calendar.render();
+    });
+</script>
 {% endblock %}

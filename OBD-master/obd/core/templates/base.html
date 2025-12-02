@@ -73,8 +73,10 @@ Description: This is the BASE template of all OBD pages. It cotains the main men
                                     Calendário de Eventos</a></li>
                             <li><a class="dropdown-item" href="{% url 'news' %}"><i class="bi bi-newspaper"></i>
                                     Notícias</a></li>
+                            {% if user.is_authenticated %}
                             <li><a class="dropdown-item" href="{% url 'documents' %}"><i
                                         class="bi bi-file-earmark-text"></i> Documentos</a></li>
+                            {% endif %}
                         </ul>
                     </li>
 
@@ -88,7 +90,9 @@ Description: This is the BASE template of all OBD pages. It cotains the main men
                             <li><a class="dropdown-item" target="_blank"
                                     href="https://www.youtube.com/c/NaMosca180/videos">Na Mosca
                                     180</a></li>
-                            <li><a class="dropdown-item" href="#">Whatsapp Dardos Online</a></li>
+                            <li><a class="dropdown-item"
+                                    href="https://chat.whatsapp.com/DXtHYPEpmcb7sldYZuBaVz?mode=hqrc"
+                                    target="_blank">Whatsapp Dardos Online</a></li>
                             <li>
                                 <hr class="dropdown-divider">
                             </li>
@@ -105,6 +109,7 @@ Description: This is the BASE template of all OBD pages. It cotains the main men
                             data-bs-toggle="dropdown" aria-expanded="false">Organizações</a>
                         <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
 
+                            <li><a class="dropdown-item" href="{% url 'obd_organization' %}">OBD</a></li>
                             <li><a class="dropdown-item" href="https://www.pdc.tv" target="_blank">PDC</a></li>
                         </ul>
                     </li>
@@ -118,7 +123,7 @@ Description: This is the BASE template of all OBD pages. It cotains the main men
                     {% if user.is_authenticated %}
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown5" role="button"
-                            data-bs-toggle="dropdown" aria-expanded="false">Olá, {% if user.profile.nickname %}{{ user.profile.nickname }}{% else %}{{ user.first_name }} {{ user.last_name }}{% endif %}</a>
+                            data-bs-toggle="dropdown" aria-expanded="false">Olá, {{ user.first_name }}</a>
                         <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
                             <li><a class="dropdown-item" href="{% url 'players:logout' %}">Sair</a></li>
                             <li><a class="dropdown-item" href="{% url 'players:dashboard' %}">Meu Dashboard</a></li>
@@ -127,7 +132,7 @@ Description: This is the BASE template of all OBD pages. It cotains the main men
                             <li>
                                 <hr class="dropdown-divider">
                             </li>
-                            <li><a class="dropdown-item" href="#">Reportar Bug</a></li>
+
                         </ul>
                     </li>
                     {% else %}
@@ -152,10 +157,10 @@ Description: This is the BASE template of all OBD pages. It cotains the main men
         </div>
     </nav>
     <!-- OBD: end Main menu -->
-    <br><br><br>
+    <br><br>
 
     <!-- Here start the main block template to be used in all OBD pages-->
-    <div class="container-fluid mt-4">
+    <div class="container-fluid mt-2">
         {% block content %}
         {% endblock %}
     </div>
@@ -203,15 +208,9 @@ Description: This is the BASE template of all OBD pages. It cotains the main men
 
                 </ul>
 
+
                 <a class="navbar-brand" href="https://brdardos.mercadoshops.com.br/lista/jogos-salao-jogo-dardos/dardos"
                     target="_blank"><strong><i class="bi bi-cart4"></i> Loja BR Dardos</strong></a>
-
-                <form class="d-flex" action="/brdardos/go/" method="GET" target="_blank">
-                    {% csrf_token %}
-                    <input class="form-control me-2" type="search" id="brsearch" name="brsearch"
-                        placeholder="Dardos & Acessórios" aria-label="brsearch">
-                    <button class="btn btn-warning" type="submit">Pesquisar </button>
-                </form>
             </div>
         </div>
     </nav>

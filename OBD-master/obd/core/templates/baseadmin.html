@@ -75,7 +75,9 @@ Description: This is the BASE template of all OBD DASHOBDRD pages. It cotains th
                             <li><a class="dropdown-item" target="_blank"
                                     href="https://www.youtube.com/c/NaMosca180/videos">Na Mosca
                                     180</a></li>
-                            <li><a class="dropdown-item" href="#">Whatsapp Dardos Online</a></li>
+                            <li><a class="dropdown-item"
+                                    href="https://chat.whatsapp.com/DXtHYPEpmcb7sldYZuBaVz?mode=hqrc"
+                                    target="_blank">Whatsapp Dardos Online</a></li>
                             <li>
                                 <hr class="dropdown-divider">
                             </li>
@@ -105,7 +107,7 @@ Description: This is the BASE template of all OBD DASHOBDRD pages. It cotains th
                     {% if user.is_authenticated %}
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
-                            data-bs-toggle="dropdown" aria-expanded="false">Olá {% if user.profile.nickname %}{{user.profile.nickname }}{% else %}{{ user.first_name }} {{ user.last_name }}{% endif %}</a>
+                            data-bs-toggle="dropdown" aria-expanded="false">Olá {{ user.first_name }}</a>
                         <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
                             <li><a class="dropdown-item" href="{% url 'players:logout' %}">Sair</a></li>
                             <li><a class="dropdown-item" href="{% url 'players:dashboard' %}">Meu Dashboard</a></li>
@@ -114,7 +116,7 @@ Description: This is the BASE template of all OBD DASHOBDRD pages. It cotains th
                             <li>
                                 <hr class="dropdown-divider">
                             </li>
-                            <li><a class="dropdown-item" href="#">Reportar Bug</a></li>
+
                         </ul>
                     </li>
                     {% else %}
@@ -149,10 +151,7 @@ Description: This is the BASE template of all OBD DASHOBDRD pages. It cotains th
                                 class="bi bi-gear-fill"></i> Configurações OBD</a>
                         <a href="{% url 'administrators:members' %}" class="list-group-item list-group-item-action"><i
                                 class="bi bi-person-lines-fill"></i> Associados</a>
-                        <a href="{% url 'league:create' %}" class="list-group-item list-group-item-action"><i
-                                class="bi bi-asterisk"></i> Cadastrar Ligas</a>
-                        <a href="{% url 'league:management' %}" class="list-group-item list-group-item-action"><i
-                                class="bi bi-card-list"></i> Gerenciar Ligas</a>
+
                         <a href="{% url 'administrators:scraping_dashboard' %}"
                             class="list-group-item list-group-item-action" style="color: red; font-weight: bold;"><i
                                 class="bi bi-cloud-download"></i> CAPTURA DE TORNEIOS (NOVO)</a>
@@ -174,8 +173,7 @@ Description: This is the BASE template of all OBD DASHOBDRD pages. It cotains th
                 <div class="col-8">
                     <div class="row">
                         <div class="alert alert-info" role="alert">Você está na página <i class="bi bi-arrow-right"></i>
-                            <strong>{% block page %} {% endblock %}</strong> / Logado como: {{ user.username | upper
-                            }}<strong></strong>
+                            <strong>{% block page %} {% endblock %}</strong> / Logado como: {{ user.username|upper }}<strong></strong>
                         </div>
                         {% block content %}
                         {% endblock %}

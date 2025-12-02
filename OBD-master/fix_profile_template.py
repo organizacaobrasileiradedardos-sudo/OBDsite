@@ -1,29 +1,44 @@
 #!/usr/bin/env python3
-import re
+"""Fix all malformed template tags in profile_view.html"""
 
-file_path = 'obd/core/templates/user_public_profile.html'
+# Read the file
+with open('/Users/mac2/Documents/Backup Pen Drive - Janeiro 2025/Coisa Minha/DARDO/OBD/Projeto Site OBD/OBD-master/obd/core/templates/profile_view.html', 'r', encoding='utf-8') as f:
+    lines = f.readlines()
 
-with open(file_path, 'r') as f:
-    content = f.read()
+# Fix line 60-62: birthdate field
+i = 59  # 0-indexed for line 60
+if i < len(lines):
+    # Combine lines 60-62 into a proper single-line expression
+    combined = lines[i].rstrip() + ' ' + lines[i+1].strip() + ' ' + lines[i+2].strip()
+    combined = combined.replace('{% endif\n                %}', '{% endif %}')
+    combined = combined.replace('{% endif %}>', '{% endif %}')
+    lines[i] = '                name="{{ form.birthdate.html_name}}" {% if form.birthdate.value is not None %} value="{{ form.birthdate.value}}" {% else %} value="{{ profile.birth_date | date:\'Y-m-d\' }}" {% endif %}>\n'
+    del lines[i+1:i+3]  # Remove the broken continuation lines
 
-# Regex to find split tags: {{ followed by newline/whitespace, then content, then }}
-# We want to match: {{ \n\s+ content \n\s* }} or similar variations
-# The goal is to remove the newlines inside {{ }}
+# Fix around line 139 (now shifted): site field
+for i in range(len(lines)):
+    if 'form.site.html_name' in lines[i] and '{% if' in lines[i]:
+        if i+1 < len(lines) and 'endif' in lines[i+1]:
+            # Merge the lines
+            lines[i] = lines[i].rstrip() + ' ' + lines[i+1].strip() + '\n'
+            lines[i] = lines[i].replace('{% endif %}>', '{% endif %}')
+            lines[i] = lines[i].replace('{% endif            %>', '{% endif %}')
+            del lines[i+1]
+            break
 
-def fix_split_tags(match):
-    full_tag = match.group(0)
-    # Replace newlines and extra whitespace with a single space
-    fixed_tag = re.sub(r'\s*\n\s*', ' ', full_tag)
-    return fixed_tag
+# Fix around line 197 (now shifted): nationalfederation field  
+for i in range(len(lines)):
+    if 'form.nationalfederation.html_name' in lines[i] and '{% if' in lines[i]:
+        if i+1 < len(lines) and i+2 < len(lines) and 'endif' in lines[i+2]:
+            # Merge three lines
+            lines[i] = lines[i].rstrip() + ' ' + lines[i+1].strip() + ' ' + lines[i+2].strip() + '\n'
+            lines[i] = lines[i].replace('{% endif\n                %}', '{% endif %}')
+            lines[i] = lines[i].replace('{% endif %}>', '{% endif %}')
+            del lines[i+1:i+3]
+            break
 
-# Pattern for {{ ... }} split across lines
-pattern = r'{{[^}]*?\n[^}]*?}}'
+# Write back
+with open('/Users/mac2/Documents/Backup Pen Drive - Janeiro 2025/Coisa Minha/DARDO/OBD/Projeto Site OBD/OBD-master/obd/core/templates/profile_view.html', 'w', encoding='utf-8') as f:
+    f.writelines(lines)
 
-new_content = re.sub(pattern, fix_split_tags, content)
-
-if content != new_content:
-    print(f"Fixed split tags in {file_path}")
-    with open(file_path, 'w') as f:
-        f.write(new_content)
-else:
-    print("No split tags found matching the pattern.")
+print("Fixed profile_view.html template tags")

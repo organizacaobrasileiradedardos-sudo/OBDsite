@@ -1,0 +1,603 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Plano de Implementação - Remoção de Plataformas Externas</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            line-height: 1.6;
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 40px 20px;
+            color: #333;
+            background-color: #f8f9fa;
+        }
+        
+        h1 {
+            color: #1a1a1a;
+            border-bottom: 4px solid #007bff;
+            padding-bottom: 15px;
+            margin: 30px 0 20px 0;
+            font-size: 2.5em;
+        }
+        
+        h2 {
+            color: #2c3e50;
+            border-bottom: 2px solid #6c757d;
+            padding-bottom: 10px;
+            margin-top: 40px;
+            margin-bottom: 20px;
+            font-size: 2em;
+        }
+        
+        h3 {
+            color: #495057;
+            margin-top: 30px;
+            margin-bottom: 15px;
+            font-size: 1.5em;
+        }
+        
+        h4 {
+            color: #6c757d;
+            margin-top: 20px;
+            margin-bottom: 10px;
+            font-size: 1.2em;
+        }
+        
+        p {
+            margin: 10px 0;
+            text-align: justify;
+        }
+        
+        code {
+            background-color: #f4f4f4;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+            font-size: 0.9em;
+            color: #d63384;
+        }
+        
+        pre {
+            background-color: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-left: 4px solid #007bff;
+            padding: 20px;
+            border-radius: 6px;
+            overflow-x: auto;
+            margin: 20px 0;
+        }
+        
+        pre code {
+            background: none;
+            padding: 0;
+            color: #212529;
+            font-size: 0.875em;
+            line-height: 1.5;
+        }
+        
+        table {
+            border-collapse: collapse;
+            width: 100%;
+            margin: 25px 0;
+            background-color: white;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        th, td {
+            border: 1px solid #dee2e6;
+            padding: 12px 15px;
+            text-align: left;
+        }
+        
+        th {
+            background-color: #007bff;
+            color: white;
+            font-weight: 600;
+        }
+        
+        tr:nth-child(even) {
+            background-color: #f8f9fa;
+        }
+        
+        tr:hover {
+            background-color: #e9ecef;
+        }
+        
+        ul {
+            margin: 15px 0;
+            padding-left: 30px;
+        }
+        
+        li {
+            margin: 8px 0;
+        }
+        
+        hr {
+            border: none;
+            border-top: 2px solid #dee2e6;
+            margin: 40px 0;
+        }
+        
+        .warning {
+            background-color: #fff3cd;
+            border-left: 5px solid #ffc107;
+            padding: 20px;
+            margin: 25px 0;
+            border-radius: 4px;
+        }
+        
+        .important {
+            background-color: #d1ecf1;
+            border-left: 5px solid #0dcaf0;
+            padding: 20px;
+            margin: 25px 0;
+            border-radius: 4px;
+        }
+        
+        blockquote {
+            border-left: 4px solid #6c757d;
+            padding-left: 20px;
+            margin: 20px 0;
+            color: #495057;
+            font-style: italic;
+        }
+        
+        a {
+            color: #007bff;
+            text-decoration: none;
+        }
+        
+        a:hover {
+            text-decoration: underline;
+        }
+        
+        footer {
+            margin-top: 60px;
+            padding-top: 30px;
+            border-top: 2px solid #dee2e6;
+            text-align: center;
+            color: #6c757d;
+            font-size: 0.9em;
+        }
+        
+        @media print {
+            body {
+                background-color: white;
+                margin: 0;
+                padding: 20px;
+            }
+            
+            .warning, .important {
+                page-break-inside: avoid;
+            }
+        }
+    </style>
+</head>
+<body>
+<h1>Plano de Implementação: Remoção de Referências a Plataformas Externas e Federações</h1>
+
+<h2>Resumo</h2>
+
+<p>Este plano detalha a remoção completa de campos relacionados a plataformas externas de dardos e federações do sistema OBD, incluindo banco de dados, formulários, views, e templates.</p>
+
+<h2>Campos Identificados no Modelo <code>Profile</code></h2>
+
+<table>
+<thead><tr>
+<th>Campo</th>
+<th>Tipo</th>
+<th>Uso Atual</th>
+<th>Risco de Remoção</th>
+</tr></thead>
+<tbody>
+<tr>
+<td><code>nakka</code></td>
+<td><code>CharField(max_length=80)</code></td>
+<td><strong><span style="color: red;">🔴</span> ALTO USO</strong> - Sistema de scraping de resultados Nakka</td>
+<td><strong>ALTO</strong> <span style="color: orange;">⚠️</span></td>
+</tr>
+<tr>
+<td><code>lidarts</code></td>
+<td><code>CharField(max_length=80)</code></td>
+<td>Apenas display/validação de formulário</td>
+<td>BAIXO <span style="color: green;">✅</span></td>
+</tr>
+<tr>
+<td><code>dartconnect</code></td>
+<td><code>CharField(max_length=80)</code></td>
+<td>Apenas validação de formulário</td>
+<td>BAIXO <span style="color: green;">✅</span></td>
+</tr>
+<tr>
+<td><code>godartspro</code></td>
+<td><code>CharField(max_length=80)</code></td>
+<td>Apenas validação de formulário</td>
+<td>BAIXO <span style="color: green;">✅</span></td>
+</tr>
+<tr>
+<td><code>darts</code></td>
+<td><code>CharField(max_length=150)</code></td>
+<td>Display de modelo de dardo do jogador</td>
+<td>BAIXO <span style="color: green;">✅</span></td>
+</tr>
+<tr>
+<td><code>nationalfederation</code></td>
+<td><code>CharField(max_length=40)</code></td>
+<td>Apenas display</td>
+<td>BAIXO <span style="color: green;">✅</span></td>
+</tr>
+<tr>
+<td><code>localfederation</code></td>
+<td><code>CharField(max_length=40)</code></td>
+<td>Apenas display</td>
+<td>BAIXO <span style="color: green;">✅</span></td>
+</tr>
+</tbody></table>
+
+<blockquote>
+<p><strong>NOTA</strong>: <code>webcamdarts</code> já foi removido anteriormente via migração <code>0027_remove_webcamdarts_field.py</code></p>
+
+<h2>Análise de Impacto</h2>
+
+<h3><span style="color: red;">🔴</span> NAKKA - <strong>ALTO IMPACTO</strong> <span style="color: orange;">⚠️</span></h3>
+
+<strong>Funcionalidade Core Afetada:</strong>
+<ul>
+<li>Sistema de importação automática de resultados do Nakka</li>
+<li>Validação de partidas através de links Nakka</li>
+<li>Matching de jogadores por nickname Nakka</li>
+</ul>
+
+<strong>Arquivos Afetados:</strong>
+<p>1. <strong>Webscraping:</strong></p>
+<p>   - <code>obd/core/obdlib/webscraping/nakka.py</code> (125 linhas - lógica de scraping)</p>
+<p>   - <code>obd/core/obdlib/webscraping/tests/test_webscraping_fixtures.py</code></p>
+   
+<p>2. <strong>Formulários/Views de Resultados:</strong></p>
+<p>   - <code>obd/dashboards/administrators/results/forms.py</code> (linhas 49-61 - validação)</p>
+<p>   - <code>obd/dashboards/administrators/results/views.py</code> (linhas 81-85 - scraping)</p>
+   
+<p>3. <strong>Dashboard de Jogadores:</strong></p>
+<p>   - <code>obd/dashboards/players/views.py</code> (linhas 90-93 - validação)</p>
+   
+<p>4. <strong>Formulários de Perfil:</strong></p>
+<p>   - <code>obd/dashboards/players/profiles/forms.py</code> (linhas 22, 34-49 - campo + validação)</p>
+<p>   - <code>obd/dashboards/players/profiles/views.py</code> (linha 53 - salvar)</p>
+   
+<p>5. <strong>Estatísticas:</strong></p>
+<p>   - <code>obd/core/views.py</code> (linha 88 - contagem de jogos por servidor)</p>
+
+<strong>Recomendação:</strong> <span style="color: orange;">⚠️</span> <strong>MANTER ESTE CAMPO</strong> ou substituir por identificador OBD próprio
+
+<hr>
+
+<h3><span style="color: green;">✅</span> LIDARTS - Baixo Impacto</h3>
+
+<strong>Uso Atual:</strong> Apenas validação de unicidade em formulários
+
+<strong>Arquivos Afetados:</strong>
+<ul>
+<li><code>obd/dashboards/players/profiles/forms.py</code> (linhas 23, 52-67)</li>
+<li><code>obd/dashboards/players/profiles/views.py</code> (linha 54)</li>
+<li><code>obd/core/views.py</code> (linha 88 - contagem estatística)</li>
+</ul>
+
+<strong>Recomendação:</strong> <span style="color: green;">✅</span> Pode ser removido com segurança
+
+<hr>
+
+<h3><span style="color: green;">✅</span> DARTCONNECT - Baixo Impacto</h3>
+
+<strong>Uso Atual:</strong> Apenas validação de unicidade em formulários
+
+<strong>Arquivos Afetados:</strong>
+<ul>
+<li><code>obd/dashboards/players/profiles/forms.py</code> (linhas 24, 70-85)</li>
+<li><code>obd/dashboards/players/profiles/models.py</code> (linha 34)</li>
+</ul>
+
+<strong>Recomendação:</strong> <span style="color: green;">✅</span> Pode ser removido com segurança
+
+<hr>
+
+<h3><span style="color: green;">✅</span> GODARTSPRO - Baixo Impacto</h3>
+
+<strong>Uso Atual:</strong> Apenas validação de unicidade em formulários
+
+<strong>Arquivos Afetados:</strong>
+<ul>
+<li><code>obd/dashboards/players/profiles/forms.py</code> (linhas 25, 88-103)</li>
+<li><code>obd/dashboards/players/profiles/models.py</code> (linha 35)</li>
+</ul>
+
+<strong>Recomendação:</strong> <span style="color: green;">✅</span> Pode ser removido com segurança
+
+<hr>
+
+<h3><span style="color: green;">✅</span> DARTS (Modelo de Dardo) - Baixo Impacto</h3>
+
+<strong>Uso Atual:</strong> Campo de texto livre para jogador informar seu modelo de dardo
+
+<strong>Arquivos Afetados:</strong>
+<ul>
+<li><code>obd/dashboards/players/profiles/forms.py</code> (linha 17)</li>
+<li><code>obd/dashboards/players/profiles/models.py</code> (linha 27)</li>
+<li>Template <code>user_public_players.html</code> (linha 78 - display)</li>
+</ul>
+
+<strong>Recomendação:</strong> <span style="color: gold;">⚡</span> <strong>OPCIONAL</strong> - É informação útil mas não crítica
+
+<hr>
+
+<h3><span style="color: green;">✅</span> FEDERAÇÕES (Nacional e Local) - Baixo Impacto</h3>
+
+<strong>Uso Atual:</strong> Apenas display em formulários e template público
+
+<strong>Arquivos Afetados:</strong>
+<ul>
+<li><code>obd/dashboards/players/profiles/forms.py</code> (linhas 26-27)</li>
+<li><code>obd/dashboards/players/profiles/views.py</code> (linhas 57-58)</li>
+<li><code>obd/dashboards/players/profiles/models.py</code> (linhas 36-37)</li>
+<li>Template <code>user_public_profile.html</code> (já removidas)</li>
+</ul>
+
+<strong>Recomendação:</strong> <span style="color: green;">✅</span> Pode ser removido com segurança
+
+<h2>Mudanças Propostas</h2>
+
+<h3>Opção 1: Remoção Conservadora (Recomendada)</h3>
+
+<p>Remover apenas campos com baixo impacto:</p>
+
+<h4>Campos a Remover:</h4>
+<ul>
+<li><span style="color: green;">✅</span> <code>lidarts</code></li>
+<li><span style="color: green;">✅</span> <code>dartconnect</code></li>
+<li><span style="color: green;">✅</span> <code>godartspro</code></li>
+<li><span style="color: green;">✅</span> <code>nationalfederation</code></li>
+<li><span style="color: green;">✅</span> <code>localfederation</code></li>
+</ul>
+
+<h4>Campos a Manter:</h4>
+<ul>
+<li><span style="color: orange;">⚠️</span> <code>nakka</code> (funcionalidade core de scraping)</li>
+<li><span style="color: gold;">⚡</span> <code>darts</code> (informação útil do jogador)</li>
+</ul>
+
+<hr>
+
+<h3>Opção 2: Remoção Completa</h3>
+
+<p>Remover todos os campos, incluindo substituição da funcionalidade Nakka.</p>
+
+<hr>
+
+<h2>Alterações Necessárias (Opção 1 - Conservadora)</h2>
+
+<h3>1. Modelo (Database)</h3>
+
+<h4>[NEW] Criar Migração para Remover Campos</h4>
+
+<pre><code class="language-python"><h1>obd/dashboards/players/profiles/migrations/00XX_remove_external_platforms.py</h1>
+operations = [
+    migrations.RemoveField(model_name='profile', name='lidarts'),
+    migrations.RemoveField(model_name='profile', name='dartconnect'),
+    migrations.RemoveField(model_name='profile', name='godartspro'),
+    migrations.RemoveField(model_name='profile', name='nationalfederation'),
+    migrations.RemoveField(model_name='profile', name='localfederation'),
+]
+</code></pre>
+
+<h4>[MODIFY] <code>obd/dashboards/players/profiles/models.py</code></h4>
+
+<p>Remover linhas 33-37:</p>
+<pre><code class="language-python"><h1>lidarts = models.CharField(max_length=80, null=False, blank=True)</h1>
+<h1>dartconnect = models.CharField(max_length=80, null=False, blank=True)</h1>
+<h1>godartspro = models.CharField(max_length=80, null=False, blank=True)</h1>
+<h1>nationalfederation = models.CharField(max_length=40, null=False, blank=True)</h1>
+<h1>localfederation = models.CharField(max_length=40, null=False, blank=True)</h1>
+</code></pre>
+
+<hr>
+
+<h3>2. Formulários</h3>
+
+<h4>[MODIFY] <code>obd/dashboards/players/profiles/forms.py</code></h4>
+
+<strong>Remover campos do formulário (linhas 23-27):</strong>
+<pre><code class="language-python"><h1>lidarts = forms.CharField(label='Lidarts', required=False)</h1>
+<h1>dartconnect = forms.CharField(label='DartConnect', required=False)</h1>
+<h1>godartspro = forms.CharField(label='GoDartsPro', required=False)</h1>
+<h1>nationalfederation = forms.CharField(label='ID Federação Nacional', required=False)</h1>
+<h1>localfederation = forms.CharField(label='ID Federação Local', required=False)</h1>
+</code></pre>
+
+<strong>Remover métodos de validação (linhas 52-103):</strong>
+<pre><code class="language-python"><h1>def clean_lidarts(self): ...</h1>
+<h1>def clean_dartconnect(self): ...</h1>
+<h1>def clean_godartspro(self): ...</h1>
+</code></pre>
+
+<hr>
+
+<h3>3. Views</h3>
+
+<h4>[MODIFY] <code>obd/dashboards/players/profiles/views.py</code></h4>
+
+<strong>Remover salvamento de campos (linhas 54, 55, 56, 57, 58):</strong>
+<pre><code class="language-python"><h1>profile.lidarts = form.cleaned_data['lidarts']</h1>
+<h1>profile.dartconnect = form.cleaned_data['dartconnect']</h1>
+<h1>profile.godartspro = form.cleaned_data['godartspro']</h1>
+<h1>profile.nationalfederation = form.cleaned_data['nationalfederation']</h1>
+<h1>profile.localfederation = form.cleaned_data['localfederation']</h1>
+</code></pre>
+
+<hr>
+
+<h3>4. Templates</h3>
+
+<h4>[MODIFY] <code>obd/core/templates/user_public_profile.html</code></h4>
+
+<span style="color: green;">✅</span> <strong>JÁ REMOVIDO</strong> (linhas 151-157)
+
+<hr>
+
+<h3>5. Estatísticas (Opcional)</h3>
+
+<h4>[MODIFY] <code>obd/core/views.py</code></h4>
+
+<p>Se quiser manter contagem de servidores, apenas remover referência a Lidarts (linha 88):</p>
+<pre><code class="language-python"><h1>Remover: lidarts=Count('server', filter=Q(server='LID')),</h1>
+</code></pre>
+
+<hr>
+
+<h3>6. Testes</h3>
+
+<h4>[MODIFY] <code>obd/dashboards/players/profiles/tests/test_model_profile.py</code></h4>
+
+<p>Remover referências nos testes (linhas 23-24):</p>
+<pre><code class="language-python"><h1>lidarts='My Lidarts Nick',</h1>
+</code></pre>
+
+<hr>
+
+<h2>Plano de Migração do Banco de Dados</h2>
+
+<h3>Comandos</h3>
+
+<pre><code class="language-bash"><h1>1. Criar migração</h1>
+python manage.py makemigrations profiles --name remove_external_platforms
+
+<h1>2. Revisar SQL gerado</h1>
+python manage.py sqlmigrate profiles 00XX
+
+<h1>3. Aplicar migração</h1>
+python manage.py migrate
+
+<h1>4. Verificar integridade</h1>
+python manage.py check
+</code></pre>
+
+<h3>Backup Recomendado</h3>
+
+<pre><code class="language-bash"><h1>Antes de migrar, fazer backup do banco</h1>
+python manage.py dumpdata dashboards.players.profiles > backup_profiles.json
+</code></pre>
+
+<hr>
+
+<h2>Cronograma de Implementação</h2>
+
+<table>
+<thead><tr>
+<th>Etapa</th>
+<th>Descrição</th>
+<th>Tempo Estimado</th>
+</tr></thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>Backup do banco de dados</td>
+<td>5 min</td>
+</tr>
+<tr>
+<td>2</td>
+<td>Remover campos do modelo</td>
+<td>2 min</td>
+</tr>
+<tr>
+<td>3</td>
+<td>Criar e aplicar migração</td>
+<td>10 min</td>
+</tr>
+<tr>
+<td>4</td>
+<td>Remover do formulário</td>
+<td>5 min</td>
+</tr>
+<tr>
+<td>5</td>
+<td>Remover salvamento em views</td>
+<td>3 min</td>
+</tr>
+<tr>
+<td>6</td>
+<td>Atualizar testes</td>
+<td>5 min</td>
+</tr>
+<tr>
+<td>7</td>
+<td>Testar aplicação</td>
+<td>15 min</td>
+</tr>
+<tr>
+<td><strong>TOTAL</strong></td>
+<td></td>
+<td><strong>~45 minutos</strong></td>
+</tr>
+</tbody></table>
+
+<hr>
+
+<h2>Riscos e Considerações</h2>
+
+<div class="warning"><strong>⚠️ WARNING</strong>
+<p><strong>Perda de Dados Históricos</strong></p>
+<blockquote>
+<p></p>
+<blockquote>
+<p>Ao remover os campos do banco, <strong>todos os dados preenchidos pelos usuários serão perdidos permanentemente</strong>. Se houver necessidade futura desses dados, considere:</p>
+<blockquote>
+<p>- Exportar para tabela de backup antes da migração</p>
+<blockquote>
+<p>- Manter campos como deprecated (ocultos) em vez de deletar</p>
+
+<div class="important"><strong>ℹ️ IMPORTANT</strong>
+<p><strong>Campo NAKKA é Crítico</strong></p>
+<blockquote>
+<p></p>
+<blockquote>
+<p>O campo <code>nakka</code> está profundamente integrado no sistema de scraping de resultados. Removê-lo requer refatoração significativa da lógica de importação de partidas.</p>
+
+<hr>
+
+<h2>Resumo de Arquivos que Serão Modificados</h2>
+
+<h3>Opção 1 (Conservadora)</h3>
+
+<p>1. ✏️ <code>obd/dashboards/players/profiles/models.py</code></p>
+<p>2. ✏️ <code>obd/dashboards/players/profiles/forms.py</code></p>
+<p>3. ✏️ <code>obd/dashboards/players/profiles/views.py</code></p>
+<p>4. ✏️ <code>obd/core/views.py</code> (opcional - estatísticas)</p>
+<p>5. ✏️ <code>obd/dashboards/players/profiles/tests/test_model_profile.py</code></p>
+<p>6. 🆕 Nova migração de banco de dados</p>
+
+<strong>Total:</strong> 5-6 arquivos
+
+<hr>
+
+<h2>Próximos Passos</h2>
+
+<p>1. <strong>Revisar este plano</strong> e decidir quais campos realmente deseja remover</p>
+<p>2. <strong>Considerar se deseja manter o campo "darts"</strong> (modelo de dardo)</p>
+<p>3. <strong>Confirmar se o campo "nakka" será mantido</strong> ou se prefere refatorar o sistema de scraping</p>
+<p>4. <strong>Aprovar implementação</strong></p>
+
+
+
+<footer>
+    <p><strong>OBD - Organização Brasileira de Dardos</strong></p>
+    <p>Documento gerado em: 24 de Novembro de 2025</p>
+</footer>
+</body>
+</html>

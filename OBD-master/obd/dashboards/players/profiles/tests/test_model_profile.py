@@ -21,7 +21,6 @@ class ProfileModelTest(TestCase):
             twitter='www.mytwitter.com/id',
             webcamdarts='My WebCam Nick',
             nakka='My Nakka Nick',
-            lidarts='My Lidarts Nick',
             dartconnect='My DartConnect ID'
         )
         self.obj.save()

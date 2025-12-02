@@ -603,9 +603,7 @@ def walkover(request, match, win, los):
 
 def orderofmerit(request):
     players = Stat.objects.all().order_by('-bcmPoints', '-bcmWin', '-bcmAvg', '-bcmTon80')
-    divisions = Division.objects.filter(formation__gt=0).all().order_by('-league__created_at', 'formation')
-    response = {'players': players,
-                'divisions': divisions}
+    response = {'players': players}
     return render(request, 'user_public_order_of_merit.html', response)
 
 

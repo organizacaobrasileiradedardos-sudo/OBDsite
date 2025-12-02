@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Apresentação OBD - Modern</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;600;800&family=Playfair+Display:ital,wght@0,700;1,400&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --primary-gold: #FFD700;
+            --primary-green: #006400;
+            --primary-red: #b91d47;
+            --dark-bg: #111;
+            --text-light: #f0f0f0;
+        }
+
+        body,
+        html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background-color: var(--dark-bg);
+            font-family: 'Montserrat', sans-serif;
+            color: var(--text-light);
+        }
+
+        #presentation-stage {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            perspective: 1000px;
+        }
+
+        /* Background Layer */
+        .bg-layer {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-size: cover;
+            background-position: center;
+            opacity: 0;
+            transition: opacity 1.5s ease-in-out;
+            z-index: -1;
+        }
+
+        .bg-layer.active {
+            opacity: 0.4;
+            animation: panZoom 20s infinite alternate;
+        }
+
+        .overlay-gradient {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, rgba(0, 0, 0, 0.9) 0%, rgba(0, 0, 0, 0.4) 50%, rgba(0, 0, 0, 0.8) 100%);
+            z-index: 0;
+        }
+
+        @keyframes panZoom {
+            0% {
+                transform: scale(1) translate(0, 0);
+            }
+
+            100% {
+                transform: scale(1.15) translate(-2%, -2%);
+            }
+        }
+
+        /* Slide Container */
+        .slide {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 1s ease, transform 1s ease;
+            transform: translateY(20px);
+            z-index: 1;
+            padding: 40px;
+            box-sizing: border-box;
+        }
+
+        .slide.active {
+            opacity: 1;
+            pointer-events: all;
+            transform: translateY(0);
+        }
+
+        /* Typography & Elements */
+        h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: 5rem;
+            margin: 0;
+            color: var(--primary-gold);
+            text-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+            opacity: 0;
+            transform: translateY(30px);
+        }
+
+        h2 {
+            font-size: 2.5rem;
+            color: var(--primary-green);
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            margin-bottom: 40px;
+            border-bottom: 2px solid var(--primary-red);
+            padding-bottom: 10px;
+            opacity: 0;
+            transform: translateX(-50px);
+        }
+
+        p.lead {
+            font-size: 1.8rem;
+            font-weight: 300;
+            max-width: 800px;
+            line-height: 1.6;
+            opacity: 0;
+        }
+
+        .logo-img {
+            max-width: 250px;
+            margin-bottom: 30px;
+            filter: drop-shadow(0 0 20px rgba(255, 215, 0, 0.3));
+            opacity: 0;
+            transform: scale(0.8);
+        }
+
+        /* List Styling */
+        .feature-list {
+            list-style: none;
+            padding: 0;
+            text-align: left;
+            max-width: 900px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .feature-list li {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 15px 20px;
+            border-left: 3px solid var(--primary-gold);
+            border-radius: 0 5px 5px 0;
+            font-size: 1.1rem;
+            opacity: 0;
+            transform: translateX(20px);
+            transition: background 0.3s;
+        }
+
+        .feature-list li:hover {
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        .feature-list.single-col {
+            grid-template-columns: 1fr;
+        }
+
+        /* Quote Styling */
+        blockquote {
+            font-family: 'Playfair Display', serif;
+            font-size: 2rem;
+            font-style: italic;
+            border-left: 5px solid var(--primary-red);
+            padding-left: 30px;
+            margin: 0 auto;
+            max-width: 800px;
+            text-align: left;
+            opacity: 0;
+        }
+
+        /* Animations Classes */
+        .active .anim-fade-up {
+            animation: fadeUp 1s forwards 0.5s;
+        }
+
+        .active .anim-fade-in {
+            animation: fadeIn 1.5s forwards 0.8s;
+        }
+
+        .active .anim-slide-right {
+            animation: slideRight 1s forwards 0.3s;
+        }
+
+        .active .anim-zoom {
+            animation: zoomIn 1.2s forwards 0.2s;
+        }
+
+        .active li:nth-child(1) {
+            animation: slideList 0.6s forwards 0.4s;
+        }
+
+        .active li:nth-child(2) {
+            animation: slideList 0.6s forwards 0.6s;
+        }
+
+        .active li:nth-child(3) {
+            animation: slideList 0.6s forwards 0.8s;
+        }
+
+        .active li:nth-child(4) {
+            animation: slideList 0.6s forwards 1.0s;
+        }
+
+        .active li:nth-child(5) {
+            animation: slideList 0.6s forwards 1.2s;
+        }
+
+        .active li:nth-child(6) {
+            animation: slideList 0.6s forwards 1.4s;
+        }
+
+        @keyframes fadeUp {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeIn {
+            to {
+                opacity: 1;
+            }
+        }
+
+        @keyframes slideRight {
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        @keyframes zoomIn {
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        @keyframes slideList {
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        /* Progress Bar */
+        .progress-container {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 6px;
+            background: rgba(255, 255, 255, 0.1);
+            z-index: 10;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary-green), var(--primary-gold), var(--primary-red));
+            width: 0%;
+            transition: width 0.1s linear;
+        }
+
+        /* Controls */
+        .controls {
+            position: absolute;
+            bottom: 30px;
+            right: 30px;
+            z-index: 20;
+            display: flex;
+            gap: 10px;
+        }
+
+        .ctrl-btn {
+            background: transparent;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: rgba(255, 255, 255, 0.7);
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+        }
+
+        .ctrl-btn:hover {
+            background: white;
+            color: black;
+            transform: scale(1.1);
+        }
+    </style>
+</head>
+
+<body>
+
+    <div id="presentation-stage">
+        <div class="overlay-gradient"></div>
+
+        <!-- Backgrounds -->
+        <div class="bg-layer" id="bg1" style="background-image: url('assets/new_img3.jpg');"></div>
+        <div class="bg-layer" id="bg2" style="background-image: url('assets/new_img2.jpg');"></div>
+        <div class="bg-layer" id="bg3" style="background-image: url('assets/new_img0.jpg');"></div>
+        <div class="bg-layer" id="bg4"
+            style="background-image: url('assets/new_img1.png'); background-size: contain; background-repeat: no-repeat;">
+        </div>
+
+        <!-- Slide 1: Intro -->
+        <div class="slide active" data-bg="bg1" data-duration="6000">
+            <img src="assets/new_logo_transparent.png" class="logo-img anim-zoom" alt="OBD Logo">
+            <h1 class="anim-fade-up">Organização Brasileira<br>de Dardos</h1>
+            <p class="lead anim-fade-in" style="margin-top: 20px; color: #ccc;">Unindo precisão, paixão e comunidade.
+            </p>
+        </div>
+
+        <!-- Slide 2: Mission Part 1 -->
+        <div class="slide" data-bg="bg2" data-duration="10000">
+            <h2 class="anim-slide-right">Nossa missão e valores</h2>
+            <ul class="feature-list">
+                <li><strong>Difundir</strong> e propagar o esporte “Dardos” em todo território.</li>
+                <li><strong>Promover</strong> competições esportivas de alto nível entre associados.</li>
+                <li><strong>Representar</strong> jogadores junto aos poderes públicos.</li>
+                <li><strong>Estabelecer</strong> critérios de qualificação para competições internacionais.</li>
+            </ul>
+        </div>
+
+        <!-- Slide 3: Mission Part 2 -->
+        <div class="slide" data-bg="bg2" data-duration="10000">
+            <h2 class="anim-slide-right">Nossa missão e valores</h2>
+            <ul class="feature-list single-col">
+                <li>Regulamentar inscrições junto às entidades de administração.</li>
+                <li>Dirimir questões e promover a integração social.</li>
+                <li>Incentivar programas culturais, esportivos e assistenciais.</li>
+                <li><strong>Levar a Inclusão Social através do Esporte.</strong></li>
+            </ul>
+        </div>
+
+        <!-- Slide 4: Management -->
+        <div class="slide" data-bg="bg3" data-duration="12000">
+            <h2 class="anim-slide-right">Gestão de Excelência</h2>
+            <blockquote class="anim-fade-up">
+                "Estabelecer um modelo de gestão de qualidade, com enfoque sistêmico e metodológico... atingindo um
+                equilíbrio dinâmico entre meios e finalidades."
+            </blockquote>
+            <p class="lead anim-fade-in" style="margin-top: 30px; font-size: 1.2rem;">
+                Definição de missões, estratégias, recursos humanos e processos.
+            </p>
+        </div>
+
+        <!-- Slide 5: Outro -->
+        <div class="slide" data-bg="bg1" data-duration="7000">
+            <img src="assets/new_logo_transparent.png" class="logo-img anim-zoom" style="max-width: 300px;"
+                alt="OBD Logo Final">
+            <h1 class="anim-fade-up" style="font-size: 4rem;">Faça Parte</h1>
+            <p class="lead anim-fade-in">www.obdardos.com.br</p>
+            <div style="margin-top: 40px; display: flex; gap: 20px; justify-content: center;" class="anim-fade-up">
+                <span style="font-size: 2rem;">🎯</span>
+                <span style="font-size: 2rem;">🇧🇷</span>
+                <span style="font-size: 2rem;">🏆</span>
+            </div>
+        </div>
+
+        <div class="progress-container">
+            <div class="progress-fill" id="progressBar"></div>
+        </div>
+
+        <div class="controls">
+            <button class="ctrl-btn" onclick="prevSlide()">&#8592;</button>
+            <button class="ctrl-btn" onclick="togglePlay()" id="playBtn">&#10074;&#10074;</button>
+            <button class="ctrl-btn" onclick="nextSlide()">&#8594;</button>
+        </div>
+    </div>
+
+    <script>
+        const slides = document.querySelectorAll('.slide');
+        const bgs = document.querySelectorAll('.bg-layer');
+        const progressBar = document.getElementById('progressBar');
+        const playBtn = document.getElementById('playBtn');
+
+        let currentSlide = 0;
+        let isPlaying = true;
+        let slideTimer;
+        let progressTimer;
+        let startTime;
+        let duration;
+
+        function updateBackground(bgId) {
+            bgs.forEach(bg => bg.classList.remove('active'));
+            const activeBg = document.getElementById(bgId);
+            if (activeBg) activeBg.classList.add('active');
+        }
+
+        function showSlide(index) {
+            // Reset current
+            slides[currentSlide].classList.remove('active');
+
+            // Update index
+            currentSlide = (index + slides.length) % slides.length;
+
+            // Show new
+            const slide = slides[currentSlide];
+            slide.classList.add('active');
+
+            // Update BG
+            const bgId = slide.getAttribute('data-bg');
+            updateBackground(bgId);
+
+            if (isPlaying) {
+                startAutoPlay();
+            }
+        }
+
+        function nextSlide() {
+            showSlide(currentSlide + 1);
+        }
+
+        function prevSlide() {
+            showSlide(currentSlide - 1);
+        }
+
+        function startAutoPlay() {
+            clearTimeout(slideTimer);
+            clearInterval(progressTimer);
+
+            const slide = slides[currentSlide];
+            duration = parseInt(slide.getAttribute('data-duration')) || 5000;
+            startTime = Date.now();
+
+            slideTimer = setTimeout(() => {
+                nextSlide();
+            }, duration);
+
+            progressTimer = setInterval(() => {
+                const elapsed = Date.now() - startTime;
+                const pct = Math.min((elapsed / duration) * 100, 100);
+                progressBar.style.width = pct + '%';
+            }, 50);
+
+            playBtn.innerHTML = '&#10074;&#10074;'; // Pause icon
+        }
+
+        function togglePlay() {
+            isPlaying = !isPlaying;
+            if (isPlaying) {
+                startAutoPlay();
+            } else {
+                clearTimeout(slideTimer);
+                clearInterval(progressTimer);
+                playBtn.innerHTML = '&#9658;'; // Play icon
+            }
+        }
+
+        // Initialize
+        updateBackground(slides[0].getAttribute('data-bg'));
+        startAutoPlay();
+
+    </script>
+
+</body>
+
+</html>

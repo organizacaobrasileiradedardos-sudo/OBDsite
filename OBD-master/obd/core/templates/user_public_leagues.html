@@ -2,191 +2,49 @@
 Project name: OBD - Organização Brasileira de Dardos
 Property: Nathan Perkes
 Developers: Walisson Oliveira
-Page name: Perfil do Usuário *Público*
-Start date of this page: Jul-03-2021
-Last update: Jul-03-2021
-Description: This is the page where main data will remains.
+Page name: Página de Ligas do OBD
+Last update: Nov-26-2025
+Description: Simplified page displaying only the OBD logo.
 -->
 {% extends 'base.html' %}
 {% load static %}
-{% block csslib %}
-{% endblock %}
-{% block title %}Página Geral de Ligas do OBD{% endblock %}
-{% block styles %}
+{% block title %}Ligas OBD{% endblock %}
 
+{% block styles %}
 <style>
-    .centerimg {
-        display: table-cell;
+    .logo-container {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        min-height: 70vh;
+        padding: 2rem;
         text-align: center;
-        vertical-align: middle;
+    }
+
+    .logo-container h1 {
+        color: #fff;
+        margin-bottom: 2rem;
+        font-weight: 300;
+        letter-spacing: 2px;
+    }
+
+    .logo-container img {
+        max-width: 100%;
+        height: auto;
+        max-height: 500px;
     }
 </style>
-
-
-
 {% endblock %}
+
 {% block content %}
-
 <div class="container">
-    <div class="row">
-
-        <div class="col-6 col-md-1"></div>
-
-        <div class="col-6 col-md-10">
-
-            <div class="card mb-3">
-                <img src="{% static '/media/logos/1230x200-banner-fundo-escuro.jpg' %}"
-                    class="card-img figure-img img-fluid rounded" alt="...">
-                <div class="card-body">
-                    <p><br></p>
-                    <h2><strong><i class="bi bi-bookmark-star-fill"></i> Página de Ligas do OBD</strong></h2>
-                    <p class="card-text"><small class="text-muted">Clique sobre a liga ou divisão para maiores
-                            detalhes.</small></p>
-                </div>
-            </div>
-
-            <table class="table">
-                <thead>
-                    <tr>
-                        <th scope="col">#</th>
-                        <th scope="col">Liga</th>
-                        <th scope="col">Fase</th>
-                        <th scope="col">Início</th>
-                        <th scope="col">Fim</th>
-                        <th scope="col">Detalhes</th>
-                        <th scope="col">Divisões</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for league in leagues %}
-                    <tr>
-                        <th scope="row">{{ league.id }}</th>
-                        <td>{{ league.name }}</td>
-                        <td>{{ league.get_phase_display }}</td>
-                        <td>{{ league.start_date | date:"d/M/y" }}</td>
-                        <td>{{ league.end_date | date:"d/M/y" }}</td>
-                        <td> <a class="btn btn-primary" href="{% url 'boaleagueview' slug=league.slug %}"
-                                role="button">Ver</a></td>
-                        <td>
-                            {% for division in league.division_set.all.reverse %}
-                            <a class="btn btn-primary" href="{% url 'boadivisionview' slug=division.slug %}"
-                                role="button">{{ division.get_formation_display }}</a>
-                            {% endfor %}
-                        </td>
-
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-
-
-
-        </div>
-    </div>
-    <div class="col-6 col-md-1"></div>
-</div>
-</div>
-
-
-
-<!-- Modal -->
-<div class="modal fade" id="envOBD" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-scrollable">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="exampleModalLabel"><i class="bi bi-gear-fill"></i> Organização Brasileira de
-                    Dardos
-                    de Dardos | OBD</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-
-                <ul class="list-group">
-                    <li class="list-group-item active" aria-current="true">Regras Gerais / Todas as divisões</li>
-                    <li class="list-group-item">Pontos por vitória: <span class="badge bg-warning text-dark">{{
-                            matches.first.division.league.enviroment.matchWinPoints }}</span></li>
-                    <li class="list-group-item">Pontos por empate: <span class="badge bg-warning text-dark">{{
-                            matches.first.division.league.enviroment.matchDrawPoints }}</span></li>
-                    <li class="list-group-item">Permitir auto bye (WO): <span class="badge bg-warning text-dark">{{
-                            matches.first.division.league.enviroment.allowAutoBye }} ausência(s) máx</span></li>
-                    <li class="list-group-item">Promoção automática: <span class="badge bg-warning text-dark">{{
-                            matches.first.division.league.enviroment.allowAutoPromo }} jogador(es)</span></li>
-                    <li class="list-group-item">Rebaixamento automático: <span class="badge bg-warning text-dark">{{
-                            matches.first.division.league.enviroment.allowAutoDemo }} jogador(es)</span></li>
-                    <li class="list-group-item">Início da liga: <span class="badge bg-warning text-dark">{{
-                            matches.first.division.league.start_date }}</span></li>
-                    <li class="list-group-item">Data limite para completar jogos: <span
-                            class="badge bg-warning text-dark">{{ matches.first.division.league.end_date }}</span></li>
-
-                </ul>
-                <p><br></p>
-                <ul class="list-group">
-                    <li class="list-group-item active" aria-current="true">Regras por Divisão OBD</li>
-                </ul>
-
-                <table class="table">
-                    <thead>
-                        <tr>
-                            <th scope="col">Regra</th>
-                            <th scope="col">Div. A</th>
-                            <th scope="col">Div. B</th>
-                            <th scope="col">Div. C</th>
-                            <th scope="col">Div. D+</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <th scope="row">Sets</th>
-                            <td><span class="badge bg-warning text-dark">{{
-                                    matches.first.division.league.enviroment.leagueAMaxSet }}</span></td>
-                            <td><span class="badge bg-warning text-dark">{{
-                                    matches.first.division.league.enviroment.leagueBMaxSet }}</span></td>
-                            <td><span class="badge bg-warning text-dark">{{
-                                    matches.first.division.league.enviroment.leagueCMaxSet }}</span></td>
-                            <td><span class="badge bg-warning text-dark">{{
-                                    matches.first.division.league.enviroment.leagueOthersMaxSet }}</span></td>
-                        </tr>
-                        <tr>
-                            <th scope="row">Best Of (legs)</th>
-                            <td><span class="badge bg-warning text-dark">{{
-                                    matches.first.division.league.enviroment.leagueABestof }}</span></td>
-                            <td><span class="badge bg-warning text-dark">{{
-                                    matches.first.division.league.enviroment.leagueBBestof }}</span></td>
-                            <td><span class="badge bg-warning text-dark">{{
-                                    matches.first.division.league.enviroment.leagueCBestof }}</span></td>
-                            <td><span class="badge bg-warning text-dark">{{
-                                    matches.first.division.league.enviroment.leagueOthersBestof }}</span></td>
-                        </tr>
-                        <tr>
-                            <th scope="row">First To (legs)</th>
-                            <td><span class="badge bg-warning text-dark">{{
-                                    matches.first.division.league.enviroment.leagueAFirstTo }}</span></td>
-                            <td><span class="badge bg-warning text-dark">{{
-                                    matches.first.division.league.enviroment.leagueBFirstTo }}</span></td>
-                            <td><span class="badge bg-warning text-dark">{{
-                                    matches.first.division.league.enviroment.leagueCFirstTo }}</span></td>
-                            <td><span class="badge bg-warning text-dark">{{
-                                    matches.first.division.league.enviroment.leagueOthersFirstTo }}</span></td>
-                        </tr>
-                        </tr>
-                    </tbody>
-                </table>
-
-                <p align="center">www.obdassociacao.com.br</p>
-
-
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"><i
-                        class="bi bi-check-circle"></i> Fechar</button>
-            </div>
-        </div>
+    <div class="logo-container">
+        <h1>Em construção...</h1>
+        <img src="{% static 'media/logos/LOGO_OBD.png' %}" alt="Logo OBD" class="img-fluid">
     </div>
 </div>
-
-
-
-
 {% endblock %}
+
 {% block jslib %}
 {% endblock %}

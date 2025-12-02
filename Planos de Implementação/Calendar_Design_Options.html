@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calendar Design Options</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        h1 {
+            color: #2c3e50;
+            border-bottom: 2px solid #eee;
+            padding-bottom: 10px;
+        }
+
+        h2 {
+            color: #34495e;
+            margin-top: 30px;
+        }
+
+        .feature-block {
+            background: #f8f9fa;
+            border-left: 4px solid #b91d47;
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 0 5px 5px 0;
+        }
+
+        .code-snippet {
+            background: #2d2d2d;
+            color: #f8f8f2;
+            padding: 15px;
+            border-radius: 5px;
+            font-family: monospace;
+            overflow-x: auto;
+        }
+
+        .icon-preview {
+            display: inline-block;
+            background: #333;
+            padding: 20px;
+            border-radius: 5px;
+            margin-top: 10px;
+            text-align: center;
+        }
+
+        .screenshot {
+            max-width: 100%;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            margin-top: 15px;
+        }
+
+        .caption {
+            font-size: 0.9em;
+            color: #666;
+            text-align: center;
+            margin-top: 5px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <h1>Calendar Design Options</h1>
+    <p>Este documento detalha as opções de design e implementações visuais aplicadas ao Calendário de Eventos do sistema
+        OBD.</p>
+
+    <h2>1. Ícone de Evento (Dartboard)</h2>
+    <div class="feature-block">
+        <h3>Design Escolhido</h3>
+        <p>Foi selecionado um ícone de alvo de dardo com fundo preto para melhor contraste e integração com o tema
+            escuro do cabeçalho do evento.</p>
+        <ul>
+            <li><strong>Arquivo:</strong> <code>dartboard_event_icon_v2.png</code></li>
+            <li><strong>Tamanho:</strong> 40px x 40px (Aumentado para melhor visibilidade)</li>
+            <li><strong>Posicionamento:</strong> Centralizado acima do título do evento.</li>
+        </ul>
+        <div class="icon-preview">
+            <img src="dartboard_event_icon_v2.png" alt="Ícone de Alvo de Dardo" width="40" height="40">
+            <div style="color: #ccc; margin-top: 5px; font-size: 0.8em;">Preview do Ícone</div>
+        </div>
+    </div>
+
+    <h2>2. Estilização do Bloco de Evento</h2>
+    <div class="feature-block">
+        <h3>Estrutura Visual</h3>
+        <p>O bloco do evento foi customizado para criar um efeito de "ícone flutuante" com um título destacado.</p>
+        <ul>
+            <li><strong>Fundo do Evento:</strong> Transparente (<code>background-color: transparent</code>). Isso remove
+                a barra sólida padrão do FullCalendar.</li>
+            <li><strong>Borda:</strong> Removida (<code>border: none</code>).</li>
+            <li><strong>Título:</strong> Fundo vermelho sólido (<code>#b91d47</code>) com texto branco, criando uma
+                barra de leitura clara abaixo do ícone.</li>
+        </ul>
+    </div>
+
+    <h3>CSS Aplicado</h3>
+    <div class="code-snippet">
+        .fc-event {
+        background-color: transparent !important;
+        border: none !important;
+        box-shadow: none !important;
+        }
+
+        .fc-event-title {
+        background-color: #b91d47; /* Vermelho OBD */
+        color: white;
+        padding: 2px 5px;
+        border-radius: 3px;
+        text-align: center;
+        font-weight: bold;
+        margin-top: 2px;
+        }
+    </div>
+
+    <h2>3. Tratamento de Eventos Multi-dias</h2>
+    <div class="feature-block">
+        <h3>Lógica de Exibição</h3>
+        <p>Para garantir que o ícone apareça em <strong>todos</strong> os dias de um evento longo, a lógica de
+            renderização foi alterada:</p>
+        <ul>
+            <li><strong>Anteriormente:</strong> O FullCalendar renderizava uma única barra contínua atravessando os
+                dias.</li>
+            <li><strong>Atualmente:</strong> O backend (Python) divide o evento em múltiplos "eventos de dia único".
+            </li>
+            <li><strong>Resultado:</strong> Cada dia possui seu próprio bloco, com seu próprio ícone e título,
+                reforçando a presença do evento na grade.</li>
+        </ul>
+    </div>
+
+    <h2>4. Correção de Datas</h2>
+    <div class="feature-block">
+        <p>A lógica de comparação de datas foi ajustada para ignorar horários (00:00 vs 10:00) e considerar apenas o
+            dia, garantindo que o último dia do evento seja sempre incluído na visualização.</p>
+    </div>
+
+    <h2>5. Resultado Final</h2>
+    <p>Abaixo, o resultado final da implementação no calendário:</p>
+    <img src="calendar_after_python_fix_1764334042823.png" alt="Calendário Final com Ícones" class="screenshot">
+    <div class="caption">Visualização mensal com ícones personalizados e eventos multi-dias</div>
+
+</body>
+
+</html>

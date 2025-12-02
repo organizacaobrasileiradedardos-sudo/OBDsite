@@ -75,7 +75,9 @@ Description: This is the BASE template of all OBD DASHOBDRD pages. It cotains th
                             <li><a class="dropdown-item" target="_blank"
                                     href="https://www.youtube.com/c/NaMosca180/videos">Na Mosca
                                     180</a></li>
-                            <li><a class="dropdown-item" href="#">Whatsapp Dardos Online</a></li>
+                            <li><a class="dropdown-item"
+                                    href="https://chat.whatsapp.com/DXtHYPEpmcb7sldYZuBaVz?mode=hqrc"
+                                    target="_blank">Whatsapp Dardos Online</a></li>
                             <li>
                                 <hr class="dropdown-divider">
                             </li>
@@ -105,13 +107,13 @@ Description: This is the BASE template of all OBD DASHOBDRD pages. It cotains th
                     {% if user.is_authenticated %}
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
-                            data-bs-toggle="dropdown" aria-expanded="false">Olá, {% if user.profile.nickname %}{{user.profile.nickname }}{% else %}{{ user.first_name }} {{ user.last_name }}{% endif %}</a>
+                            data-bs-toggle="dropdown" aria-expanded="false">Olá, {{ user.profile.nickname }}</a>
                         <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
                             <li><a class="dropdown-item" href="{% url 'players:logout' %}">Sair</a></li>
                             <li><a class="dropdown-item" href="{% url 'players:dashboard' %}">Meu Dashboard</a></li>
                             <li><a class="dropdown-item" href="{% url 'players:access' %}">Atualizar Login</a></li>
                             <li><a class="dropdown-item" href="#"></a></li>
-                            <li><a class="dropdown-item" href="#">Reportar Bug</a></li>
+
                             <li>
                                 <hr class="dropdown-divider">
                             </li>
@@ -135,10 +137,9 @@ Description: This is the BASE template of all OBD DASHOBDRD pages. It cotains th
         </div>
     </nav>
     <!-- OBD: end Main menu -->
-    <br>
 
     <!-- Here start the main block template to be used in all OBD pages-->
-    <div class="row">
+    <div class="row" style="padding-top: 80px;">
         <div class="container">
             <div class="row">
                 <div class="col-2">
@@ -150,7 +151,7 @@ Description: This is the BASE template of all OBD DASHOBDRD pages. It cotains th
                         <a href="{% url 'players:access' %}" class="list-group-item list-group-item-action"><i
                                 class="bi bi-key"></i> Atualizar Login</a>
                         <a href="{% url 'players:leagues' %}" class="list-group-item list-group-item-action"><i
-                                class="bi bi-trophy"></i> Ver Ligas OBD</a>
+                                class="bi bi-trophy"></i> Meus Torneios</a>
                         <a href="{% url 'players:mygames' %}" class="list-group-item list-group-item-action"><i
                                 class="bi bi-list-stars"></i> Ver meu histórico</a>
                         <a href="{% url 'players:player_audit' %}" class="list-group-item list-group-item-action"><i
@@ -179,8 +180,7 @@ Description: This is the BASE template of all OBD DASHOBDRD pages. It cotains th
                 <div class="col-8">
                     <div class="row">
                         <div class="alert alert-info" role="alert">Você está na página <i class="bi bi-arrow-right"></i>
-                            <strong>{% block page %} {% endblock %}</strong> / Logado como: {{ user.username | upper
-                            }}<strong></strong>
+                            <strong>{% block page %} {% endblock %}</strong> / Logado como: {{ user.username|upper }}<strong></strong>
                         </div>
                         {% block content %}
                         {% endblock %}

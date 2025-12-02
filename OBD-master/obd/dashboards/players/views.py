@@ -87,12 +87,11 @@ def logoutuser(request):
 @login_required()
 def signupleague(request, slug):
     player = request.user
-    player_wcd = player.profile.webcamdarts
     player_nakka = player.profile.nakka
 
-    # Check if user already has an account on WEBCAMDARTS and NAKKA. If not, no allowed dubscribe for leagues.
-    if (player_wcd == '' or player_wcd == 'Null') or (player_nakka == '' or player_nakka == 'Null'):
-        messages.success(request, f'Para se inscrever, primeiro informe seu apelido NAKKA e WEBCAMDARTS em "Configurações do Perfil"')
+    # Check if user already has an account on NAKKA. If not, no allowed subscribe for leagues.
+    if (player_nakka == '' or player_nakka == 'Null'):
+        messages.success(request, f'Para se inscrever, primeiro informe seu apelido NAKKA em "Configurações do Perfil"')
         return userleagues(request, alert='alert-danger')
     else:
         # Get league instance and related formation DIV;
@@ -123,17 +122,15 @@ def signoffleague(request, slug):
 
 @login_required()
 def userleagues(request, alert=''):
+    # List all tournaments that user is participating in (all phases)
+    tournaments = Division.objects.filter(
+        status=True, 
+        players=request.user.id
+    ).exclude(
+        formation=0  # Exclude formation divisions
+    ).order_by('-league__phase', 'league__start_date')
 
-    #List all open leagues for user
-    opens = League.objects.filter(phase=0, status=True)
-
-    #List all leagues that user is part of and formation is TRUE
-    subscriptions = Division.objects.filter(status=True, formation=0, players=request.user.id, league__phase=0)
-
-    #List all leagues that user is part of and status is 2 "STARTED".
-    starts = Division.objects.filter(status=True, players=request.user.id, league__phase__range=(2, 3))
-
-    return render(request, 'user_open_leagues.html', {'opens': opens, 'subscriptions': subscriptions, 'starts': starts, 'alert': alert})
+    return render(request, 'user_open_leagues.html', {'tournaments': tournaments, 'alert': alert})
 
 
 @login_required()

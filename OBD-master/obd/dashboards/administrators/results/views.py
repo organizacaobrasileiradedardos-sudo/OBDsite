@@ -8,13 +8,13 @@ from django.shortcuts import render, redirect
 from obd.dashboards.administrators.divisions.models import Division
 from obd.dashboards.administrators.fixtures.models import Fixture
 from obd.dashboards.administrators.leagues.models import League
-from obd.dashboards.administrators.results.forms import ResultForm, ValidateServerForm
+from obd.dashboards.administrators.results.forms import ResultForm
 from obd.dashboards.administrators.results.models import Result
 from obd.dashboards.administrators.champions.models import Champion
 from django.db.models import Avg, Sum, Count, Max, Min, Q, Value
 from django.db.models.functions import Cast, Coalesce
-from obd.core.obdlib.webscraping.nakka import NakkaScraping
-from obd.core.obdlib.webscraping.webcamdarts import WebcamdartsScraping
+
+
 import cloudinary
 import cloudinary.uploader
 import cloudinary.api
@@ -54,119 +54,14 @@ def show(request, slug, match):
                 pass
 
     division = Division.objects.get(slug=slug)
-    form = ValidateServerForm()
-    html = {'validated': False, 'required': '', 'text_submit': 'Validar partida!', 'color_submit': 'btn-warning',
+    form = ResultForm()
+    html = {'validated': True, 'required': '', 'text_submit': 'Validar partida!', 'color_submit': 'btn-warning',
             'readonly_server': 'readonly', 'readonly_data': ''}
     return render(request, 'user_result_submit.html',
                   {'division': division, 'match': match, 'form': form, 'html': html})
 
 
-# View to validate the server and bring to the form NAKKA/WEBCAMDARTS or LIDARTS match results.
-@login_required()
-def setserver(request, slug, match, alert='alert-success'):
-    form_validate = ValidateServerForm(request.POST)
-    division = Division.objects.get(slug=slug)
-    match = Fixture.objects.get(id=match)
-    if not form_validate.is_valid():
-        html = {'validated': True, 'required': 'required', 'text_submit': 'Validar dados!',
-                'color_submit': 'btn-warning'}
-        alert = 'alert-danger'
-        html = {'validated': False, 'required': '', 'text_submit': 'Validar dados!', 'color_submit': 'btn-warning'}
-        return render(request, 'user_result_submit.html',
-                      {'division': division, 'match': match, 'form': form_validate, 'html': html})
 
-    # Once validated.
-    form = ResultForm()
-    if form_validate.cleaned_data['server'] == 'WED':
-        # Execute WEBCAMDARTS SCRAP
-        webcamdarts = WebcamdartsScraping()
-        name_wed = match.result_set.first().player.profile.webcamdarts
-        name_wed = str(name_wed).strip().lower()
-        link = form_validate.cleaned_data['link']
-        data = copy.deepcopy(webcamdarts.start_by(auto_only=False, link=link, name=name_wed))
-
-        nickname_server = str(data['p1']['name']).strip().lower()
-
-        if name_wed == nickname_server:
-            data_p1 = data['p1']
-            data_p2 = data['p2']
-        else:
-            data_p1 = data['p2']
-            data_p2 = data['p1']
-
-        server = {'code': 'WED',
-                  'name': 'WEBCAMDARTS',
-                  'link': link}
-
-        html = {'validated': True,
-                'required': 'required',
-                'text_submit': 'Registrar partida via WEBCAMDARTS',
-                'color_submit': 'btn-success',
-                'readonly_server': 'readonly',
-                'readonly_data': 'readonly'}
-
-        response = {'division': division,
-                    'match': match,
-                    'p1': data_p1,
-                    'p2': data_p2,
-                    'form': form,
-                    'html': html,
-                    'server': server}
-
-        return render(request, 'user_result_submit.html', response)
-
-    else:
-        if form_validate.cleaned_data['server'] == 'N01':
-            name_n01 = match.result_set.first().player.profile.nakka
-            name_n01 = str(name_n01).strip().lower()
-            nakka = NakkaScraping()
-            link = form_validate.cleaned_data['link']
-            data = copy.deepcopy(nakka.start_by(auto_only=False, link=link))
-
-            nickname_server = str(data['p1']['name']).strip().lower()
-
-            if name_n01 == nickname_server:
-                data_p1 = data['p1']
-                data_p2 = data['p2']
-            else:
-                data_p1 = data['p2']
-                data_p2 = data['p1']
-
-            server = {'code': 'N01',
-                      'name': 'NAKKA',
-                      'link': link}
-
-            html = {'validated': True,
-                    'required': 'required',
-                    'text_submit': 'Registrar partida via NAKKA',
-                    'color_submit': 'btn-success',
-                    'readonly_server': 'readonly',
-                    'readonly_data': 'readonly'}
-
-            response = {'division': division,
-                        'match': match,
-                        'p1': data_p1,
-                        'p2': data_p2,
-                        'form': form,
-                        'html': html,
-                        'server': server}
-
-            return render(request, 'user_result_submit.html', response)
-
-    # In the case server is not WEBCAMDARTS or NAKKA
-    server = {'code': form_validate.cleaned_data['server'],
-              'name': form_validate.cleaned_data['server'],
-              'link': form_validate.cleaned_data['link']}
-
-    html = {'validated': True,
-            'required': 'required',
-            'text_submit': 'Registrar partida',
-            'color_submit': 'btn-success',
-            'readonly_server': 'readonly',
-            'readonly_data': ''}
-
-    return render(request, 'user_result_submit.html',
-                  {'division': division, 'match': match, 'form': form, 'html': html, 'server': server})
 
 
 # Post method to record data into tables: stats, fixture, results.
@@ -195,10 +90,10 @@ def submit(request, slug, match, alert='alert-success'):
 
     # Updating Fixture Table related to Match/Game
     game.status = 1
-    game.link = form.cleaned_data['link']
+    game.link = ''
     game.submited_by = request.user.username
     game.on_date = datetime.date.today()
-    game.server = form.cleaned_data['server']
+    game.server = 'OTH'
 
     if form.cleaned_data['photo'] is not None:
         cloudinary_response = cloudinary.uploader.upload(form.cleaned_data['photo'],
@@ -294,17 +189,11 @@ def submit(request, slug, match, alert='alert-success'):
             merit_p2.enabled = True
 
 
-    if (game.server == 'WED') or (game.server == 'N01') or (game.server == 'LID'):
+    if (game.server == 'N01') or (game.server == 'LID'):
         game.validation = 1
         result_p1.validation = 1
         result_p2.validation = 1
         game.comment = 'AUTO INSERT'
-        # game.save()
-    else:
-        game.validation = 0
-        result_p1.validation = 0
-        result_p2.validation = 0
-        game.comment = 'MANUAL INSERT'
         # game.save()
 
     # Updating P1 Stat
@@ -526,8 +415,8 @@ def submit(request, slug, match, alert='alert-success'):
                 champion.p3 = result_p2.player
                 champion.p4 = result_p1.player
 
-    # Saving P1 and P2 stats if SERVER is WED, N01 ou LID (Dont need validation).
-    if (game.server == 'WED') or (game.server == 'N01') or (game.server == 'LID'):
+    # Saving P1 and P2 stats if SERVER is N01 ou LID (Dont need validation).
+    if (game.server == 'N01') or (game.server == 'LID'):
         p1.stat.save()
         p2.stat.save()
         champion.save()

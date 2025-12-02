@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OBD Banner Generator - 1024x155</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700;800&display=swap" rel="stylesheet">
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            background: #333;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            font-family: 'Montserrat', Arial, sans-serif;
+        }
+
+        .banner-container {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+        }
+
+        .banner {
+            width: 1024px;
+            height: 155px;
+            background: linear-gradient(90deg, #000000 0%, #2b2b2b 100%);
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+        }
+
+        /* Logo container */
+        .logo-container {
+            width: 155px;
+            height: 155px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 5px;
+            box-sizing: border-box;
+            margin-left: 20px;
+            z-index: 2;
+        }
+
+        .logo-container img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+            filter: drop-shadow(0 0 10px rgba(255, 215, 0, 0.2));
+        }
+
+        /* Text content */
+        .banner-text {
+            flex: 1;
+            padding-left: 30px;
+            padding-right: 40px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .main-title {
+            font-size: 42px;
+            font-weight: 800;
+            color: white;
+            margin: 0;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            line-height: 1.1;
+            background: linear-gradient(180deg, #FFFFFF 40%, #CCCCCC 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .highlight {
+            color: #FFD700;
+            background: linear-gradient(180deg, #FFD700 0%, #FFA500 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        /* Minimal accent */
+        .accent-bar {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #009c3b 0%, #ffdf00 50%, #002776 100%);
+            opacity: 0.8;
+        }
+
+        .instructions {
+            margin-top: 20px;
+            padding: 15px;
+            background: #f5f5f5;
+            border-radius: 5px;
+            max-width: 1024px;
+        }
+
+        .instructions h3 {
+            margin-top: 0;
+            color: #1a1a1a;
+        }
+
+        .instructions ol {
+            margin: 10px 0;
+            padding-left: 20px;
+        }
+
+        .instructions li {
+            margin: 8px 0;
+            color: #333;
+        }
+
+        button {
+            background: #00A859;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            font-size: 16px;
+            font-weight: bold;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+
+        button:hover {
+            background: #008f4a;
+        }
+
+        #logoInput {
+            margin-top: 10px;
+            padding: 8px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="banner-container">
+        <div class="banner" id="banner">
+
+            <div class="logo-container">
+                <img src="" alt="Logo OBD" id="logo-img">
+            </div>
+
+            <div class="banner-text">
+                <div class="main-title">Organização <span class="highlight">Brasileira</span> de Dardos</div>
+            </div>
+
+            <div class="accent-bar"></div>
+        </div>
+
+        <div class="instructions">
+            <h3>📸 Gerador de Banner OBD (1024x155) - Estilo Minimalista</h3>
+            <ol>
+                <li><strong>Passo 1:</strong> Carregue o logo OBD usando o botão abaixo.</li>
+                <li><strong>Passo 2:</strong> Salve o banner:
+                    <ul>
+                        <li><strong>Chrome/Edge:</strong> F12 → Selecione #banner → ... → Capture node screenshot</li>
+                        <li><strong>Manual:</strong> Use ferramenta de captura de tela na área do banner.</li>
+                    </ul>
+                </li>
+            </ol>
+            <div>
+                <input type="file" id="logoInput" accept="image/*">
+                <button onclick="loadLogo()">📤 Carregar Logo</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('logoInput').addEventListener('change', function (e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function (event) {
+                    document.getElementById('logo-img').src = event.target.result;
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
+        function loadLogo() {
+            document.getElementById('logoInput').click();
+        }
+
+        // Auto-load if file exists in expected path (for demo)
+        window.addEventListener('load', function () {
+            const logoPath = '/Users/mac2/.gemini/antigravity/brain/5314b65d-d9a4-4a7c-be20-4b0cc04583ac/uploaded_image_1_1763996250671.png';
+            document.getElementById('logo-img').src = logoPath;
+        });
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Plano de Implementação - Reformulação da Página Principal</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            max-width: 900px;
+            margin: 40px auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+            color: #333;
+        }
+
+        h1 {
+            color: #DC2626;
+            border-bottom: 3px solid #DC2626;
+            padding-bottom: 10px;
+        }
+
+        h2 {
+            color: #059669;
+            margin-top: 30px;
+            border-left: 4px solid #059669;
+            padding-left: 15px;
+        }
+
+        h3 {
+            color: #374151;
+            margin-top: 25px;
+        }
+
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        ul,
+        ol {
+            margin-left: 20px;
+        }
+
+        li {
+            margin-bottom: 8px;
+        }
+
+        strong {
+            color: #1F2937;
+        }
+
+        code {
+            background-color: #f3f4f6;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: 'Courier New', monospace;
+            color: #DC2626;
+        }
+
+        .file-ref {
+            background-color: #EEF2FF;
+            padding: 10px;
+            border-left: 4px solid #4F46E5;
+            margin: 15px 0;
+            border-radius: 4px;
+        }
+
+        .impact {
+            background-color: #FEF3C7;
+            padding: 8px 12px;
+            border-radius: 4px;
+            display: inline-block;
+            font-weight: bold;
+            color: #92400E;
+        }
+
+        hr {
+            border: none;
+            border-top: 2px solid #e5e7eb;
+            margin: 25px 0;
+        }
+
+        .total {
+            background: linear-gradient(135deg, #059669, #047857);
+            color: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+
+        .verification {
+            background: #F3F4F6;
+            padding: 15px;
+            border-radius: 6px;
+            margin: 15px 0;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>Reformulação da Página Principal - Layout Compacto</h1>
+
+        <h2>Objetivo</h2>
+        <p>Ajustar o layout da página principal do site para que o banner e o quadro "Bem-vindo ao Portal OBD" apareçam
+            integralmente (acima da dobra) quando a página é carregada, sem necessidade de scroll.</p>
+
+        <h2>Análise Atual</h2>
+        <p>Atualmente, a página tem os seguintes elementos que ocupam espaço vertical:</p>
+        <ol>
+            <li><strong>Navbar fixa</strong> (<code>fixed-top</code>) - ocupa espaço no topo</li>
+            <li><strong>Três <code>&lt;br&gt;</code> tags</strong> após a navbar (linha 160 do <code>base.html</code>)
+            </li>
+            <li><strong>Container com margem superior</strong> (<code>mt-4</code> na linha 163)</li>
+            <li><strong>Banner</strong> (linha 15-18 do <code>index.html</code>) com margem inferior <code>mb-3</code>
+            </li>
+            <li><strong>Welcome Card</strong> (linhas 21-51) com padding vertical <code>py-5</code> no corpo do card e
+                margem inferior <code>mb-5</code></li>
+        </ol>
+
+        <h2>Mudanças Propostas</h2>
+
+        <div class="file-ref">
+            <h3>base.html</h3>
+        </div>
+
+        <p><strong>Linha 160</strong>: Reduzir o espaçamento após a navbar</p>
+        <ul>
+            <li><strong>Atual</strong>: <code>&lt;br&gt;&lt;br&gt;&lt;br&gt;</code> (3 quebras de linha)</li>
+            <li><strong>Proposto</strong>: <code>&lt;br&gt;&lt;br&gt;</code> (2 quebras de linha)</li>
+            <li><span class="impact">Impacto: Reduz ~20px de espaço vertical</span></li>
+        </ul>
+
+        <p><strong>Linha 163</strong>: Reduzir margem superior do container</p>
+        <ul>
+            <li><strong>Atual</strong>: <code>&lt;div class="container-fluid mt-4"&gt;</code></li>
+            <li><strong>Proposto</strong>: <code>&lt;div class="container-fluid mt-2"&gt;</code></li>
+            <li><span class="impact">Impacto: Reduz ~16px de espaço vertical</span></li>
+        </ul>
+
+        <hr>
+
+        <div class="file-ref">
+            <h3>index.html</h3>
+        </div>
+
+        <p><strong>Linha 15</strong>: Reduzir margem inferior do banner</p>
+        <ul>
+            <li><strong>Atual</strong>: <code>&lt;div class="mb-3 text-center"&gt;</code></li>
+            <li><strong>Proposto</strong>: <code>&lt;div class="mb-2 text-center"&gt;</code></li>
+            <li><span class="impact">Impacto: Reduz ~8px de espaço entre navbar e banner</span></li>
+        </ul>
+
+        <p><strong>Linha 25</strong>: Reduzir padding vertical do corpo do Welcome Card</p>
+        <ul>
+            <li><strong>Atual</strong>: <code>&lt;div class="card-body py-5"&gt;</code></li>
+            <li><strong>Proposto</strong>: <code>&lt;div class="card-body py-3"&gt;</code></li>
+            <li><span class="impact">Impacto: Reduz ~32px na altura do card (16px no topo + 16px na base)</span></li>
+        </ul>
+
+        <p><strong>Linha 21</strong>: Reduzir margem inferior do Welcome Card</p>
+        <ul>
+            <li><strong>Atual</strong>: <code>&lt;div class="card card-dartboard text-center mb-5"&gt;</code></li>
+            <li><strong>Proposto</strong>: <code>&lt;div class="card card-dartboard text-center mb-4"&gt;</code></li>
+            <li><span class="impact">Impacto: Reduz ~16px abaixo do card</span></li>
+        </ul>
+
+        <div class="total">
+            <h2 style="color: white; border: none; margin: 0;">Impacto Total Estimado</h2>
+            <ul style="margin-top: 10px;">
+                <li>Redução total de espaçamento: <strong>~92px</strong></li>
+                <li>Isso deve permitir que o banner e o welcome card sejam totalmente visíveis em viewports de 768px de
+                    altura ou maiores</li>
+            </ul>
+        </div>
+
+        <h2>Plano de Verificação</h2>
+        <div class="verification">
+            <ol>
+                <li>Fazer um hard refresh do navegador após as alterações</li>
+                <li>Verificar a visualização em diferentes tamanhos de tela (desktop, tablet)</li>
+                <li>Confirmar que o banner e o welcome card estão completamente visíveis no carregamento inicial</li>
+                <li>Garantir que o layout ainda parece equilibrado e profissional</li>
+            </ol>
+        </div>
+
+        <p style="margin-top: 30px; text-align: center; color: #6B7280; font-size: 0.9em;">
+            <strong>OBD - Organização Brasileira de Dardos</strong><br>
+            Plano de Implementação gerado em 02/12/2025
+        </p>
+    </div>
+</body>
+
+</html>

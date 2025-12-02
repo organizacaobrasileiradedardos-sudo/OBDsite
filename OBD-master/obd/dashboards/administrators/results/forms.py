@@ -1,97 +1,14 @@
 from decouple import config
 from django import forms
-from obd.core.obdlib.webscraping.webcamdarts import WebcamdartsScraping
-from obd.core.obdlib.webscraping.nakka import NakkaScraping
+
+
 import re
 
 # Class form for player to register results from match
 from obd.dashboards.administrators.fixtures.models import Fixture
 
 
-class ValidateServerForm(forms.Form):
-    # Subforms for general data/info
-    division = forms.IntegerField(label='Liga/Divisão', required=True)
-    match = forms.IntegerField(label='#ID Partida', required=True)
-    player1 = forms.IntegerField(label='Jogador(a) 1', required=True)
-    player2 = forms.IntegerField(label='Joagdor(a) 2', required=True)
-    server = forms.CharField(label='Servidor', required=True, max_length=40)
-    link = forms.CharField(label='Link da partida', required=False, max_length=250)
 
-    def clean_match(self):
-        try:
-            game = Fixture.objects.get(id=self.cleaned_data['match'])
-        except Fixture.DoesNotExist:
-            raise forms.ValidationError(f'Não foi possível encontrar a partida #{game.id}.')
-        else:
-            if game.validation == 1 and game.enabled:
-                raise forms.ValidationError(f'A partida #{game.id} já foi finalizada anteriormente.')
-            else:
-                return self.cleaned_data['match']
-
-
-    def clean_link(self):
-        server_match = self.cleaned_data['server']
-        game = Fixture.objects.get(id=self.cleaned_data['match'])
-        url_match = self.cleaned_data['link']
-
-        #Checking wich server, if WEBCAMDARTS or NAKKA or OTHER
-        if server_match == 'WED' or server_match == 'N01':
-            if server_match == 'WED':
-                pattern = re.compile(config('PATTERN_WEBCAMDARTS_LINK'))
-
-                #Checking if URL is a valid WEBCAMDARTS link
-                if pattern.match(url_match):
-                    webcamdarts_scrap = WebcamdartsScraping()
-                    p1_webcamdarts = game.result_set.first().player.profile.webcamdarts
-                    p1_webcamdarts = str(p1_webcamdarts).strip().lower()
-                    p2_webcamdarts = game.result_set.last().player.profile.webcamdarts
-                    p2_webcamdarts = str(p2_webcamdarts).strip().lower()
-
-                    #Checking if URL returns a valid WEBCAMDARTS match.
-                    webcamdarts_scrap.get_results(auto_only=False, link=url_match, page_max=10, name=p1_webcamdarts)
-                    if len(webcamdarts_scrap.matches[3]) == 0:
-                        raise forms.ValidationError(f'Não foi possível localizar sua partida utilizando o link informado')
-                    else:
-                        p1 = str(webcamdarts_scrap.matches[3]['p1']['name'].lower().strip())
-                        p2 = str(webcamdarts_scrap.matches[3]['p2']['name'].lower().strip())
-                        if (p1 == p1_webcamdarts) or (p1 == p2_webcamdarts):
-                            if p2 == p1_webcamdarts or p2 == p2_webcamdarts:
-                                return self.cleaned_data['link']
-                            else:
-                                raise forms.ValidationError(f'O link informado não correponde ao jogo entre {p1_webcamdarts.upper()} Vs {p2_webcamdarts}.upper()')
-                        else:
-                            raise forms.ValidationError(f'O link informado não correponde ao jogo entre {p1_webcamdarts.upper()} Vs {p2_webcamdarts}.upper()')
-
-                else:
-                    raise forms.ValidationError(f'Link WEBCAMDARTS inválido. Por favor verifique o link da partida.')
-            else:
-                pattern = re.compile(config('PATTERN_NAKKA_LINK'))
-                #Checking NAKKA URL pattern / format
-                if pattern.match(url_match):
-                    nakka_scrap = NakkaScraping()
-                    #Checking if the URL returns a valid match
-                    result = nakka_scrap.start_by(auto_only=False, link=url_match)
-                    if not result:
-                        raise forms.ValidationError(f'Não foi possível localizar uma partida válida no NAKKA com o link informado.')
-                    else:
-                        #Cheking if the URL, after players validated, belongs to its players.
-                        p1_nakka = game.result_set.first().player.profile.nakka
-                        p1_nakka = str(p1_nakka).strip().lower()
-                        p2_nakka = game.result_set.last().player.profile.nakka
-                        p2_nakka = str(p2_nakka).strip().lower()
-                        nicknames = (p1_nakka, p2_nakka)
-
-                        # result = nakka_scrap.start_by(auto_only=False, link=url_match)
-                        player1 = str(result['p1']['name']).lower().strip()
-                        player2 = str(result['p2']['name']).lower().strip()
-                        if (player2 in nicknames) and (player1 in nicknames):
-                            return self.cleaned_data['link']
-                        else:
-                            raise forms.ValidationError(f'O link informado não se refere a partida entre "{p1_nakka}" Vs. "{p2_nakka}" pelo NAKKA.')
-                else:
-                    raise forms.ValidationError('Link NAKKA inválido. Por favor verifique o link da partida.')
-        else:
-            return self.cleaned_data['link']
 
 
 class ResultForm(forms.Form):
@@ -100,8 +17,6 @@ class ResultForm(forms.Form):
     match = forms.IntegerField(label='#ID Partida', required=False)
     player1 = forms.IntegerField(label='Jogador(a) 1', required=False)
     player2 = forms.IntegerField(label='Joagdor(a) 2', required=False)
-    server = forms.CharField(label='Servidor', required=False, max_length=40)
-    link = forms.CharField(label='Link da partida', required=False, max_length=250)
     comment = forms.CharField(label='Comentários', required=False, max_length=250)
 
     # Subforms for Player 01
@@ -128,11 +43,7 @@ class ResultForm(forms.Form):
 
     photo = forms.ImageField(label='Anexo', required=False)
 
-    def clean_server(self):
-        return self.cleaned_data['server']
 
-    def clean_link(self):
-        return self.cleaned_data['link']
 
     def clean_sets_p2(self):
         p2_sets = self.cleaned_data['sets_p2']
