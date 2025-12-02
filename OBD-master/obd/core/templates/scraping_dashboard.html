@@ -1,0 +1,76 @@
+{% extends 'baseadmin.html' %}
+
+{% block title %} Dashboard de Captura de Dados {% endblock %}
+
+{% block page %}Captura de Dados N01 Darts{% endblock %}
+{% block boauser %} Administrador {% endblock %}
+
+{% block content %}
+
+{% if messages %}
+{% for message in messages %}
+<div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+  {{ message }}
+  <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+</div>
+{% endfor %}
+{% endif %}
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="card bg-dark text-white mb-4">
+            <div class="card-header">
+                <i class="bi bi-cloud-download"></i> Nova Captura
+            </div>
+            <div class="card-body">
+                <form method="post" action="{% url 'administrators:run_capture' %}">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label for="url" class="form-label">URL do Torneio N01 (t_stats.html)</label>
+                        <input type="url" class="form-control" id="url" name="url" placeholder="https://n01darts.com/n01/tournament/t_stats.html?id=..." required>
+                        <div class="form-text text-muted">Insira a URL completa da página de estatísticas do torneio.</div>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Capturar Dados</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-12">
+        <h5><strong><i class="bi bi-clock-history"></i> Histórico de Capturas</strong></h5>
+        <table class="table table-dark table-striped">
+            <thead>
+                <tr>
+                    <th scope="col">Torneio</th>
+                    <th scope="col">Data</th>
+                    <th scope="col">Jogadores</th>
+                    <th scope="col">Capturado em</th>
+                    <th scope="col">Ações</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for tournament in tournaments %}
+                <tr>
+                    <td>{{ tournament.name }}</td>
+                    <td>{{ tournament.date|date:"d/m/Y" }}</td>
+                    <td>{{ tournament.stats.count }}</td>
+                    <td>{{ tournament.created_at|date:"d/m/Y H:i" }}</td>
+                    <td>
+                        <a href="{{ tournament.source_url }}" target="_blank" class="btn btn-sm btn-outline-light" title="Ver Fonte">
+                            <i class="bi bi-link-45deg"></i>
+                        </a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="5" class="text-center">Nenhum torneio capturado ainda.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+{% endblock %}

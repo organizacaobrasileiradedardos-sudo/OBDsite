@@ -1,0 +1,51 @@
+{% extends 'baseuser.html' %}
+{% load static %}
+{% block csslib %}
+{% endblock %}
+{% block title %} Ligas OBD {% now "Y" %} {% endblock %}
+{% block styles %} {% endblock %}
+{% block page %}Ligas em aberto/andamento do OBD {% now "Y" %}{% endblock %}
+{% block content %}
+<p><br></p>
+
+{% if messages %}
+{% for message in messages %}
+<div class="alert alert-danger alert-dismissible fade show" role="alert">
+    {{ message}}
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+</div>
+{% endfor %}
+{% endif %}
+
+{% if form.errors %}
+{% for field in form %}
+{% for error in field.errors %}
+<div class="alert alert-danger alert-dismissible fade show" role="alert">
+    <strong>{{ error|escape }}</strong>
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+</div>
+{% endfor %}
+{% endfor %}
+{% for error in form.non_field_errors %}
+<div class="alert alert-danger">
+    <strong>{{ error|escape }}</strong>
+</div>
+{% endfor %}
+{% endif %}
+
+<h5><strong><i class="bi bi-list-stars"></i> Relatório/Auditoria de Jogos OBD</strong>
+    <p><br></p>
+    {% if link %}
+    <p>::: Arquivo gerado automaticamente através do banco de dados OBD (Organização Brasileira de Dardos)</p><br>
+    <p>::: Solicitado por: {{ user.first_name }} {{ user.last_name }} / {{ user.email }}</p><br>
+    <p>::: Em caso de divergência de resultados entrar em contato com Nathan Perks.</p><br>
+    <a class="btn btn-warning" href="/{{ path_1 }}" download role="button">Baixar Relatório **OBD**</a>
+    {% else %}
+    <p>Relatório não pode ser gerado. Tente novamente mais tarde.</p>
+    {% endif %}
+
+
+
+    {% endblock %}
+    {% block jslib %}
+    {% endblock %}

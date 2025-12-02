@@ -1,0 +1,106 @@
+{% extends 'baseuser.html' %}
+{% block csslib %}
+{% endblock %}
+{% block title %} Perfil Geral do Jogador {% endblock %}
+{% block styles %} {% endblock %}
+{% block page %}Atualização de Login e Senha do usuário{% endblock %}
+{% block content %}
+
+           {% if messages %}
+                    {% for message in messages %}
+                            <div class="alert {{ alert }} alert-dismissible fade show" role="alert">
+                                {{ message}}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                            </div>
+                    {% endfor %}
+          {% endif %}
+
+        {% if form.errors %}
+            {% for field in form %}
+                {% for error in field.errors %}
+                    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                    <strong>{{ error|escape }}</strong>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                {% endfor %}
+            {% endfor %}
+            {% for error in form.non_field_errors %}
+                <div class="alert alert-danger">
+                <strong>{{ error|escape }}</strong>
+                </div>
+            {% endfor %}
+        {% endif %}
+
+        <form action="" method="post">
+        {% csrf_token %}
+
+            <h5><strong><i class="bi bi-list-stars"></i>  Informe os dados do login atual:</strong></h5>
+
+        <div class="row mb-3">
+        <label for="{{ form.email.id_for_label }}" class="col-sm-2 col-form-label">{{ form.email.label }}</label>
+        <div class="col-sm-4">
+        <input class="form-control" type="email" id="{{ form.email.id_for_label }}" name="{{ form.email.html_name }}" minlength="3" value="{{ user.email }}" required>
+        </div>
+        </div>
+
+        <div class="row mb-3">
+        <label for="{{ form.username.id_for_label }}" class="col-sm-2 col-form-label">{{ form.username.label }}</label>
+        <div class="col-sm-4">
+        <input class="form-control" type="text"  id="{{ form.username.id_for_label }}" name="{{ form.username.html_name }}" minlength="3"
+        {% if form.username.value is not None %} value="{{ form.username.value }}" {% endif %} required>
+        </div>
+        </div>
+
+        <div class="row mb-3">
+        <label for="{{ form.password.id_for_label }}" class="col-sm-2 col-form-label">{{ form.password.label }}</label>
+        <div class="col-sm-4">
+        <input class="form-control" type="password"  id="{{ form.password.id_for_label }}" name="{{ form.password.html_name }}" minlength="3"
+        {% if form.password.value is not None %} value="{{ form.password.value }}" {% endif %} required>
+        </div>
+        </div>
+
+        <p><br></p>
+        <h5><strong><i class="bi bi-list-stars"></i>  Informe abaixo os dados o(s) qual(ais) deseja atualização: </strong></h5>
+
+        <div class="row mb-3">
+        <label for="{{ form.email2.id_for_label }}" class="col-sm-2 col-form-label">{{ form.email2.label }}</label>
+        <div class="col-sm-4">
+        <input class="form-control" type="email"  id="{{ form.email2.id_for_label }}" name="{{ form.email2.html_name }}" minlength="3"
+        {% if form.email2.value is not None %} value="{{ form.email2.value }}" {% endif %}>
+        </div>
+        </div>
+
+
+        <div hidden class="row mb-3">
+        <label hidden for="{{ form.username2.id_for_label }}" class="col-sm-2 col-form-label">{{ form.username2.label }}</label>
+        <div class="col-sm-4">
+        <input  hidden class="form-control" type="text"  id="{{ form.username2.id_for_label }}" name="{{ form.username2.html_name }}" minlength="5"
+        {% if form.username2.value is not None %} value="{{ form.username2.value }}" {% endif %}>
+        </div>
+        </div>
+
+        <div class="row mb-3">
+        <label for="{{ form.password2.id_for_label }}" class="col-sm-2 col-form-label">{{ form.password2.label }}</label>
+        <div class="col-sm-4">
+        <input class="form-control" type="password"  id="{{ form.password2.id_for_label }}" name="{{ form.password2.html_name }}" minlength="7"
+        {% if form.password2.value is not None %} value="{{ form.password2.value }}" {% endif %}>
+        </div>
+        </div>
+
+        <div class="row mb-3">
+        <label for="{{ form.password3.id_for_label }}" class="col-sm-2 col-form-label">{{ form.password3.label }}</label>
+        <div class="col-sm-4">
+        <input class="form-control" type="password"  id="{{ form.password3.id_for_label }}" name="{{ form.password3.html_name }}" minlength="7"
+        {% if form.password3.value is not None %} value="{{ form.password3.value }}" {% endif %}>
+        </div>
+        </div>
+
+        <br>
+        <button type="submit" class="btn btn-warning mb-3"><i class="bi bi-save2-fill"></i> Atualizar</button>
+        <br>
+
+      </form>
+
+{% endblock %}
+{% block jslib %}
+{% endblock %}

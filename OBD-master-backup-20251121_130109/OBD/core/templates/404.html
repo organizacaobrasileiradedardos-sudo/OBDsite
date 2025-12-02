@@ -1,0 +1,48 @@
+<!--
+Project name: OBD - Organização Brasileira de Dardos
+Property: Nathan Perkes
+Developers: Walisson Oliveira
+Page name: login.html (Página LOGIN dos jogadores o OBD)
+Start date of this page: Apr-11-2021
+Last update:
+Description: This is the page where players can log-in
+-->
+{% extends 'base.html' %}
+{% block csslib %}
+{% endblock %}
+{% block title %} A página que você está tentando acessar não foi encontrada. Entre em contato com o administrador. |
+Código 404 {% endblock %}
+{% block styles %}
+{% endblock %}
+{% block content %}
+
+<div class="container">
+    <div class="row">
+
+        <div class="col-4"></div>
+        <div class="col-4">
+            {% if user.is_authenticated %}
+            <div class="alert alert-danger" role="alert" align="center">
+                <strong>Olá {{ user.first_name }} {{ user.last_name }}, a página que você está tentando acessar não foi
+                    encontrada. Entre em contato com o administrador do sistema e informe os dados:</strong>
+                <hr>
+                <p>Código: 404</p>
+                <p>Endereço: {{ request.get_full_path }}</p>
+                <p>Data/hora do acesso: {% now "d/M/Y - H:i" %}</p>
+            </div>
+            {% else %}
+            <div class="alert alert-danger" role="alert" align="center">
+                <strong>Olá, somente usuários logados tem acesso à esta página.</strong>
+            </div>
+            {% endif %}
+
+        </div>
+        <div class="col">
+            <p></p>
+        </div>
+    </div>
+</div>
+<br>
+{% endblock %}
+{% block jslib %}
+{% endblock %}

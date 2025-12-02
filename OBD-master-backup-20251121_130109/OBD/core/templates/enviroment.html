@@ -1,0 +1,546 @@
+<!--
+Project name: OBD - Organização Brasileira de Dardos
+Property: Nathan Perkes
+Developers: Walisson Oliveira
+Page name: enviroment.html (Página de Configurações Gerais)
+Start date of this page: Mar-13-2021
+Last update: Mar-20-2021
+Description: This is the enviroment setup page.
+-->
+{% extends 'baseadmin.html' %}
+{% block csslib %}
+{% endblock %}
+{% block title %} Página de configuração de parâmetros do OBD {% endblock %}
+{% block styles %}
+{% endblock %}
+{% block page %}Configurações de Parâmetros do Sistema OBD{% endblock %}
+
+{% block content %}
+
+{% if messages %}
+{% for message in messages %}
+<div class="alert {{ alert }} alert-dismissible fade show" role="alert">
+    <a href="#" class="link-success">{{ message}}</a>
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+</div>
+{% endfor %}
+{% endif %}
+
+{% if form.errors %}
+{% for field in form %}
+{% for error in field.errors %}
+<div class="alert alert-danger alert-dismissible fade show" role="alert">
+    <strong>{{ error|escape }}</strong>
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+</div>
+{% endfor %}
+{% endfor %}
+{% for error in form.non_field_errors %}
+<div class="alert alert-danger">
+    <strong>{{ error|escape }}</strong>
+</div>
+{% endfor %}
+{% endif %}
+<h7><strong> <i class="bi bi-bookmark-check-fill"></i> Configurações atuais do OBD:</strong></h7>
+<p>
+
+</p>
+<table class="table">
+    <thead>
+        <tr>
+            <th scope="col">#</th>
+            <th scope="col">Versão Atual</th>
+            <th scope="col">Atualizado em</th>
+            <th scope="col">Status</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <th scope="row">1</th>
+            <td>Versão {{ env.id }}</td>
+            <td>{{ env.created_at }}</td>
+            <td><i class="bi bi-bullseye"></i> Ativo</td>
+        </tr>
+    </tbody>
+</table>
+
+<p>
+
+</p>
+
+<form action="" method="post">
+    {% csrf_token %}
+
+    <h5><strong><i class="bi bi-list-stars"></i> Configurações do OBD Card of Merit (BCM):</strong></h5>
+
+    <div class="row mb-3">
+        <label for="{{ form.meritPmin.id_for_label }}" class="col-sm-2 col-form-label">{{ form.meritPmin.label
+            }}</label>
+        <div class="col-sm-2">
+            <input class="form-control" type="number" id="{{ form.meritPmin.id_for_label }}"
+                name="{{ form.meritPmin.html_name }}" min="26" max="167" value="{{ env.meritPmin }}" required>
+        </div>
+    </div>
+
+
+    <div class="row mb-3">
+        <label for="{{ form.meritAmin.id_for_label }}" class="col-sm-2 col-form-label">{{ form.meritAmin.label
+            }}</label>
+        <div class="col-sm-2">
+            <input class="form-control" type="number" id="{{ form.meritAmin.id_for_label }}"
+                name="{{ form.meritAmin.html_name }}" min="26" max="167" value="{{ env.meritAmin }}" required>
+        </div>
+    </div>
+
+
+    <div class="row mb-3">
+        <label for="{{ form.meritBmin.id_for_label }}" class="col-sm-2 col-form-label">{{ form.meritBmin.label
+            }}</label>
+        <div class="col-sm-2">
+            <input class="form-control" type="number" id="{{ form.meritBmin.id_for_label }}"
+                name="{{ form.meritBmin.html_name }}" min="26" max="167" value="{{ env.meritBmin }}" required>
+        </div>
+    </div>
+
+    <div class="row mb-3">
+        <label for="{{ form.meritCmin.id_for_label }}" class="col-sm-2 col-form-label">{{ form.meritCmin.label
+            }}</label>
+        <div class="col-sm-2">
+            <input class="form-control" type="number" id="{{ form.meritCmin.id_for_label }}"
+                name="{{ form.meritCmin.html_name }}" min="26" max="167" value="{{ env.meritCmin }}" required>
+        </div>
+    </div>
+
+    <div class="row mb-3">
+        <label for="{{ form.meritDmin.id_for_label }}" class="col-sm-2 col-form-label">{{ form.meritDmin.label
+            }}</label>
+        <div class="col-sm-2">
+            <input class="form-control" type="number" id="{{ form.meritDmin.id_for_label }}"
+                name="{{ form.meritDmin.html_name }}" min="26" max="167" value="{{ env.meritDmin }}" required>
+        </div>
+    </div>
+
+    <div class="row mb-3">
+        <label for="{{ form.meritRmin.id_for_label }}" class="col-sm-2 col-form-label">{{ form.meritRmin.label
+            }}</label>
+        <div class="col-sm-2">
+            <input class="form-control" type="number" id="{{ form.meritRmin.id_for_label }}"
+                name="{{ form.meritRmin.html_name }}" min="26" max="167" value="{{ env.meritRmin }}" required>
+        </div>
+    </div>
+
+
+    <br>
+    <h5><strong><i class="bi bi-list-stars"></i> Configurações Ranking BCM</strong></h5>
+    <br>
+    <div class="row mb-3">
+        <label for="{{ form.meritTimeline.id_for_label }}" class="col-sm-2 col-form-label">{{ form.meritTimeline.label
+            }}</label>
+        <div class="col-sm-2">
+            <input class="form-control" type="number" id="{{ form.meritTimeline.id_for_label }}"
+                name="{{ form.meritTimeline.html_name }}" min="30" max="721" value="{{ env.meritTimeline }}" required>
+        </div>
+    </div>
+    <div class="row mb-3">
+        <label for="{{ form.meritChampionBonus.id_for_label }}" class="col-sm-2 col-form-label">{{
+            form.meritChampionBonus.label }}</label>
+        <div class="col-sm-1">
+            <input type="number" class="form-control" id="{{ form.meritChampionBonus.id_for_label }}"
+                name="{{ form.meritChampionBonus.html_name }}" min="1" max="99" value="{{ env.meritChampionBonus }}"
+                required>
+        </div>
+        <label for="{{ form.meritSecondBonus.id_for_label }}" class="col-sm-2 col-form-label">{{
+            form.meritSecondBonus.label }}</label>
+        <div class="col-sm-1">
+            <input type="number" class="form-control" id="{{ form.meritSecondBonus.id_for_label }}"
+                name="{{ form.meritSecondBonus.html_name }}" min="1" max="99" value="{{ env.meritSecondBonus }}"
+                required>
+        </div>
+        <label for="{{ form.meritThirdBonus.id_for_label }}" class="col-sm-2 col-form-label">{{
+            form.meritThirdBonus.label }}</label>
+        <div class="col-sm-1">
+            <input type="number" class="form-control" id="{{ form.meritThirdBonus.id_for_label }}"
+                name="{{ form.meritThirdBonus.html_name }}" min="1" max="99" value="{{ env.meritThirdBonus }}" required>
+        </div>
+    </div>
+
+    <div class="row mb-3">
+        <label for="{{ form.meritDivAPoints.id_for_label }}" class="col-sm-2 col-form-label">{{
+            form.meritDivAPoints.label }}</label>
+        <div class="col-sm-1">
+            <input type="number" class="form-control" id="{{ form.meritDivAPoints.id_for_label }}"
+                name="{{ form.meritDivAPoints.html_name }}" value="{{ env.meritDivAPoints }}" min="1" max="99" required>
+        </div>
+        <label for="{{ form.meritDivBPoints.id_for_label }}" class="col-sm-2 col-form-label">{{
+            form.meritDivBPoints.label }}</label>
+        <div class="col-sm-1">
+            <input type="number" class="form-control" id="{{ form.meritDivBPoints.id_for_label }}"
+                name="{{ form.meritDivBPoints.html_name }}" value="{{ env.meritDivBPoints }}" min="1" max="99" required>
+        </div>
+        <label for="{{ form.meritDivCPoints.id_for_label }}" class="col-sm-2 col-form-label">{{
+            form.meritDivCPoints.label }}</label>
+        <div class="col-sm-1">
+            <input type="number" class="form-control" id="{{ form.meritDivCPoints.id_for_label }}"
+                name="{{ form.meritDivCPoints.html_name }}" value="{{ env.meritDivCPoints }}" min="1" max="99" required>
+        </div>
+        <label for="{{ form.meritDivOthersPoints.id_for_label }}" class="col-sm-2 col-form-label">{{
+            form.meritDivOthersPoints.label }}</label>
+        <div class="col-sm-1">
+            <input type="number" class="form-control" id="{{ form.meritDivOthersPoints.id_for_label }}"
+                name="{{ form.meritDivOthersPoints.html_name }}" value="{{ env.meritDivOthersPoints }}" min="1" max="99"
+                required>
+        </div>
+    </div>
+
+    <br>
+    <h5><strong><i class="bi bi-list-stars"></i> Configurações da Liga do OBD</strong></h5>
+    <br>
+
+    <div class="row mb-3">
+        <label for="{{ form.matchWinPoints.id_for_label }}" class="col-sm-2 col-form-label">{{ form.matchWinPoints.label
+            }}</label>
+        <div class="col-sm-1">
+            <input type="number" class="form-control" id="{{ form.matchWinPoints.id_for_label }}"
+                name="{{ form.matchWinPoints.html_name }}" value="{{ env.matchWinPoints }}" min="1" max="9" required>
+        </div>
+    </div>
+
+    <div class="row mb-3">
+        <label for="{{ form.matchDrawPoints.id_for_label }}" class="col-sm-2 col-form-label">{{
+            form.matchDrawPoints.label }}</label>
+        <div class="col-sm-1">
+            <input type="number" class="form-control" id="{{ form.matchDrawPoints.id_for_label }}"
+                name="{{ form.matchDrawPoints.html_name }}" value="{{ env.matchDrawPoints }}" min="0" max="9" required>
+        </div>
+    </div>
+
+    <div class="row mb-3">
+        <label for="{{ form.leagueMinPlayers.id_for_label }}" class="col-sm-2 col-form-label">{{
+            form.leagueMinPlayers.label }}</label>
+        <div class="col-sm-1">
+            <input type="number" class="form-control" id="{{ form.leagueMinPlayers.id_for_label }}"
+                name="{{ form.leagueMinPlayers.html_name }}" value="{{ env.leagueMinPlayers }}" min="4" max="64"
+                required>
+        </div>
+        <label for="{{ form.leagueMaxPlayers.id_for_label }}" class="col-sm-2 col-form-label">{{
+            form.leagueMaxPlayers.label }}</label>
+        <div class="col-sm-1">
+            <input type="number" class="form-control" id="{{ form.leagueMaxPlayers.id_for_label }}"
+                name="{{ form.leagueMaxPlayers.html_name }}" value="{{ env.leagueMaxPlayers }}" min="4" max="64"
+                required>
+        </div>
+    </div>
+
+    <div class="row mb-3">
+        <label for="{{ form.allowAutoPromo.id_for_label }}" class="col-sm-2 col-form-label">{{ form.allowAutoPromo.label
+            }}</label>
+        <div class="col-sm-1">
+            <input type="number" class="form-control" id="{{ form.allowAutoPromo.id_for_label }}"
+                name="{{ form.allowAutoPromo.html_name }}" value="{{ env.allowAutoPromo }}" min="0" max="4" required>
+        </div>
+        <label for="{{ form.allowAutoDemo.id_for_label }}" class="col-sm-2 col-form-label">{{ form.allowAutoDemo.label
+            }}</label>
+        <div class="col-sm-1">
+            <input type="number" class="form-control" id="{{ form.allowAutoDemo.id_for_label }}"
+                name="{{ form.allowAutoDemo.html_name }}" value="{{ env.allowAutoDemo }}" min="0" max="4" required>
+        </div>
+    </div>
+
+    <div class="row mb-3">
+        <label for="{{form.allowAutoBye.id_for_label}}"
+            class="col-sm-2 col-form-label">{{form.allowAutoBye.label}}</label>
+        <div class="col-sm-1">
+            <input type="number" class="form-control" id="{{form.allowAutoBye.id_for_label}}"
+                name="{{form.allowAutoBye.html_name}}" value="{{env.allowAutoBye}}" min="0" max="10" required>
+        </div>
+    </div>
+
+
+    <div class="row mb-3">
+        <label for="{{form.leagueSubscriptionsEnds.id_for_label}}"
+            class="col-sm-2 col-form-label">{{form.leagueSubscriptionsEnds.label}} </label>
+        <div class="col-sm-1">
+            <input type="number" class="form-control" id="{{form.leagueSubscriptionsEnds.id_for_label}}"
+                name="{{form.leagueSubscriptionsEnds.html_name}}" value="{{env.leagueSubscriptionsEnds}}" min="7"
+                max="30" required>
+        </div>
+    </div>
+
+    <br>
+    <h5><strong><i class="bi bi-list-stars"></i> Configurações Divisão OBD</strong></h5>
+    <br>
+
+    <div class="row mb-3">
+        <label for="{{ form.leagueAplayoffs.id_for_label }}" class="col-sm-2 col-form-label">{{
+            form.leagueAplayoffs.label }}</label>
+        <div class="col-sm-1">
+            <input class="form-check-input" type="checkbox" {% if env.leagueAplayoffs %}checked{% else %}{%endif%}
+                value="True" name="{{form.leagueAplayoffs.html_name}}" id="{{form.leagueAplayoffs.id_for_label}}">
+        </div>
+        <label for="{{ form.leagueBplayoffs.id_for_label }}" class="col-sm-2 col-form-label">{{
+            form.leagueBplayoffs.label }}</label>
+        <div class="col-sm-1">
+            <input class="form-check-input" type="checkbox" {% if env.leagueBplayoffs %}checked{% else %}{%endif%}
+                value="True" name="{{form.leagueBplayoffs.html_name}}" id="{{form.leagueAplayoffs.id_for_label}}">
+        </div>
+        <label for="{{ form.leagueCplayoffs.id_for_label }}" class="col-sm-2 col-form-label">{{
+            form.leagueCplayoffs.label }}</label>
+        <div class="col-sm-1">
+            <input class="form-check-input" type="checkbox" {% if env.leagueCplayoffs %}checked{% else %}{%endif%}
+                value="True" name="{{form.leagueCplayoffs.html_name}}" id="{{form.leagueAplayoffs.id_for_label}}">
+        </div>
+        <label for="{{ form.leagueOthersplayoffs.id_for_label }}" class="col-sm-2 col-form-label">{{
+            form.leagueOthersplayoffs.label }}</label>
+        <div class="col-sm-1">
+            <input class="form-check-input" type="checkbox" {% if env.leagueOthersplayoffs %}checked{% else %}{%endif%}
+                value="True" name="{{form.leagueOthersplayoffs.html_name}}" id="{{form.leagueAplayoffs.id_for_label}}">
+        </div>
+
+    </div>
+
+    <div class="row mb-3">
+        <label for="{{ form.leagueAMaxSet.id_for_label }}" class="col-sm-2 col-form-label">{{ form.leagueAMaxSet.label
+            }}</label>
+        <div class="col-sm-1">
+            <input type="number" class="form-control" id="{{ form.leagueAMaxSet.id_for_label }}"
+                name="{{ form.leagueAMaxSet.html_name }}" value="{{ env.leagueAMaxSet }}" min="1" max="11" required>
+        </div>
+        <label for="{{ form.leagueBMaxSet.id_for_label }}" class="col-sm-2 col-form-label">{{ form.leagueBMaxSet.label
+            }}</label>
+        <div class="col-sm-1">
+            <input type="number" class="form-control" id="{{ form.leagueBMaxSet.id_for_label }}"
+                name="{{ form.leagueBMaxSet.html_name }}" value="{{ env.leagueBMaxSet }}" min="1" max="11" required>
+        </div>
+        <label for="{{ form.leagueCMaxSet.id_for_label }}" class="col-sm-2 col-form-label">{{ form.leagueCMaxSet.label
+            }}</label>
+        <div class="col-sm-1">
+            <input type="number" class="form-control" id="{{ form.leagueCMaxSet.id_for_label }}"
+                name="{{ form.leagueCMaxSet.html_name }}" value="{{ env.leagueCMaxSet }}" min="1" max="11" required>
+        </div>
+
+        <label for="{{ form.leagueOthersMaxSet.id_for_label }}" class="col-sm-2 col-form-label">{{
+            form.leagueOthersMaxSet.label }}</label>
+        <div class="col-sm-1">
+            <input type="number" class="form-control" id="{{ form.leagueOthersMaxSet.id_for_label }}"
+                name="{{ form.leagueOthersMaxSet.html_name }}" value="{{ env.leagueOthersMaxSet }}" min="1" max="11"
+                required>
+        </div>
+    </div>
+
+    <div class="row mb-3">
+        <label for="{{ form.leagueABestof.id_for_label }}" class="col-sm-2 col-form-label">{{ form.leagueABestof.label
+            }}</label>
+        <div class="col-sm-1">
+            <input type="number" class="form-control" id="{{ form.leagueABestof.id_for_label }}"
+                name="{{ form.leagueABestof.html_name }}" value="{{ env.leagueABestof }}" min="1" max="31" required>
+        </div>
+        <label for="{{ form.leagueBBestof.id_for_label }}" class="col-sm-2 col-form-label">{{ form.leagueBBestof.label
+            }}</label>
+        <div class="col-sm-1">
+            <input type="number" class="form-control" id="{{ form.leagueBBestof.id_for_label }}"
+                name="{{ form.leagueBBestof.html_name }}" value="{{ env.leagueBBestof }}" min="1" max="31" required>
+        </div>
+        <label for="{{ form.leagueCBestof.id_for_label }}" class="col-sm-2 col-form-label">{{ form.leagueCBestof.label
+            }}</label>
+        <div class="col-sm-1">
+            <input type="number" class="form-control" id="{{ form.leagueCBestof.id_for_label }}"
+                name="{{ form.leagueCBestof.html_name }}" value="{{ env.leagueCBestof }}" min="1" max="31" required>
+        </div>
+        <label for="{{ form.leagueOthersBestof.id_for_label }}" class="col-sm-2 col-form-label">{{
+            form.leagueOthersBestof.label }}</label>
+        <div class="col-sm-1">
+            <input type="number" class="form-control" id="{{ form.leagueOthersBestof.id_for_label }}"
+                name="{{ form.leagueOthersBestof.html_name }}" value="{{ env.leagueOthersBestof }}" min="1" max="31"
+                required>
+        </div>
+
+    </div>
+
+    <div class="row mb-3">
+        <label for="{{ form.leagueAFirstTo.id_for_label }}" class="col-sm-2 col-form-label">{{ form.leagueAFirstTo.label
+            }}</label>
+        <div class="col-sm-1">
+            <input type="number" class="form-control" id="{{ form.leagueAFirstTo.id_for_label }}"
+                name="{{ form.leagueAFirstTo.html_name }}" value="{{ env.leagueAFirstTo }}" min="1" max="31" required>
+        </div>
+        <label for="{{ form.leagueBFirstTo.id_for_label }}" class="col-sm-2 col-form-label">{{ form.leagueBFirstTo.label
+            }}</label>
+        <div class="col-sm-1">
+            <input type="number" class="form-control" id="{{ form.leagueBFirstTo.id_for_label }}"
+                name="{{ form.leagueBFirstTo.html_name }}" value="{{ env.leagueBFirstTo }}" min="0" max="31" required>
+        </div>
+        <label for="{{ form.leagueCFirstTo.id_for_label }}" class="col-sm-2 col-form-label">{{ form.leagueCFirstTo.label
+            }}</label>
+        <div class="col-sm-1">
+            <input type="number" class="form-control" id="{{ form.leagueCFirstTo.id_for_label }}"
+                name="{{ form.leagueCFirstTo.html_name }}" value="{{ env.leagueCFirstTo }}" min="0" max="31" required>
+        </div>
+        <label for="{{ form.leagueOthersFirstTo.id_for_label }}" class="col-sm-2 col-form-label">{{
+            form.leagueOthersFirstTo.label }}</label>
+        <div class="col-sm-1">
+            <input type="number" class="form-control" id="{{ form.leagueOthersFirstTo.id_for_label }}"
+                name="{{ form.leagueOthersFirstTo.html_name }}" value="{{ env.leagueOthersFirstTo }}" min="1" max="31"
+                required>
+        </div>
+
+    </div>
+
+    <br>
+    <h5><strong><i class="bi bi-list-stars"></i> Definições de Modalide (1001, 501, 301 - SD/DD)</strong></h5>
+    <br>
+
+    <div class="row mb-3">
+        <label for="{{ form.leagueAGameMode.id_for_label }}" class="col-sm-2 col-form-label">{{
+            form.leagueAGameMode.label }}</label>
+        <div class="col-sm-4">
+            <select class="form-select" id="{{ form.leagueAGameMode.id_for_label }}"
+                name="{{ form.leagueAGameMode.html_name }}">
+                <option value="{{ env.leagueAGameMode }}">{{ env.get_leagueAGameMode_display }}</option>
+                <optgroup label="Single In / Double Out (SD)">
+                    <option value="1">1001 SD</option>
+                    <option value="3">501 SD</option>
+                    <option value="5">301 SD</option>
+                    <option value="7">201 SD</option>
+                </optgroup>
+                <optgroup label="Double In / Double Out (DD)">
+                    <option value="2">1001 DD</option>
+                    <option value="4">501 DD</option>
+                    <option value="6">301 DD</option>
+                    <option value="8">201 DD</option>
+                </optgroup>
+
+            </select>
+        </div>
+        <label for="{{ form.leagueAWinnerBy.id_for_label }}" class="col-sm-2 col-form-label">{{
+            form.leagueAWinnerBy.label }}</label>
+        <div class="col-sm-4">
+            <select class="form-select" id="{{ form.leagueAWinnerBy.id_for_label }}"
+                name="{{ form.leagueAWinnerBy.html_name }}">
+                <option selected value="{{ env.leagueAWinnerBy }}">{{ env.get_leagueAWinnerBy_display }}</option>
+                <option value="1">Por Sets</option>
+                <option value="2">Por Legs</option>
+            </select>
+        </div>
+    </div>
+
+    <div class="row mb-3">
+        <label for="{{ form.leagueBGameMode.id_for_label }}" class="col-sm-2 col-form-label">{{
+            form.leagueBGameMode.label }}</label>
+        <div class="col-sm-4">
+            <select class="form-select" id="{{ form.leagueBGameMode.id_for_label }}"
+                name="{{ form.leagueBGameMode.html_name }}">
+                <option value="{{ env.leagueBGameMode }}">{{ env.get_leagueBGameMode_display }}</option>
+                <optgroup label="Single In / Double Out (SD)">
+                    <option value="1">1001 SD</option>
+                    <option value="3">501 SD</option>
+                    <option value="5">301 SD</option>
+                    <option value="7">201 SD</option>
+                </optgroup>
+                <optgroup label="Double In / Double Out (DD)">
+                    <option value="2">1001 DD</option>
+                    <option value="4">501 DD</option>
+                    <option value="6">301 DD</option>
+                    <option value="8">201 DD</option>
+                </optgroup>
+            </select>
+        </div>
+        <label for="{{ form.leagueBWinnerBy.id_for_label }}" class="col-sm-2 col-form-label">{{
+            form.leagueBWinnerBy.label }}</label>
+        <div class="col-sm-4">
+            <select class="form-select" id="{{ form.leagueBWinnerBy.id_for_label }}"
+                name="{{ form.leagueBWinnerBy.html_name }}">
+                <option selected value="{{ env.leagueBWinnerBy }}">{{ env.get_leagueBWinnerBy_display }}</option>
+                <option value="1">Por Sets</option>
+                <option value="2">Por Legs</option>
+            </select>
+        </div>
+    </div>
+
+    <div class="row mb-3">
+        <label for="{{ form.leagueCGameMode.id_for_label }}" class="col-sm-2 col-form-label">{{
+            form.leagueCGameMode.label }}</label>
+        <div class="col-sm-4">
+            <select class="form-select" id="{{ form.leagueCGameMode.id_for_label }}"
+                name="{{ form.leagueCGameMode.html_name }}">
+                <option value="{{ env.leagueCGameMode }}">{{ env.get_leagueCGameMode_display }}</option>
+                <optgroup label="Single In / Double Out (SD)">
+                    <option value="1">1001 SD</option>
+                    <option value="3">501 SD</option>
+                    <option value="5">301 SD</option>
+                    <option value="7">201 SD</option>
+                </optgroup>
+                <optgroup label="Double In / Double Out (DD)">
+                    <option value="2">1001 DD</option>
+                    <option value="4">501 DD</option>
+                    <option value="6">301 DD</option>
+                    <option value="8">201 DD</option>
+                </optgroup>
+            </select>
+        </div>
+        <label for="{{ form.leagueCWinnerBy.id_for_label }}" class="col-sm-2 col-form-label">{{
+            form.leagueCWinnerBy.label }}</label>
+        <div class="col-sm-4">
+            <select class="form-select" id="{{ form.leagueCWinnerBy.id_for_label }}"
+                name="{{ form.leagueCWinnerBy.html_name }}">
+                <option selected value="{{ env.leagueCWinnerBy }}">{{ env.get_leagueCWinnerBy_display }}</option>
+                <option value="1">Por Sets</option>
+                <option value="2">Por Legs</option>
+            </select>
+        </div>
+    </div>
+
+    <div class="row mb-3">
+        <label for="{{ form.leagueOthersGameMode.id_for_label }}" class="col-sm-2 col-form-label">{{
+            form.leagueOthersGameMode.label }}</label>
+        <div class="col-sm-4">
+            <select class="form-select" id="{{ form.leagueOthersGameMode.id_for_label }}"
+                name="{{ form.leagueOthersGameMode.html_name }}">
+                <option value="{{ env.leagueOthersGameMode }}">{{ env.get_leagueOthersGameMode_display }}</option>
+                <optgroup label="Single In / Double Out (SD)">
+                    <option value="1">1001 SD</option>
+                    <option value="3">501 SD</option>
+                    <option value="5">301 SD</option>
+                    <option value="7">201 SD</option>
+                </optgroup>
+                <optgroup label="Double In / Double Out (DD)">
+                    <option value="2">1001 DD</option>
+                    <option value="4">501 DD</option>
+                    <option value="6">301 DD</option>
+                    <option value="8">201 DD</option>
+                </optgroup>
+            </select>
+        </div>
+        <label for="{{ form.leagueOthersWinnerBy.id_for_label }}" class="col-sm-2 col-form-label">{{
+            form.leagueOthersWinnerBy.label }}</label>
+        <div class="col-sm-4">
+            <select class="form-select" id="{{ form.leagueOthersWinnerBy.id_for_label }}"
+                name="{{ form.leagueOthersWinnerBy.html_name }}">
+                <option selected value="{{ env.leagueOthersWinnerBy }}">{{ env.get_leagueOthersWinnerBy_display }}
+                </option>
+                <option value="1">Por Sets</option>
+                <option value="2">Por Legs</option>
+
+            </select>
+        </div>
+    </div>
+
+    <p>
+    <div class="dropdown">
+        <button class="btn btn-danger dropdown-toggle" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown"
+            aria-expanded="false">
+            Salvar Configurações?
+        </button>
+        <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
+            <li><button type="submit" class="btn btn-warning mb-3"><i class="bi bi-save2-fill"></i> Salvar</button></li>
+        </ul>
+    </div>
+    </p>
+
+
+
+</form>
+<br>
+{% endblock %}
+
+{% block jslib %}
+{% endblock %}

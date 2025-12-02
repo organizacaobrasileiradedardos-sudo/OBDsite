@@ -1,0 +1,95 @@
+<!--
+Project name: OBD - Organização Brasileira de Dardos
+Property: Nathan Perkes
+Developers: Walisson Oliveira
+Page name: Perfil do Usuário *Público*
+Start date of this page: Jul-03-2021
+Last update: Jul-03-2021
+Description: This is the page where main data will remains.
+-->
+{% extends 'base.html' %}
+{% load static %}
+{% block csslib %}
+{% endblock %}
+{% block title %}Hall dos Campeões{% endblock %}
+{% block styles %}
+
+<style>
+    .centerimg {
+        display: table-cell;
+        text-align: center;
+        vertical-align: middle;
+    }
+</style>
+
+
+
+{% endblock %}
+{% block content %}
+
+<div class="container">
+    <div class="row">
+
+        <div class="col-6 col-md-1"></div>
+
+        <div class="col-6 col-md-10">
+
+            <div class="card mb-3">
+                <img src="{% static '/media/logos/1230x200-banner-fundo-escuro.jpg' %}"
+                    class="card-img figure-img img-fluid rounded" alt="...">
+                <div class="card-body">
+                    <p><br></p>
+                    <h2><strong><i class="bi bi-trophy"></i> Hall dos Campeões do OBD</strong></h2>
+                    <p class="card-text"><small class="text-muted">Confira aqui as estrelas dos OBD que já fizeram
+                            história!</small></p>
+                </div>
+            </div>
+
+            {% if champions %}
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th scope="col">Data</th>
+                        <th scope="col">Liga / Divisão</th>
+                        <th scope="col"><i class="bi bi-trophy"></i> Campeão</th>
+                        <th scope="col"><i class="bi bi-star"></i><i class="bi bi-star"></i> Segundo lugar</th>
+                        <th scope="col"><i class="bi bi-star"></i> Terceiro lugar</th>
+                    </tr>
+                </thead>
+                <tbody>
+
+                    {% for champ in champions.all %}
+                    <tr>
+                        <td>{{ champ.league.created_at | date:"M/y" }}</td>
+                        <td>{{ champ.league.name }} | Divisão {{ champ.division.get_formation_display }}</td>
+                        <td>{{ champ.p1.first_name }} {{ champ.p1.last_name }}</td>
+                        <td>{{ champ.p2.first_name }} {{ champ.p2.last_name }}</td>
+                        <td>{{ champ.p3.first_name }} {{ champ.p3.last_name }}</td>
+
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            <p><br></p>
+
+
+            {% else %}
+            <p>Ainda não há campeões registrados no OBD.</p>
+            {% endif %}
+
+
+
+        </div>
+    </div>
+    <div class="col-6 col-md-1"></div>
+</div>
+</div>
+
+
+
+
+
+
+{% endblock %}
+{% block jslib %}
+{% endblock %}

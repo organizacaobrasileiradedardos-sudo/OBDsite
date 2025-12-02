@@ -1,0 +1,340 @@
+{% extends 'baseuser.html' %}
+{% block csslib %}
+{% endblock %}
+{% block title %} Meus Jogos Ligas OBD {% now "Y" %} {% endblock %}
+{% block styles %} {% endblock %}
+{% block page %}Meus jogos pela Liga OBD {% now "Y" %}{% endblock %}
+{% block content %}
+<p><br></p>
+
+{% if messages %}
+{% for message in messages %}
+<div class="alert alert-info alert-dismissible fade show" role="alert">
+    {{ message}}
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+</div>
+{% endfor %}
+{% endif %}
+
+{% if form.errors %}
+{% for field in form %}
+{% for error in field.errors %}
+<div class="alert alert-danger alert-dismissible fade show" role="alert">
+    <strong>{{ error|escape }}</strong>
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+</div>
+{% endfor %}
+{% endfor %}
+{% for error in form.non_field_errors %}
+<div class="alert alert-danger">
+    <strong>{{ error|escape }}</strong>
+</div>
+{% endfor %}
+{% endif %}
+
+<h5><strong><i class="bi bi-list-stars"></i> {{ matches.first.division.name }}</strong></h5>
+<p><br></p>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th scope="col">ID Partida</th>
+            <th scope="col"></th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th scope="col"></th>
+            <th scope="col">Finalizado?</th>
+            <th scope="col">Validação?</th>
+            <th scope="col">Ação?</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for match in matches %}
+        <tr>
+            <td>{{ match.id }}</td>
+            <td><strong>{{ match.result_set.first.player.first_name }} {{ match.result_set.first.player.last_name
+                    }}</strong>
+                <h6 style="font-size: smaller">({{ match.result_set.first.player.username }})</h6>
+            </td>
+            <td><span class="badge bg-warning text-dark">{% if match.result_set.first.legs is None %} 0 {% else %} {{
+                    match.result_set.first.legs }}{% endif %} </span></td>
+            <td><strong>Vs.</strong></td>
+            <td><span class="badge bg-warning text-dark">{% if match.result_set.last.legs is None %} 0 {% else %} {{
+                    match.result_set.last.legs }} {% endif %}</span></td>
+            <td><strong>{{ match.result_set.last.player.first_name }} {{ match.result_set.last.player.last_name
+                    }}</strong>
+                <h6 style="font-size: smaller">({{ match.result_set.last.player.username }})</h6>
+            </td>
+            <td>{{ match.get_status_display.capitalize }}</td>
+            <td>{{ match.get_validation_display.capitalize }}</td>
+            <td>
+                <div class="dropdown">
+                    <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton2"
+                        data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="bi bi-shield-exclamation"></i> Minhas Ações Disponíveis
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-dark" aria-labelledby="dropdownMenuButton2">
+                        {% if match.status == 0 %}
+                        <li><a class="dropdown-item"
+                                href="{% url 'results:submit' slug=match.division.slug match=match.id %}"><i
+                                    class="bi bi-save"></i> Registrar Jogo</a></li>
+                        {% else %}
+                        {% if match.validation == 0 %}
+                        {% if match.submited_by == user.username %}
+                        <li><a class="dropdown-item" href="#" data-bs-toggle="modal"
+                                data-bs-target="#game{{match.id}}"><i class="bi bi-zoom-in"></i> Ver resultado</a></li>
+                        {% else %}
+                        <li><a class="dropdown-item" href="#" data-bs-toggle="modal"
+                                data-bs-target="#game{{match.id}}"><i class="bi bi-hand-thumbs-up"></i> Validar
+                                Partida</a></li>
+                        {% endif %}
+                        {% else %}
+                        <li><a class="dropdown-item" href="#" data-bs-toggle="modal"
+                                data-bs-target="#game{{match.id}}"><i class="bi bi-zoom-in"></i> Ver resultado</a></li>
+                        {% if match.server == 'WO' %}
+                        <li><a class="dropdown-item" href="#"><i class="bi bi-zoom-in"></i> Aplicado WO</a></li>
+                        {% else %}
+                        {% if match.server == 'OTH' %}
+                        <li><a class="dropdown-item" href="{{ match.photo }}" target="_blank"><i
+                                    class="bi bi-zoom-in"></i> Ver anexo</a></li>
+                        {% else %}
+                        <li><a class="dropdown-item" href="{{ match.link }}" target="_blank"><i
+                                    class="bi bi-zoom-in"></i> Ver no {{ match.get_server_display }}</a></li>
+                        {% endif %}
+                        {% endif %}
+                        {% endif %}
+                        {% endif %}
+                        <li>
+                            <hr class="dropdown-divider">
+                        </li>
+                        <li><a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#envOBD"><i
+                                    class="bi bi-ui-radios"></i> Ver Regras da Liga</a></li>
+                        <li><a class="dropdown-item " href="{% url 'results:ranking' slug=match.division.slug %}"><i
+                                    class="bi bi-ui-radios"></i> Ver Classificação</a></li>
+                        <li><a class="dropdown-item " href="{% url 'index' %}"><i class="bi bi-house-door"></i> Página
+                                Inicial OBD</a></li>
+                    </ul>
+                </div>
+            </td>
+        </tr>
+
+        <!-- Modal -->
+        <div class="modal fade" id="game{{match.id}}" tabindex="-1" aria-labelledby="exampleModalLabel"
+            aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+
+
+                        <h5 class="modal-title" id="exampleModalLabel" style="font-size: medium">{{ match.division.name
+                            | upper }} - Partida <strong>#{{ match.id }}</strong></h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body modal-lg">
+
+                        <div class="container-fluid">
+                            <div class="row">
+                                <div class="col-sm-4"><strong></strong></div>
+                                <div class="col justify-content-md-center">{{ match.result_set.first.player.first_name
+                                    }}</div>
+                                <div class="col justify-content-md-center">{{ match.result_set.last.player.first_name }}
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-sm-4"></div>
+                                <div class="col justify-content-md-center">{{ match.result_set.first.player.last_name }}
+                                </div>
+                                <div class="col justify-content-md-center">{{ match.result_set.last.player.last_name }}
+                                </div>
+                            </div>
+
+                            <hr>
+
+                            <div class="row">
+                                <div class="col-sm">Sets</div>
+                                <div class="col-sm">{{ match.result_set.first.sets }}</div>
+                                <div class="col-sm">{{ match.result_set.last.sets }}</div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-sm">Legs</div>
+                                <div class="col-sm">{{ match.result_set.first.legs }}</div>
+                                <div class="col-sm">{{ match.result_set.last.legs }}</div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-sm">Média</div>
+                                <div class="col-sm">{{ match.result_set.first.average }}</div>
+                                <div class="col-sm">{{ match.result_set.last.average | floatformat:"2"}}</div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-sm">Melhor Fechada</div>
+                                <div class="col-sm">{{ match.result_set.first.highest_out }}</div>
+                                <div class="col-sm">{{ match.result_set.last.highest_out }}</div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-sm">Melhor Leg</div>
+                                <div class="col-sm">{{ match.result_set.first.best_leg }}</div>
+                                <div class="col-sm">{{ match.result_set.last.best_leg }}</div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-sm">100+</div>
+                                <div class="col-sm">{{ match.result_set.first.ton }}</div>
+                                <div class="col-sm">{{ match.result_set.last.ton }}</div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-sm">140+</div>
+                                <div class="col-sm">{{ match.result_set.first.ton40 }}</div>
+                                <div class="col-sm">{{ match.result_set.last.ton40 }}</div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-sm">170+</div>
+                                <div class="col-sm">{{ match.result_set.first.ton70 }}</div>
+                                <div class="col-sm">{{ match.result_set.last.ton70 }}</div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-sm">180+</div>
+                                <div class="col-sm">{{ match.result_set.first.ton80 }}</div>
+                                <div class="col-sm">{{ match.result_set.last.ton80 }}</div>
+                            </div>
+                            <hr>
+                            <p align="center"><strong>OBD</strong> | Resultado #{{ match.id }} acessado em {% now
+                                "d/m/Y" %}</p>
+                            <p align="center">www.obdassociacao.com.br</p>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
+
+                            {% if match.validation == 0 %}
+                            {% if match.submited_by != user.username %}
+                            <a class="btn btn-warning" href="{% url 'results:invalidate' match=match.id %}"
+                                role="button">Invalidar</a>
+                            <a class="btn btn-success" href="{% url 'results:validate' match=match.id %}"
+                                role="button">Confirmar</a>
+
+                            {% endif %}
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        {% endfor %}
+    </tbody>
+</table>
+
+<p>
+    <strong>Atenção!</strong> A janela para lançamento dos resultados/jogos ficará ativa até {{
+    matches.first.division.league.end_date }}.
+</p>
+
+
+<!-- Modal -->
+<div class="modal fade" id="envOBD" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel"><i class="bi bi-gear-fill"></i> Organização Brasileira de
+                    Dardos
+                    de Dardos | OBD</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+
+                <ul class="list-group">
+                    <li class="list-group-item active" aria-current="true">Regras Gerais / Todas as divisões</li>
+                    <li class="list-group-item">Pontos por vitória: <span class="badge bg-warning text-dark">{{
+                            matches.first.division.league.enviroment.matchWinPoints }}</span></li>
+                    <li class="list-group-item">Pontos por empate: <span class="badge bg-warning text-dark">{{
+                            matches.first.division.league.enviroment.matchDrawPoints }}</span></li>
+                    <li class="list-group-item">Permitir auto bye (WO): <span class="badge bg-warning text-dark">{{
+                            matches.first.division.league.enviroment.allowAutoBye }} ausência(s) máx</span></li>
+                    <li class="list-group-item">Promoção automática: <span class="badge bg-warning text-dark">{{
+                            matches.first.division.league.enviroment.allowAutoPromo }} jogador(es)</span></li>
+                    <li class="list-group-item">Rebaixamento automático: <span class="badge bg-warning text-dark">{{
+                            matches.first.division.league.enviroment.allowAutoDemo }} jogador(es)</span></li>
+                    <li class="list-group-item">Início da liga: <span class="badge bg-warning text-dark">{{
+                            matches.first.division.league.start_date }}</span></li>
+                    <li class="list-group-item">Data limite para completar jogos: <span
+                            class="badge bg-warning text-dark">{{ matches.first.division.league.end_date }}</span></li>
+
+                </ul>
+                <p><br></p>
+                <ul class="list-group">
+                    <li class="list-group-item active" aria-current="true">Regras por Divisão OBD</li>
+                </ul>
+
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th scope="col">Regra</th>
+                            <th scope="col">Div. A</th>
+                            <th scope="col">Div. B</th>
+                            <th scope="col">Div. C</th>
+                            <th scope="col">Div. D+</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <th scope="row">Sets</th>
+                            <td><span class="badge bg-warning text-dark">{{
+                                    matches.first.division.league.enviroment.leagueAMaxSet }}</span></td>
+                            <td><span class="badge bg-warning text-dark">{{
+                                    matches.first.division.league.enviroment.leagueBMaxSet }}</span></td>
+                            <td><span class="badge bg-warning text-dark">{{
+                                    matches.first.division.league.enviroment.leagueCMaxSet }}</span></td>
+                            <td><span class="badge bg-warning text-dark">{{
+                                    matches.first.division.league.enviroment.leagueOthersMaxSet }}</span></td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Best Of (legs)</th>
+                            <td><span class="badge bg-warning text-dark">{{
+                                    matches.first.division.league.enviroment.leagueABestof }}</span></td>
+                            <td><span class="badge bg-warning text-dark">{{
+                                    matches.first.division.league.enviroment.leagueBBestof }}</span></td>
+                            <td><span class="badge bg-warning text-dark">{{
+                                    matches.first.division.league.enviroment.leagueCBestof }}</span></td>
+                            <td><span class="badge bg-warning text-dark">{{
+                                    matches.first.division.league.enviroment.leagueOthersBestof }}</span></td>
+                        </tr>
+                        <tr>
+                            <th scope="row">First To (legs)</th>
+                            <td><span class="badge bg-warning text-dark">{{
+                                    matches.first.division.league.enviroment.leagueAFirstTo }}</span></td>
+                            <td><span class="badge bg-warning text-dark">{{
+                                    matches.first.division.league.enviroment.leagueBFirstTo }}</span></td>
+                            <td><span class="badge bg-warning text-dark">{{
+                                    matches.first.division.league.enviroment.leagueCFirstTo }}</span></td>
+                            <td><span class="badge bg-warning text-dark">{{
+                                    matches.first.division.league.enviroment.leagueOthersFirstTo }}</span></td>
+                        </tr>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <p align="center">www.obdassociacao.com.br</p>
+
+
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"><i
+                        class="bi bi-check-circle"></i> Fechar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+{% endblock %}
+{% block jslib %}
+{% endblock %}

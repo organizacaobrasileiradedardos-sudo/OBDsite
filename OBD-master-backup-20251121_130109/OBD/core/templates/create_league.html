@@ -1,0 +1,258 @@
+{% extends 'baseadmin.html' %}
+{% block csslib %}
+{% endblock %}
+{% block title %} Página de criação de Ligas OBD {% endblock %}
+{% block styles %} {% endblock %}
+{% block page %}Criação de Ligas OBD {% endblock %}
+{% block boauser %} {{ user.username }}{% endblock %}
+{% block content %}
+
+{% if messages %}
+{% for message in messages %}
+<div class="alert {{ alert }} alert-dismissible fade show" role="alert">
+    <a href="#" class="link-success">{{ message}}</a>
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+</div>
+{% endfor %}
+{% endif %}
+
+{% if form.errors %}
+{% for field in form %}
+{% for error in field.errors %}
+<div class="alert alert-danger alert-dismissible fade show" role="alert">
+    <strong>{{ error|escape }}</strong>
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+</div>
+{% endfor %}
+{% endfor %}
+{% for error in form.non_field_errors %}
+<div class="alert alert-danger">
+    <strong>{{ error|escape }}</strong>
+</div>
+{% endfor %}
+{% endif %}
+
+<p>
+</p>
+
+<h5><strong><i class="bi bi-list-stars"></i> Dados da nova liga:</strong></h5>
+<p><br></p>
+
+<div lass="row">
+    <div class="col-sm-4">
+        <button type="button" class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#envOBD">
+            Verificar configurações atuais OBD
+        </button>
+    </div>
+</div>
+<p><br></p>
+
+<form action="" method="post">
+    {% csrf_token %}
+
+    <div class="row mb-3">
+        <label for="{{ form.start_date.id_for_label }}" class="col-sm-2 col-form-label">{{ form.start_date.label
+            }}</label>
+        <div class="col-sm-4">
+            <input class="datetime" type="date" id="{{ form.start_date.id_for_label }}"
+                name="{{ form.start_date.html_name}}" required {% if form.start_date.value is not None %}
+                value="{{ form.start_date.value}}" {% else %} value="{{ league.start_date | date:'Y-m-d' }}" {% endif
+                %}>
+        </div>
+    </div>
+
+
+    <div class="row mb-3">
+        <label for="{{ form.end_date.id_for_label }}" class="col-sm-2 col-form-label">{{ form.end_date.label }}</label>
+        <div class="col-sm-4">
+            <input class="datetime" type="date" id="{{ form.end_date.id_for_label }}"
+                name="{{ form.end_date.html_name}}" required {% if form.end_date.value is not None %}
+                value="{{ form.end_date.value}}" {% else %} value="{{ league.end_date | date:'Y-m-d' }}" {% endif %}>
+        </div>
+    </div>
+
+
+    <div class="row mb-3">
+        <label for="{{ form.name.id_for_label }}" class="col-sm-2 col-form-label">{{ form.name.label }}</label>
+        <div class="col-sm-8">
+            <input class="form-control" type="text" id="{{ form.name.id_for_label }}" name="{{ form.name.html_name }}"
+                minlength="3" required {% if form.name.value is not None %} value="{{ form.name.value }}" {% else %}
+                value="{{ league.name }}" {% endif %} required>
+        </div>
+    </div>
+
+
+    <div class="row mb-3">
+        <label for="{{ form.description.id_for_label }}" class="col-sm-2 col-form-label">{{ form.description.label
+            }}</label>
+        <div class="col-sm-8">
+            <input class="form-control" type="text" id="{{ form.state.id_for_label }}"
+                name="{{ form.description.html_name }}" minlength="3" required {% if form.description.value is not None
+                %} value="{{ form.description.value }}" {% else %} value="{{ league.description}}" {% endif %}>
+        </div>
+    </div>
+
+    <div class="row mb-3">
+        <label for="{{ form.add_info.id_for_label }}" class="col-sm-2 col-form-label">{{ form.add_info.label }}</label>
+        <div class="col-sm-8">
+            <input class="form-control" type="text" id="{{ form.add_info.id_for_label }}"
+                name="{{ form.add_info.html_name }}" minlength="3" {% if form.add_info.value is not None %}
+                value="{{ form.add_info.value }}" {% else %} value="{{ league.add_info}}" {% endif %}>
+        </div>
+    </div>
+
+    <div class="row mb-3">
+        <label for="{{ form.scope.id_for_label }}" class="col-sm-2 col-form-label">{{ form.scope.label }}</label>
+        <div class="col-sm-4">
+            <select class="form-select" id="{{ form.scope.id_for_label }}" name="{{ form.scope.html_name }}">
+                {% if league.scope is not None %}
+                <option selected value="{{ league.scope }}">{{ league.get_scope_display }}</option>
+                {% else %}
+                <option value="0">Internacional</option>
+                <option value="1">Continental</option>
+                <option value="1">Nacional</option>
+                <option value="1">Estadual</option>
+                <option value="1">Municipal</option>
+                <option value="1">Comemorativa</option>
+                {% endif %}
+            </select>
+        </div>
+    </div>
+
+    <div class="row mb-3">
+        <label for="{{ form.runoff.id_for_label }}" class="col-sm-2 col-form-label">{{ form.runoff.label }}</label>
+        <div class="col-sm-4">
+            <select class="form-select" id="{{ form.runoff.id_for_label }}" name="{{ form.runoff.html_name }}">
+                {% if league.runoff is not None %}
+                <option selected value="{{ league.runoff }}">{{ league.get_runoff_display }}</option>
+                {% else %}
+                <option value="1">Turno</option>
+                <option value="2">Returno</option>
+                {% endif %}
+            </select>
+        </div>
+    </div>
+
+
+    <div class="row mb-3">
+        <label for="{{ form.phase.id_for_label }}" class="col-sm-2 col-form-label">{{ form.phase.label }}</label>
+        <div class="col-sm-4">
+            <select class="form-select" id="{{ form.phase.id_for_label }}" name="{{ form.phase.html_name }}">
+                {% if league.phase is not None %}
+                <option selected value="{{ league.phase }}">{{ league.get_phase_display }}</option>
+                {% else %}
+                <option value="0">Inscrição</option>
+                {% endif %}
+            </select>
+        </div>
+    </div>
+
+
+    <div class="row mb-3">
+        <label for="{{ form.token.id_for_label }}" class="col-sm-2 col-form-label">{{ token }}</label>
+        <div class="col-sm-3">
+            <input class="form-control" type="text" id="token_id" name="token" minlength="3" required {% if
+                form.token.value is not None %} value="{{ form.token.value }}" {% else %} value="" {% endif %}>
+        </div>
+    </div>
+
+    <br>
+    <button type="submit" class="btn btn-warning mb-3"><i class="bi bi-save2-fill"></i> Criar liga!</button>
+    <br>
+    <p><br></p>
+
+</form>
+
+
+<!-- Modal -->
+<div class="modal fade" id="envOBD" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel"><i class="bi bi-gear-fill"></i> Organização Brasileira de
+                    Dardos
+                    de Dardos | OBD</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+
+                <ul class="list-group">
+                    <li class="list-group-item active" aria-current="true">Regras Gerais / Todas as divisões</li>
+                    <li class="list-group-item">Pontos por vitória: <span class="badge bg-warning text-dark">{{
+                            enviroment.matchWinPoints }}</span></li>
+                    <li class="list-group-item">Pontos por empate: <span class="badge bg-warning text-dark">{{
+                            enviroment.matchDrawPoints }}</span></li>
+                    <li class="list-group-item">Qtd. máx. jogadores: <span class="badge bg-warning text-dark">{{
+                            enviroment.leagueMaxPlayers }} jogadores</span></li>
+                    <li class="list-group-item">Qtd. min. jogadores: <span class="badge bg-warning text-dark">{{
+                            enviroment.leagueMinPlayers }} jogadores</span></li>
+                    <li class="list-group-item">Permitir auto bye (WO): <span class="badge bg-warning text-dark">{{
+                            enviroment.allowAutoBye }} ausência(s) máx</span></li>
+                    <li class="list-group-item">Promoção automática: <span class="badge bg-warning text-dark">{{
+                            enviroment.allowAutoPromo }} jogador(es)</span></li>
+                    <li class="list-group-item">Rebaixamento automático: <span class="badge bg-warning text-dark">{{
+                            enviroment.allowAutoDemo }} jogador(es)</span></li>
+                    <li class="list-group-item">Prazo para inscrição: <span class="badge bg-warning text-dark">{{
+                            enviroment.leagueSubscriptionsEnds }} dias</span></li>
+                </ul>
+                <p><br></p>
+                <ul class="list-group">
+                    <li class="list-group-item active" aria-current="true">Regras por Divisão OBD</li>
+                </ul>
+
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th scope="col">Regra</th>
+                            <th scope="col">Div. A</th>
+                            <th scope="col">Div. B</th>
+                            <th scope="col">Div. C</th>
+                            <th scope="col">Div. D+</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <th scope="row">Sets</th>
+                            <td><span class="badge bg-warning text-dark">{{ enviroment.leagueAMaxSet }}</span></td>
+                            <td><span class="badge bg-warning text-dark">{{ enviroment.leagueBMaxSet }}</span></td>
+                            <td><span class="badge bg-warning text-dark">{{ enviroment.leagueCMaxSet }}</span></td>
+                            <td><span class="badge bg-warning text-dark">{{ enviroment.leagueOthersMaxSet }}</span></td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Best Of (legs)</th>
+                            <td><span class="badge bg-warning text-dark">{{ enviroment.leagueABestof }}</span></td>
+                            <td><span class="badge bg-warning text-dark">{{ enviroment.leagueBBestof }}</span></td>
+                            <td><span class="badge bg-warning text-dark">{{ enviroment.leagueCBestof }}</span></td>
+                            <td><span class="badge bg-warning text-dark">{{ enviroment.leagueOthersBestof }}</span></td>
+                        </tr>
+                        <tr>
+                            <th scope="row">First To (legs)</th>
+                            <td><span class="badge bg-warning text-dark">{{ enviroment.leagueAFirstTo }}</span></td>
+                            <td><span class="badge bg-warning text-dark">{{ enviroment.leagueBFirstTo }}</span></td>
+                            <td><span class="badge bg-warning text-dark">{{ enviroment.leagueCFirstTo }}</span></td>
+                            <td><span class="badge bg-warning text-dark">{{ enviroment.leagueOthersFirstTo }}</span>
+                            </td>
+                        </tr>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <p align="center">www.brasilonlineassociacao.com.br</p>
+
+
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-success" data-bs-dismiss="modal"><i class="bi bi-check-circle"></i>
+                    Aceitar</button>
+                <a class="btn btn-secondary" href="{% url 'enviroments:dashboard'%}" role="button"><i
+                        class="bi bi-gear-fill"></i> Rever Configurações</a>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Fim Modal -->
+
+
+{% endblock %}
+{% block jslib %}
+{% endblock %}

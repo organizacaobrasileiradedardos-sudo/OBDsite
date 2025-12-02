@@ -1,0 +1,233 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block csslib %}
+{% endblock %}
+{% block title %} Lista de Jogadores na Liga OBD {% now "Y" %} {% endblock %}
+{% block styles %} {% endblock %}
+{% block content %}
+<p><br></p>
+
+{% if messages %}
+{% for message in messages %}
+<div class="alert {{ alert }} alert-dismissible fade show" role="alert">
+    {{ message}}
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+</div>
+{% endfor %}
+{% endif %}
+
+{% if form.errors %}
+{% for field in form %}
+{% for error in field.errors %}
+<div class="alert alert-danger alert-dismissible fade show" role="alert">
+    <strong>{{ error|escape }}</strong>
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+</div>
+{% endfor %}
+{% endfor %}
+{% for error in form.non_field_errors %}
+<div class="alert alert-danger">
+    <strong>{{ error|escape }}</strong>
+</div>
+{% endfor %}
+{% endif %}
+
+
+<div class="row">
+
+    <div class="col-6 col-md-1"></div>
+
+    <div class="col-6 col-md-10">
+
+        <div class="card mb-3">
+            <img src="{% static '/media/logos/1230x200-banner-fundo-escuro.jpg' %}"
+                class="card-img figure-img img-fluid rounded" alt="...">
+            <div class="card-body">
+                <p><br></p>
+                <h2><strong><i class="bi bi-bookmark-star-fill"></i> {{ league.name }} </strong> <a
+                        class="btn btn-warning" href="#" data-bs-toggle="modal" data-bs-target="#envOBD"
+                        class="link-primary" title="Ver Ligas">Ver regras.</a></h2>
+                <p class="card-text"><small class="text-muted">A melhor liga online de Dardos do Brasil! </small></p>
+            </div>
+        </div>
+
+
+
+        <table class="table table-sm table-dark ">
+            <thead>
+                <tr>
+                    <th scope="col" style="text-align: center; vertical-align: middle;">Divisão / Liga - OBD</th>
+                    <th scope="col" style="text-align: center; vertical-align: middle;">Média Divisão</th>
+                    <th scope="col" style="text-align: center; vertical-align: middle;">Total partidas</th>
+                    <th scope="col" style="text-align: center; vertical-align: middle;">Partidas finalizadas</th>
+                    <th scope="col" style="text-align: center; vertical-align: middle;">Partidas em validação</th>
+                    <th scope="col" style="text-align: center; vertical-align: middle;">Jogos pendentes</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for div,avg in database %}
+                <tr>
+                    <th scope="row" style="text-align: center; vertical-align: middle;">{{ forloop.counter }}ª Divisão
+                    </th>
+                    <td style="text-align: center; vertical-align: middle;">{{ avg.avg | floatformat:"2"}}</td>
+                    <td style="text-align: center; vertical-align: middle;">{{ div.matches }}</td>
+                    <td style="text-align: center; vertical-align: middle;">{{ div.completed }}</td>
+                    <td style="text-align: center; vertical-align: middle;">{{ div.hold }}</td>
+                    <td style="text-align: center; vertical-align: middle;">{{ div.pending }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <p><br></p>
+
+
+        {% for division in league.division_set.all.reverse %}
+        <h5>
+            <strong>
+                Divisão {{ division.get_formation_display }} - {{ league.name }} |
+                <a class="btn btn-primary" href="{% url 'boadivisionview' slug=division.slug %}" class="link-primary"
+                    title="Ver Ranking da Divisão">
+                    Ver Ranking & Jogos</a>
+
+            </strong>
+        </h5>
+        <p></p>
+        <table class="table table-sm">
+            <thead>
+                <tr>
+                    <th scope="col">Jogador</th>
+                    <th scope="col">Divisão</th>
+                    <th scope="col">AVG</th>
+                    <th scope="col">OBD Class</th>
+                    <th scope="col">Webcamdarts</th>
+                    <th scope="col">Nakka</th>
+                    <th scope="col"></th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for player in division.players.all %}
+                <tr>
+                    <td>
+                        {{ player.first_name }} {{ player.last_name }}
+                    </td>
+                    <td>{{ player.stat.get_bcmDiv_display}}</td>
+                    <td>{{ player.stat.bcmAvg}}</td>
+                    <td>{{ player.stat.get_bcmClass_display }}</td>
+                    <td>{{ player.profile.webcamdarts }}</td>
+                    <td>{{ player.profile.nakka }}</td>
+                </tr>
+
+
+                {% endfor %}
+            </tbody>
+        </table>
+        <p><br></p>
+        {% endfor %}
+
+    </div>
+</div>
+<div class="col-6 col-md-1"></div>
+
+
+
+<!-- Modal -->
+<div class="modal fade" id="envOBD" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel"><i class="bi bi-gear-fill"></i> Organização Brasileira de
+                    Dardos
+                    de Dardos | OBD</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+
+                <ul class="list-group">
+                    <li class="list-group-item active" aria-current="true">Regras Gerais / Todas as divisões</li>
+                    <li class="list-group-item">Pontos por vitória: <span class="badge bg-warning text-dark">{{
+                            league.enviroment.matchWinPoints }}</span></li>
+                    <li class="list-group-item">Pontos por empate: <span class="badge bg-warning text-dark">{{
+                            league.enviroment.matchDrawPoints }}</span></li>
+                    <li class="list-group-item">Permitir auto bye (WO): <span class="badge bg-warning text-dark">{{
+                            league.enviroment.allowAutoBye }} ausência(s) máx</span></li>
+                    <li class="list-group-item">Promoção automática: <span class="badge bg-warning text-dark">{{
+                            league.enviroment.allowAutoPromo }} jogador(es)</span></li>
+                    <li class="list-group-item">Rebaixamento automático: <span class="badge bg-warning text-dark">{{
+                            league.enviroment.allowAutoDemo }} jogador(es)</span></li>
+                    <li class="list-group-item">Início da liga: <span class="badge bg-warning text-dark">{{
+                            league.start_date }}</span></li>
+                    <li class="list-group-item">Data limite para completar jogos: <span
+                            class="badge bg-warning text-dark">{{league.end_date }}</span></li>
+
+                </ul>
+                <p><br></p>
+                <ul class="list-group">
+                    <li class="list-group-item active" aria-current="true">Regras por Divisão OBD</li>
+                </ul>
+
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th scope="col">Regra</th>
+                            <th scope="col">Div. A</th>
+                            <th scope="col">Div. B</th>
+                            <th scope="col">Div. C</th>
+                            <th scope="col">Div. D+</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <th scope="row">Sets</th>
+                            <td><span class="badge bg-warning text-dark">{{ league.enviroment.leagueAMaxSet }}</span>
+                            </td>
+                            <td><span class="badge bg-warning text-dark">{{ league.enviroment.leagueBMaxSet }}</span>
+                            </td>
+                            <td><span class="badge bg-warning text-dark">{{ league.enviroment.leagueCMaxSet }}</span>
+                            </td>
+                            <td><span class="badge bg-warning text-dark">{{ league.enviroment.leagueOthersMaxSet
+                                    }}</span></td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Best Of (legs)</th>
+                            <td><span class="badge bg-warning text-dark">{{ league.enviroment.leagueABestof }}</span>
+                            </td>
+                            <td><span class="badge bg-warning text-dark">{{ league.enviroment.leagueBBestof }}</span>
+                            </td>
+                            <td><span class="badge bg-warning text-dark">{{ league.enviroment.leagueCBestof }}</span>
+                            </td>
+                            <td><span class="badge bg-warning text-dark">{{ league.enviroment.leagueOthersBestof
+                                    }}</span></td>
+                        </tr>
+                        <tr>
+                            <th scope="row">First To (legs)</th>
+                            <td><span class="badge bg-warning text-dark">{{ league.enviroment.leagueAFirstTo }}</span>
+                            </td>
+                            <td><span class="badge bg-warning text-dark">{{ league.enviroment.leagueBFirstTo }}</span>
+                            </td>
+                            <td><span class="badge bg-warning text-dark">{{ league.enviroment.leagueCFirstTo }}</span>
+                            </td>
+                            <td><span class="badge bg-warning text-dark">{{ league.enviroment.leagueOthersFirstTo
+                                    }}</span></td>
+                        </tr>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <p align="center">www.obdassociacao.com.br</p>
+
+
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"><i
+                        class="bi bi-check-circle"></i> Fechar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+{% endblock %}
+{% block jslib %}
+{% endblock %}

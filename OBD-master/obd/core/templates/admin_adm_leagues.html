@@ -1,0 +1,406 @@
+{% extends 'baseadmin.html' %}
+{% block csslib %}
+{% endblock %}
+{% block title %} Administrar Ligas OBD {% now "Y" %} {% endblock %}
+{% block styles %} {% endblock %}
+{% block page %}Administração de Ligas OBD - {% now "Y" %}{% endblock %}
+{% block boauser %} {{ user.username }} {% endblock %}
+{% block content %}
+<p><br></p>
+
+{% if messages %}
+{% for message in messages %}
+<div class="alert {{ alert }} alert-dismissible fade show" role="alert">
+    {{ message}}
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+</div>
+{% endfor %}
+{% endif %}
+
+{% if form.errors %}
+{% for field in form %}
+{% for error in field.errors %}
+<div class="alert alert-danger alert-dismissible fade show" role="alert">
+    <strong>{{ error|escape }}</strong>
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+</div>
+{% endfor %}
+{% endfor %}
+{% for error in form.non_field_errors %}
+<div class="alert alert-danger">
+    <strong>{{ error|escape }}</strong>
+</div>
+{% endfor %}
+{% endif %}
+
+<h5><strong><i class="bi bi-pencil-square"></i> Ligas em inscrição</strong>
+    {% if opens %}
+    <span class="badge bg-primary ">{{ opens | length }}</span></a>
+    {% else %}
+    <span class="badge bg-danger">0</span></a>
+    {% endif %}
+</h5>
+
+{% if opens %}
+<p><br></p>
+<table class="table">
+    <thead>
+        <tr>
+            <th scope="col">ID</th>
+            <th scope="col">Nome</th>
+            <th scope="col">Status</th>
+            <th scope="col">Fase</th>
+            <th scope="col">Turno</th>
+            <th scope="col">Início</th>
+            <th scope="col">Divisões</th>
+            <th scope="col">Gerenciar Liga</th>
+            <th scope="col"></th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for open in opens %}
+        <tr>
+            <th scope="row">{{ open.id }}</th>
+            <td>
+                {{ open.name }}
+            </td>
+            <td>{% if open.status %} Ativa {% else %} Inativa {% endif %}</td>
+            <td>{{ open.get_phase_display}}</td>
+            <td>{{ open.get_runoff_display}}</td>
+            <td>{{ open.start_date | date:'d/m/Y'}}</td>
+            <td>{{ open.division_set.count }}</td>
+            <td>
+                <div class="dropdown">
+                    <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton2"
+                        data-bs-toggle="dropdown" aria-expanded="false">
+                        Ações Disponíveis
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-dark" aria-labelledby="dropdownMenuButton2">
+                        <li><a class="dropdown-item" href="{% url 'league:setformation' slug=open.slug %}"><i
+                                    class="bi bi-alarm"></i> Iniciar Formação</a></li>
+                        <li><a class="dropdown-item" href="{% url 'league:players' slug=open.slug %}"><i
+                                    class="bi bi-eye"></i> Ver Inscritos</a></li>
+                        <li>
+                            <hr class="dropdown-divider">
+                        </li>
+                        <li><a class="dropdown-item" href="#" data-bs-toggle="modal"
+                                data-bs-target="#cancel{{ open.id }}"><i class="bi bi-x-lg"></i> Excluir Liga?</a></li>
+                    </ul>
+                </div>
+            </td>
+        </tr>
+
+        <!-- Modal -->
+        <div class="modal fade" id="cancel{{ open.id }}" tabindex="-1" aria-labelledby="exampleModalLabel"
+            aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLabel"><i class="bi bi-x-octagon-fill"></i> Cancelar {{
+                            open.name }}?</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        Olá, {{ user.first_name }} {{ user.last_name }}! <br>Deseja realmente proceder com o
+                        cancelamento?
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
+                        <a class="btn btn-warning" href="{% url 'league:remove' slug=open.slug %}"
+                            role="button">Cancelar Liga?</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+
+        {% endfor %}
+    </tbody>
+</table>
+<p><br></p>
+{% else %}
+<p>Não existe ligas ativas no momento.</p>
+<p><br></p>
+{% endif %}
+
+<h5><strong><i class="bi bi-alarm"></i> Ligas em formação</strong>
+    {% if formations %}
+    <span class="badge bg-primary ">{{ formations | length }}</span></a>
+    {% else %}
+    <span class="badge bg-danger">0</span></a>
+    {% endif %}
+</h5>
+
+{% if formations %}
+<p><br></p>
+<table class="table">
+    <thead>
+        <tr>
+            <th scope="col">ID</th>
+            <th scope="col">Nome</th>
+            <th scope="col">Status</th>
+            <th scope="col">Fase</th>
+            <th scope="col">Turno</th>
+            <th scope="col">Início</th>
+            <th scope="col">Divisões</th>
+            <th scope="col">Gerenciar Liga</th>
+            <th scope="col"></th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for formation in formations %}
+        <tr>
+            <th scope="row">{{ formation.id }}</th>
+            <td>
+                {{formation.name}}
+            </td>
+            <td>{% if formation.status %} Ativa {% else %} Inativa {% endif %}</td>
+            <td>{{ formation.get_phase_display}}</td>
+            <td>{{ formation.get_runoff_display}}</td>
+            <td>{{ formation.start_date | date:'d/m/Y'}}</td>
+            <td>{{ formation.division_set.count }}</td>
+            <td>
+                <div class="dropdown">
+                    <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton2"
+                        data-bs-toggle="dropdown" aria-expanded="false">
+                        Ações Disponíveis
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-dark" aria-labelledby="dropdownMenuButton2">
+                        <li><a class="dropdown-item" href="{% url 'league:players' slug=formation.slug %}"><i
+                                    class="bi bi-gear"></i> Gerenciar Liga</a></li>
+                        <li><a class="dropdown-item" href="{% url 'league:setsubscription' slug=formation.slug %}"><i
+                                    class="bi bi-pencil-square"></i> Retomar Inscrições</a></li>
+                        <li><a class="dropdown-item" href="{% url 'league:start' slug=formation.slug %}"><i
+                                    class="bi bi-bullseye"></i> Iniciar Liga</a></li>
+                        <li>
+                            <hr class="dropdown-divider">
+                        </li>
+                        <li><a class="dropdown-item" href="#" data-bs-toggle="modal"
+                                data-bs-target="#cancel{{ formation.id }}"><i class="bi bi-x-lg"></i> Excluir Liga?</a>
+                        </li>
+                    </ul>
+                </div>
+            </td>
+        </tr>
+
+        <!-- Modal -->
+        <div class="modal fade" id="cancel{{ formation.id }}" tabindex="-1" aria-labelledby="exampleModalLabel"
+            aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLabel"><i class="bi bi-x-octagon-fill"></i> Cancelar {{
+                            formation.name }}?</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        Olá, {{ user.first_name }} {{ user.last_name }}! <br>Deseja realmente proceder com o
+                        cancelamento?
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
+                        <a class="btn btn-warning" href="{% url 'league:remove' slug=formation.slug %}"
+                            role="button">Cancelar Liga?</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        {% endfor %}
+    </tbody>
+</table>
+<p><br></p>
+{% else %}
+<p>Não existe ligas em formação no momento.</p>
+<p><br></p>
+{% endif %}
+
+
+<h5><strong><i class="bi bi-bullseye"></i> Ligas em andamento</strong>
+    {% if starts %}
+    <span class="badge bg-primary ">{{ starts | length }}</span></a>
+    {% else %}
+    <span class="badge bg-danger">0</span></a>
+    {% endif %}
+</h5>
+
+{% if starts %}
+<p><br></p>
+<table class="table">
+    <thead>
+        <tr>
+            <th scope="col">ID</th>
+            <th scope="col">Nome</th>
+            <th scope="col">Status</th>
+            <th scope="col">Fase</th>
+            <th scope="col">Turno</th>
+            <th scope="col">Início</th>
+            <th scope="col">Divisões</th>
+            <th scope="col">Gerenciar Liga</th>
+            <th scope="col"></th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for started in starts %}
+        <tr>
+            <th scope="row">{{ started.id }}</th>
+            <td>
+                {{ started.name }}
+            </td>
+            <td>{% if started.status %} Ativa {% else %} Inativa {% endif %}</td>
+            <td>{{ started.get_phase_display}}</td>
+            <td>{{ started.get_runoff_display}}</td>
+            <td>{{ started.start_date | date:'d/m/Y'}}</td>
+            <td>{{ started.division_set.count }}</td>
+            <td>
+                <div class="dropdown">
+                    <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton2"
+                        data-bs-toggle="dropdown" aria-expanded="false">
+                        Ações Disponíveis
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-dark" aria-labelledby="dropdownMenuButton2">
+                        <li><a class="dropdown-item" href="{% url 'league:players' slug=started.slug %}"><i
+                                    class="bi bi-gear"></i> Gerenciar Liga</a></li>
+                        <li><a class="dropdown-item" href="{% url 'league:playoffs' slug=started.slug %}"><i
+                                    class="bi bi-diagram-3"></i> Formar Playoffs</a></li>
+                        <li>
+                            <hr class="dropdown-divider">
+                        </li>
+                        <li><a class="dropdown-item" href="#" data-bs-toggle="modal"
+                                data-bs-target="#cancel{{ started.id }}"><i class="bi bi-x-lg"></i> Anular Liga?</a>
+                        </li>
+                    </ul>
+                </div>
+        </tr>
+
+
+        <!-- Modal -->
+        <div class="modal fade" id="cancel{{ started.id }}" tabindex="-1" aria-labelledby="exampleModalLabel"
+            aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLabel"><i class="bi bi-x-octagon-fill"></i> Anular {{
+                            started.name }}?</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        Olá, {{ user.first_name }} {{ user.last_name }}! <br>Deseja realmente proceder com o
+                        cancelamento?
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
+                        <a class="btn btn-warning" href="{% url 'league:inactive' slug=started.slug %}"
+                            role="button">Anular Liga?</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        {% endfor %}
+    </tbody>
+</table>
+<p><br></p>
+{% else %}
+<p>Não existe ligas em andamento no momento.</p>
+<p><br></p>
+{% endif %}
+
+
+<h5><strong><i class="bi bi-diagram-3"></i> Ligas em Playoffs</strong>
+    {% if playoffs %}
+    <span class="badge bg-primary ">{{ playoffs | length }}</span></a>
+    {% else %}
+    <span class="badge bg-danger">0</span></a>
+    {% endif %}
+</h5>
+
+{% if playoffs %}
+<p><br></p>
+<table class="table">
+    <thead>
+        <tr>
+            <th scope="col">ID</th>
+            <th scope="col">Nome</th>
+            <th scope="col">Status</th>
+            <th scope="col">Fase</th>
+            <th scope="col">Turno</th>
+            <th scope="col">Início</th>
+            <th scope="col">Divisões</th>
+            <th scope="col">Gerenciar Liga</th>
+            <th scope="col"></th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for playoff in playoffs %}
+        <tr>
+            <th scope="row">{{ playoff.id }}</th>
+            <td>
+                {{ playoff.name }}
+            </td>
+            <td>{% if playoff.status %} Ativa {% else %} Inativa {% endif %}</td>
+            <td>{{ playoff.get_phase_display}}</td>
+            <td>{{ playoff.get_runoff_display}}</td>
+            <td>{{ playoff.start_date | date:'d/m/Y'}}</td>
+            <td>{{ playoff.division_set.count }}</td>
+            <td>
+                <div class="dropdown">
+                    <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton2"
+                        data-bs-toggle="dropdown" aria-expanded="false">
+                        Ações Disponíveis
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-dark" aria-labelledby="dropdownMenuButton2">
+                        <li><a class="dropdown-item" href="{% url 'league:players' slug=playoff.slug %}"><i
+                                    class="bi bi-gear"></i> Gerenciar Liga</a></li>
+                        <li><a class="dropdown-item" href="{% url 'league:finish' slug=playoff.slug %}"><i
+                                    class="bi bi-award"></i> Finalizar Liga</a></li>
+                        <li>
+                            <hr class="dropdown-divider">
+                        </li>
+                        <li><a class="dropdown-item" href="#" data-bs-toggle="modal"
+                                data-bs-target="#cancel{{ playoff.id }}"><i class="bi bi-x-lg"></i> Anular Liga?</a>
+                        </li>
+                    </ul>
+                </div>
+            </td>
+        </tr>
+
+        <!-- Modal -->
+        <div class="modal fade" id="cancel{{ playoff.id }}" tabindex="-1" aria-labelledby="exampleModalLabel"
+            aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLabel"><i class="bi bi-x-octagon-fill"></i> Anular {{
+                            playoff.name }}?</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        Olá, {{ user.first_name }} {{ user.last_name }}! <br>Deseja realmente proceder com o
+                        cancelamento?
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
+                        <a class="btn btn-warning" href="{% url 'league:inactive' slug=playoff.slug %}"
+                            role="button">Anular Liga?</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        {% endfor %}
+    </tbody>
+</table>
+<p><br></p>
+{% else %}
+<p>Não existe ligas em Playoffs no momento.</p>
+<p><br></p>
+{% endif %}
+
+
+{% endblock %}
+{% block jslib %}
+{% endblock %}

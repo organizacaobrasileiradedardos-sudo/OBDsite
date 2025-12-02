@@ -1,0 +1,19 @@
+## Development Contatct
+1. (Project Manager) Walisson Oliveira --> woliv88@outlook.com
+
+
+## Source Code
+1. Go to Mega cloudy server throwout this link:
+2. Donwload all the "Source Code" directory
+3. Open "brasilonline" project on PyCharm or other Python/Framework IDE
+4. Config the .ENV file
+5. Run pip install -r requirement-dev.txt
+
+
+## How to deploy
+1. Create a Heroku instance
+2. Send the setup/config to Heroku
+3. Define a SECRET_KEY to the instance
+4. Define DEBUG as False
+5. Configure the SMTP mail server/service
+6. Send the source code (all) to Heroku

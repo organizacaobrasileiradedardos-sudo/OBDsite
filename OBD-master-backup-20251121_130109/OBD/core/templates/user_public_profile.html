@@ -1,0 +1,237 @@
+<!--
+Project name: OBD - Organização Brasileira de Dardos
+Property: Nathan Perkes
+Developers: Walisson Oliveira
+Page name: Perfil do Usuário *Público*
+Start date of this page: Jul-03-2021
+Last update: Jul-03-2021
+Description: This is the page where main data will remains.
+-->
+{% extends 'base.html' %}
+{% load static %}
+{% block csslib %}
+{% endblock %}
+{% block title %}{{ profile.user.first_name }} {{ profile.user.last_name }} - Perfil público jogador OBD{% endblock %}
+{% block styles %}
+{% endblock %}
+{% block content %}
+
+<div class="container">
+    <div class="row">
+        <div class="col-6 col-md-1"></div>
+        <div class="col-6 col-md-10">
+
+            <img src="{% static '/media/logos/1230x200-banner-fundo-escuro.jpg' %}"
+                class="card-img figure-img img-fluid rounded" alt="...">
+            <p><br></p>
+            <h2 class="card-title"><strong><i class="bi bi-list-stars"></i> Perfil Público de {{ profile.user.first_name
+                    }} {{ profile.user.last_name }} @{{ profile.nickname }}</strong></h2>
+            <p><br></p>
+            <div class="card mb-3" style="max-width: 100%;">
+                <div class="row g-0">
+                    <div class="col-md-4">
+                        <div class="rect-img-container">
+                            <img class="rect-img figure-img img-fluid rounded" src="{{ profile.photo }}" align="center"
+                                title="{{ profile.nickname }}" alt="{{ profile.nickname }}">
+                        </div>
+                    </div>
+                    <div class="col-md-8">
+                        <div class="card-body">
+                            <br>
+                            <h6>{% if profile.facebook|length_is:"0" %}{% else %}<i class="bi bi-facebook"></i> {{
+                                profile.facebook }}{% endif %}
+                                {% if profile.twitter|length_is:"0" %}{% else %}<i class="bi bi-instagram"></i> {{
+                                profile.twitter }}{% endif %}</h6>
+                            </h2>
+                            <p class="card-text">{{profile.bio}}</p>
+                            <p class="card-text"><small class="text-muted">Membro desde {{ profile.created_at |
+                                    date:"d/M/y"}}</small></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <p><br></p>
+
+            <h5><strong><i class="bi bi-list-stars"></i> Estatísticas de {{ profile.user.first_name }} {{
+                    profile.user.last_name }}</strong></h5>
+
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th scope="col" style="text-align: center; vertical-align: middle;">#ID</th>
+                        <th scope="col" style="text-align: center; vertical-align: middle;">Classe</th>
+                        <th scope="col" style="text-align: center; vertical-align: middle;">OBD Score</th>
+                        <th scope="col" style="text-align: center; vertical-align: middle;">Best Leg</th>
+                        <th scope="col" style="text-align: center; vertical-align: middle;">Melhor Fechada</th>
+                        <th scope="col" style="text-align: center; vertical-align: middle;">Média</th>
+                        <th scope="col" style="text-align: center; vertical-align: middle;">Títulos</th>
+                        <th scope="col" style="text-align: center; vertical-align: middle;">Jogos</th>
+                        <th scope="col" style="text-align: center; vertical-align: middle;">Triunfos</th>
+                        <th scope="col" style="text-align: center; vertical-align: middle;">100+</th>
+                        <th scope="col" style="text-align: center; vertical-align: middle;">140+</th>
+                        <th scope="col" style="text-align: center; vertical-align: middle;">170+</th>
+                        <th scope="col" style="text-align: center; vertical-align: middle;">180+</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td scope="row" style="text-align: center; vertical-align: middle;">{{ profile.user.id }}</td>
+                        <td style="text-align: center; vertical-align: middle;">{{
+                            profile.user.stat.get_bcmClass_display }}</td>
+                        <td style="text-align: center; vertical-align: middle;">{{ profile.user.stat.bcmPoints }}</td>
+                        <td style="text-align: center; vertical-align: middle;">{{ profile.user.stat.bcmLeg }}</td>
+                        <td style="text-align: center; vertical-align: middle;">{{ profile.user.stat.bcmOut }}</td>
+                        <td style="text-align: center; vertical-align: middle;">{{ profile.user.stat.bcmAvg |
+                            floatformat:"2" }}</td>
+                        <td style="text-align: center; vertical-align: middle;">{{ total }}</td>
+                        <td style="text-align: center; vertical-align: middle;">{{ profile.user.stat.leagueParticipation
+                            }}</td>
+                        <td style="text-align: center; vertical-align: middle;">{{ profile.user.stat.bcmWin }}</td>
+                        <td style="text-align: center; vertical-align: middle;">{{ profile.user.stat.bcmTon }}</td>
+                        <td style="text-align: center; vertical-align: middle;">{{ profile.user.stat.bcmTon40 }}</td>
+                        <td style="text-align: center; vertical-align: middle;">{{ profile.user.stat.bcmTon70 }}</td>
+                        <td style="text-align: center; vertical-align: middle;">{{ profile.user.stat.bcmTon80 }}</td>
+                    </tr>
+                </tbody>
+            </table>
+            <p><br></p>
+
+            <h5><strong><i class="bi bi-list-stars"></i> Últimos 5 jogos:</strong></h5>
+            <div class="row">
+
+                <div class="col">
+                    {% if matches %}
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th scope="col">Data</th>
+                                <th scope="col">Jogador 01</th>
+                                <th scope="col">Resultado</th>
+                                <th scope="col">Jogador 02</th>
+                                <th scope="col">Liga</th>
+                                <th scope="col">Servidor</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Loop for last game comes here -->
+                            {% for match in matches %}
+                            <tr>
+                                <td>{{ match.on_date | date:"d/m/Y"}}</td>
+                                <td>{{ match.result_set.first.player.first_name }} {{
+                                    match.result_set.first.player.last_name }}</td>
+                                <th scope="row"><strong>{{ match.result_set.first.legs }} x {{
+                                        match.result_set.last.legs }}</strong></th>
+                                <td>{{ match.result_set.last.player.first_name }} {{
+                                    match.result_set.last.player.last_name }}</td>
+                                <td>{{match.division.league.name}} - Divisão {{match.division.get_formation_display}}
+                                </td>
+                                <td>{{match.get_server_display}}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+
+                    {% else %}
+
+                    <p>{{ profile.user.first_name }} {{ profile.user.last_name }} ainda não realizou jogos no momento.
+                        Aproveita e convida para um amistoso!</p>
+
+                    {% endif %}
+                </div>
+            </div>
+
+            <p><br></p>
+            <h5><strong><i class="bi bi-graph-up"></i> Histórico das médias ({{graph}} jogos) | {{ title }}</strong>
+            </h5>
+            {% if graph %}
+            <div>
+                <canvas id="myChart"></canvas>
+                <p><br></p>
+            </div>
+            {% else %}
+            <p>Sem jogos registrados no momento.</p>
+            <p><br></p>
+            {% endif %}
+
+
+            <h5><strong><i class="bi bi-list-stars"></i> Informações de perfil</strong></h5>
+            <p></p>
+            <h6><strong><i class="bi bi-arrow-right-short"></i> Nome:</strong> {{ profile.user.first_name }} {{
+                profile.user.last_name }}</h6>
+            <h6><strong><i class="bi bi-arrow-right-short"></i> País:</strong> {{ profile.country }} </h6>
+            <h6><strong><i class="bi bi-arrow-right-short"></i> Estado:</strong> {{ profile.state}} </h6>
+            <h6><strong><i class="bi bi-arrow-right-short"></i> Webcamdarts:</strong> {{ profile.webcamdarts }}</h6>
+            <h6><strong><i class="bi bi-arrow-right-short"></i> Nakka:</strong> {{ profile.nakka }} </h6>
+            <h6><strong><i class="bi bi-arrow-right-short"></i> Lidarts:</strong> {{ profile.lidarts }} </h6>
+            <h6><strong><i class="bi bi-arrow-right-short"></i> Dardos:</strong> {{ profile.darts }} </h6>
+            <h6><strong><i class="bi bi-arrow-right-short"></i> Federação Brasileira:</strong> {{
+                profile.nationalfederation }} </h6>
+            <h6><strong><i class="bi bi-arrow-right-short"></i> Federação Local:</strong> {{ profile.localfederation }}
+            </h6>
+            <p><br></p>
+
+
+            <div class="card text-center">
+                <div class="card-header">
+                    Organização Brasileira de Dardos | OBD
+                </div>
+                <div class="card-body">
+                    <h5 class="card-title">E aí? O que está esperando para se tornar um membro OBD?</h5>
+                    <p class="card-text"><span class="badge bg-warning text-dark">Faça igual a {{
+                            profile.user.first_name }} {{ profile.user.last_name }} e se junte a nós! É grátis e com
+                            diversão e profissionalismo garantido!</span></p>
+                    <a href="/subscribe/" class="btn btn-primary">Seja um membro OBD!</a>
+                </div>
+                <div class="card-footer text-muted">
+                    **OBD**
+                </div>
+            </div>
+
+
+        </div>
+    </div>
+    <div class="col-6 col-md-1"></div>
+</div>
+</div>
+
+
+
+
+{% endblock %}
+{% block jslib %}
+
+{% if graph %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@3.5.1/dist/chart.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+    var ctx = document.getElementById('myChart');
+    var myChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: {{ labels | safe }},
+    datasets: [{
+        label: 'Médias (AVG)',
+        data: {{ data | safe }},
+        fill: true,
+        backgroundColor: [
+        'rgba(99,143,255,0.2)',
+    ],
+        borderColor: [
+        'rgb(14,41,103)',
+    ],
+        borderWidth: 3
+            }]
+        },
+    options: {
+        scales: {
+            y: {
+                beginAtZero: false
+            }
+        }
+    }
+    });
+</script>
+{% endif %}
+
+{% endblock %}

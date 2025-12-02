@@ -1,0 +1,50 @@
+Olá {{ first_name }}, seja muito bem-vindo à OBD!
+
+Estamos muito felizes em ter você como novo associado!
+
+Estes foram os dados que você nos forneceu
+em sua inscrição para associação:
+
+Nome: {{ first_name }} {{ last_name }}
+Email: {{ email }}
+Usuário de acesso: {{ username }}
+Senha: {{ password }}
+
+Entre no nosso grupo WhatsApp aqui:  https://chat.whatsapp.com/DpvgVZRi9lY3R7UQt881vZ
+E-mail geral do OBD: organizacaobrasileiradedardos@gmail.com
+
+Agora que voce é um associado OBD, terá os seguintes benefícios:
+
+- Participação em eventos oficiais do OBD;
+- Participação em eventos comemorativos do OBD;
+- Aplicativo online para lançamento dos resultados da Liga OBD;
+- OCM - OBD Card of Merit;
+- Acompanhamento de suas principais estatísticas performadas durante as partidas pela liga;
+- E muito mais!!!
+
+
+
+Importante:
+
+- Não compartilhe com outra pessoa o nome de seu usuário e senha. Eles fazem parte do acesso à sua conta;
+- Não armazenamos o texto de sua senha na íntegra. Em caso de esquecimento da senha ou perda deste e-mail, uma nova senha poderá ser solicitada para seu e-mail cadastrado;
+- Atualize seu perfil o quanto antes. E de preferência, informe o seu "apelido" usado para os aplicativos tais como NAKKA, WEBCAMCARTS ou LIDARTS;
+- Mantenha sempre atualizado os "apelidos" utiizados nos aplicativos de jogos online;
+- Mantenha seu e-mail sempre atualizado para eventuais notificações do OBD, sistema ou recuperação de dados;
+
+
+
+Ah! Antes dos 180's e fechadas em 170, vale muito a pena conferir os links abaixo:
+
+Para compra de dardos & acessorios: www.brdardos.com.br
+Para conhecer mais sobre os dardos no Brasil: https://www.youtube.com/c/NaMosca180/videos
+Aplicativo de treino recomendado: www.godartspro.com
+Site recomendado para os jogos online: https://n01darts.com/n01/
+
+
+
+Então é isso, {{ first_name }}! Divirta-se bastante!
+
+Atenciosamente,
+Diretoria OBD
+organizacaobrasileiradedardos@gmail.com

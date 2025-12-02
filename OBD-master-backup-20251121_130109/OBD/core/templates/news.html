@@ -1,0 +1,117 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Notícias | OBD{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="row mb-4">
+        <div class="col-12">
+            <h1 class="fw-bold text-center mb-2 text-dartboard-black">
+                <i class="bi bi-newspaper text-dartboard-green"></i> Notícias de Dardos
+            </h1>
+            <p class="text-center text-muted">Fique por dentro das últimas novidades do mundo dos dardos</p>
+        </div>
+    </div>
+
+    <!-- Featured News -->
+    {% if featured_news %}
+    <div class="row mb-5">
+        <div class="col-12">
+            <h2 class="h3 fw-bold mb-4">
+                <i class="bi bi-star-fill text-warning"></i> Notícias em Destaque
+            </h2>
+
+            <div class="row g-4">
+                {% for news in featured_news %}
+                <div class="col-md-4">
+                    <div class="card card-dartboard h-100 hover-lift">
+                        {% if news.image_url %}
+                        <img src="{{ news.image_url }}" class="card-img-top" alt="{{ news.title }}"
+                            style="height: 200px; object-fit: cover;">
+                        {% else %}
+                        <div class="card-img-top bg-gradient"
+                            style="height: 200px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);"></div>
+                        {% endif %}
+                        <div class="card-body">
+                            <span class="badge bg-warning text-dark mb-2">
+                                <i class="bi bi-star-fill"></i> Destaque
+                            </span>
+                            <h5 class="card-title">{{ news.title }}</h5>
+                            <p class="card-text text-muted">{{ news.summary|truncatewords:25 }}</p>
+                            <p class="small text-muted mb-0">
+                                <i class="bi bi-calendar3"></i> {{ news.published_date|date:"d/m/Y" }} |
+                                <i class="bi bi-building"></i> {{ news.source }}
+                            </p>
+                        </div>
+                        <div class="card-footer card-footer-dartboard">
+                            <a href="{{ news.link }}" target="_blank" class="btn btn-dartboard-secondary btn-sm w-100">
+                                <i class="bi bi-box-arrow-up-right"></i> Ler Notícia Completa
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- All News -->
+    <div class="row">
+        <div class="col-12">
+            <h2 class="h3 fw-bold mb-4">
+                <i class="bi bi-list-ul"></i> Todas as Notícias
+            </h2>
+
+            {% if all_news %}
+            <div class="row g-3">
+                {% for news in all_news %}
+                <div class="col-12">
+                    <div class="card border-0 shadow-sm">
+                        <div class="card-body">
+                            <div class="row align-items-center">
+                                <div class="col-md-8">
+                                    <h5 class="card-title mb-2">
+                                        <a href="{{ news.link }}" target="_blank"
+                                            class="text-decoration-none text-dark">
+                                            {{ news.title }}
+                                        </a>
+                                    </h5>
+                                    <p class="card-text text-muted mb-2">{{ news.summary|truncatewords:30 }}</p>
+                                    <p class="small text-muted mb-0">
+                                        <i class="bi bi-calendar3"></i> {{ news.published_date|date:"d/m/Y" }} |
+                                        <i class="bi bi-building"></i> {{ news.source }}
+                                    </p>
+                                </div>
+                                <div class="col-md-4 text-end">
+                                    <a href="{{ news.link }}" target="_blank" class="btn btn-outline-primary btn-sm">
+                                        <i class="bi bi-box-arrow-up-right"></i> Ler Mais
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="alert alert-info" role="alert">
+                <i class="bi bi-info-circle"></i> Nenhuma notícia disponível no momento.
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<style>
+    .hover-lift {
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .hover-lift:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.2) !important;
+    }
+</style>
+{% endblock %}

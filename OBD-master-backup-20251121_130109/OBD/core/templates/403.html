@@ -1,0 +1,43 @@
+<!--
+Project name: OBD - Organização Brasileira de Dardos
+Property: Nathan Perkes
+Developers: Walisson Oliveira
+Page name: login.html (Página LOGIN dos jogadores o OBD)
+Start date of this page: Apr-11-2021
+Last update:
+Description: This is the page where players can log-in
+-->
+{% extends 'base.html' %}
+{% block csslib %}
+{% endblock %}
+{% block title %}Acesso não autorizado ao OBD ADMIN | 403 Forbiden Access.{% endblock %}
+{% block styles %}
+{% endblock %}
+{% block content %}
+
+<div class="container">
+    <div class="row">
+
+        <div class="col-4"></div>
+        <div class="col-4">
+            {% if user.is_authenticated %}
+            <div class="alert alert-danger" role="alert" align="center">
+                <strong>Olá {{ user.first_name }}, somente os administradores da liga possuem acesso a esta
+                    página.</strong>
+            </div>
+            {% else %}
+            <div class="alert alert-danger" role="alert" align="center">
+                <strong>Olá, somente os administradores da liga possuem acesso a esta página.</strong>
+            </div>
+            {% endif %}
+
+        </div>
+        <div class="col">
+            <p></p>
+        </div>
+    </div>
+</div>
+<br>
+{% endblock %}
+{% block jslib %}
+{% endblock %}

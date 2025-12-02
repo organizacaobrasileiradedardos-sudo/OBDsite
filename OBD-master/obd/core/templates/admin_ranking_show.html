@@ -1,0 +1,480 @@
+{% extends 'baseadmin.html' %}
+{% load l10n %}
+{% block csslib %}
+{% endblock %}
+{% block title %} Classificação/Ranking OBD {% now "Y" %} {% endblock %}
+{% block styles %} {% endblock %}
+{% block page %}Classificação/Ranking Liga OBD {% now "Y" %}{% endblock %}
+{% block content %}
+<p><br></p>
+
+{% if messages %}
+{% for message in messages %}
+<div class="alert {{ alert }} alert-dismissible fade show" role="alert">
+    {{ message}}
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+</div>
+{% endfor %}
+{% endif %}
+
+{% if form.errors %}
+{% for field in form %}
+{% for error in field.errors %}
+<div class="alert alert-danger alert-dismissible fade show" role="alert">
+    <strong>{{ error|escape }}</strong>
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+</div>
+{% endfor %}
+{% endfor %}
+{% for error in form.non_field_errors %}
+<div class="alert alert-danger">
+    <strong>{{ error|escape }}</strong>
+</div>
+{% endfor %}
+{% endif %}
+
+
+
+<ul class="nav nav-tabs" id="myTab" role="tablist">
+    <li class="nav-item" role="presentation">
+        <button class="nav-link active" id="home-tab" data-bs-toggle="tab" data-bs-target="#ranking" type="button"
+            role="tab" aria-controls="ranking" aria-selected="true">Classificação</button>
+    </li>
+    <li class="nav-item" role="presentation">
+        <button class="nav-link" id="profile-tab" data-bs-toggle="tab" data-bs-target="#finished" type="button"
+            role="tab" aria-controls="finished" aria-selected="false">Jogos Finalizados</button>
+    </li>
+    <li class="nav-item" role="presentation">
+        <button class="nav-link" id="contact-tab" data-bs-toggle="tab" data-bs-target="#pending" type="button"
+            role="tab" aria-controls="pending" aria-selected="false">Próximos Jogos</button>
+    </li>
+    <li class="nav-item" role="presentation">
+        <button class="nav-link" id="contact-tab" data-bs-toggle="tab" data-bs-target="#playoffs" type="button"
+            role="tab" aria-controls="playoffs" aria-selected="false">Playoffs</button>
+    </li>
+    <li class="nav-item" role="presentation">
+        <button class="nav-link" id="contact-tab" data-bs-toggle="tab" data-bs-target="#finals" type="button" role="tab"
+            aria-controls="finais" aria-selected="false">Finais</button>
+    </li>
+</ul>
+
+<div class="tab-content" id="myTabContent">
+
+    <div class="tab-pane fade show active" id="ranking" role="tabpanel" aria-labelledby="ranking">
+        <p><br></p>
+        <h5><strong><i class="bi bi-list-stars"></i> Classificação - {{ division.name }} </strong>({{
+            division.get_phase_display }})</h5>
+        <p><br></p>
+        <table class="table table-striped table-bordered">
+            <thead>
+                <tr>
+                    <th scope="col">#</th>
+                    <th scope="col">Jogador</th>
+                    <th scope="col">J</th>
+                    <th scope="col">P**</th>
+                    <th scope="col">S</th>
+                    <th scope="col">L</th>
+                    <th scope="col">V</th>
+                    <th scope="col">E</th>
+                    <th scope="col">D</th>
+                    <th scope="col">WO</th>
+                    <th scope="col">Média</th>
+                    <th scope="col">BL</th>
+                    <th scope="col">HO</th>
+                    <th scope="col">100+</th>
+                    <th scope="col">140+</th>
+                    <th scope="col">170+</th>
+                    <th scope="col">180+</th>
+                    <th scope="col">Performance***</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for line in database %}
+                <tr>
+                    <td>
+                        <h6 style="font-size: small" align="center">{{ forloop.counter }}</h6>
+                    </td>
+                    <td>
+                        <h6 style="font-size: small" align="center">{{ line.player.first_name }} {{
+                            line.player.last_name }}</h6>
+                    </td>
+                    <td>
+                        <h6 style="font-size: small" align="center">{% if line.matches is None %}0{% else %}{{
+                            line.matches }}{% endif %}</h6>
+                    </td>
+                    <td>
+                        <h6 style="font-size: small" align="center">{% if line.points is None %}0{% else %}{{
+                            line.points }}{% endif %}</h6>
+                    </td>
+                    <td>
+                        <h6 style="font-size: small" align="center">{% if line.difference is None %}0{% else %}{{
+                            line.difference }}{% endif %}</h6>
+                    </td>
+                    <td>
+                        <h6 style="font-size: small" align="center">{% if line.legs is None %}0{% else %}{{ line.legs
+                            }}{% endif %}</h6>
+                    </td>
+                    <td>
+                        <h6 style="font-size: small" align="center">{% if line.wins is None %}0{% else %}{{ line.wins
+                            }}{% endif %}</h6>
+                    </td>
+                    <td>
+                        <h6 style="font-size: small" align="center">{% if line.draws is None %}0{% else %}{{ line.draws
+                            }}{% endif %}</h6>
+                    </td>
+                    <td>
+                        <h6 style="font-size: small" align="center">{% if line.losses is None %}0{% else %}{{
+                            line.losses }}{% endif %}</h6>
+                    </td>
+                    <td>
+                        <h6 style="font-size: small" align="center">{% if line.walkover is None %}0{% else %}{{
+                            line.walkover }}{% endif %}</h6>
+                    </td>
+                    <td>
+                        <h6 style="font-size: small" align="center">{% if line.average is None %}0{% else %}{{
+                            line.average | floatformat:"2"}}{% endif %}</h6>
+                    </td>
+                    <td>
+                        <h6 style="font-size: small" align="center">{% if line.best is None %}0{% else %}{{ line.best
+                            }}{% endif %}</h6>
+                    </td>
+                    <td>
+                        <h6 style="font-size: small" align="center">{% if line.out is None %}0{% else %}{{ line.out }}{%
+                            endif %}</h6>
+                    </td>
+                    <td>
+                        <h6 style="font-size: small" align="center">{% if line.ton is None %}0{% else %}{{ line.ton }}{%
+                            endif %}</h6>
+                    </td>
+                    <td>
+                        <h6 style="font-size: small" align="center">{% if line.ton40 is None %}0{% else %}{{ line.ton40
+                            }}{% endif %}</h6>
+                    </td>
+                    <td>
+                        <h6 style="font-size: small" align="center">{% if line.ton70 is None %}0{% else %}{{ line.ton70
+                            }}{% endif %}</h6>
+                    </td>
+                    <td>
+                        <h6 style="font-size: small" align="center">{% if line.ton80 is None %}0{% else %}{{ line.ton80
+                            }}{% endif %}</h6>
+                    </td>
+                    <td>
+                        <h6 style="font-size: small">
+                            {% for char in line.player.stat.leaguePerformance%}
+                            {% if forloop.counter < 6 %} {% if char=='O' %}<span class="badge bg-warning"><i
+                                    class="bi bi-emoji-dizzy"></i></span>{% endif %}
+                                {% if char == 'W' %}<span class="badge bg-success"><i
+                                        class="bi bi-emoji-laughing"></i></span>{% endif %}
+                                {% if char == 'L' %}<span class="badge bg-danger"><i
+                                        class="bi bi-emoji-dizzy"></i></span>{% endif %}
+                                {% if char == 'D' %}<span class="badge bg-info"><i
+                                        class="bi bi-emoji-neutral"></i></span>{% endif %}
+                                {% endif %}
+                                {% endfor %}
+                        </h6>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <h6 style="font-size:small" align="center">Posição | Jogador | Jogos | Pontos | Saldo | Legs | Vitórias |
+            Empates | Derrotas | Média | Melhor Leg | Melhor Fechada | 100+ | 140+ | 170+ | 180s | Performance</h6>
+        <hr>
+        <h6 style="font-size:small" align="center"><strong>* </strong>Critérios de classificação, em ordem: pontos,
+            saldo, legs, vitórias e média.</h6>
+        <h6 style="font-size:small" align="center"><strong>** </strong>Somente jogos validados ou lançadados
+            automaticamente via WEBCAMDARTS ou NAKKA foram considerados no ranking.</h6>
+        <h6 style="font-size:small" align="center"><strong>*** </strong>Baseado nos últimos jogos, de quaisquer ligas ou
+            divisões.</h6>
+        <h6 style="font-size:small" align="center"><strong>Atenção! </strong> A janela para lançamento dos
+            resultados/jogos ficará ativa até {{ division.league.end_date }}.</h6>
+        <h6 style="font-size:small" align="center">
+            <strong>Legendas:</strong>
+            Vitória <span class="badge bg-success"><i class="bi bi-emoji-laughing"></i></span> |
+            Derrota <span class="badge bg-danger"><i class="bi bi-emoji-dizzy"></i></span> |
+            WO <span class="badge bg-warning"><i class="bi bi-emoji-dizzy"></i></span> |
+            Empate <span class="badge bg-info"><i class="bi bi-emoji-neutral"></i></span>
+        </h6>
+        <p></p>
+
+
+    </div>
+
+    <div class="tab-pane fade" id="finished" role="tabpanel" aria-labelledby="profile-tab">
+        <p><br></p>
+        <h5><strong><i class="bi bi-list-stars"></i> Jogos finalizados* {{ finished.first.division.name }}</strong>({{
+            division.get_phase_display }})</h5>
+        <p><br></p>
+
+        {% if finished %}
+        <table class="table">
+            <thead>
+                <tr>
+                    <th scope="col">ID Partida</th>
+                    <th scope="col">Data</th>
+                    <th scope="col"></th>
+                    <th></th>
+                    <th></th>
+                    <th></th>
+                    <th scope="col"></th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for match in finished %}
+                <tr>
+                    <td>{{ match.id }}</td>
+                    <td>{{ match.on_date }}</td>
+                    <td><strong>{{ match.result_set.first.player.first_name }} {{
+                            match.result_set.first.player.last_name }}</strong>
+                        <h6 style="font-size: smaller">({{ match.result_set.first.player.username }})</h6>
+                    </td>
+                    <td><span class="badge bg-warning text-dark">{% if match.result_set.first.legs is None %} 0 {% else
+                            %} {{ match.result_set.first.legs }}{% endif %} </span></td>
+                    <td><strong>Vs.</strong></td>
+                    <td><span class="badge bg-warning text-dark">{% if match.result_set.last.legs is None %} 0 {% else
+                            %} {{ match.result_set.last.legs }} {% endif %}</span></td>
+                    <td><strong>{{ match.result_set.last.player.first_name }} {{ match.result_set.last.player.last_name
+                            }}</strong>
+                        <h6 style="font-size: smaller">({{ match.result_set.last.player.username }})</h6>
+                    </td>
+                    <td>
+
+                        <div class="dropdown">
+                            <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton2"
+                                data-bs-toggle="dropdown" aria-expanded="false">
+                                <i class="bi bi-shield-exclamation"></i> Ver Estatísticas
+                            </button>
+                            <ul class="dropdown-menu dropdown-menu-dark" aria-labelledby="dropdownMenuButton2">
+                                <li><a class="dropdown-item"
+                                        href="{% url 'result' slug=match.division.slug match=match.id %}"
+                                        target="_blank"><i class="bi bi-zoom-in"></i> Ver resultado</a></li>
+                                {% if match.server == 'WO' %}
+                                <li><a class="dropdown-item" href="#"><i class="bi bi-zoom-in"></i> Aplicado WO</a></li>
+                                {% else %}
+                                {% if match.server == 'OTH' %}
+                                <li><a class="dropdown-item" href="{{ match.photo }}" target="_blank"><i
+                                            class="bi bi-zoom-in"></i> Ver anexo</a></li>
+                                {% else %}
+                                <li><a class="dropdown-item" href="{{ match.link }}" target="_blank"><i
+                                            class="bi bi-zoom-in"></i> Ver no {{ match.get_server_display }}</a></li>
+                                {% endif %}
+                                {% endif %}
+                                <li>
+                                    <hr class="dropdown-divider">
+                                </li>
+                                <li><a class="dropdown-item " href="{% url 'index' %}"><i class="bi bi-house-door"></i>
+                                        Página Inicial OBD</a></li>
+                            </ul>
+                        </div>
+
+                    </td>
+                </tr>
+
+                {% endfor %}
+            </tbody>
+        </table>
+        <h6 style="font-size:medium" align="center"><strong>Atenção! </strong> Somente jogos validados estão sendo
+            considerados nesta análise.</h6>
+        <p><br></p>
+        {% else %}
+        <p>Não há jogos completados no momento para {{ pending.first.division.name }}</p>
+        {% endif %}
+
+    </div>
+
+    <div class="tab-pane fade" id="pending" role="tabpanel" aria-labelledby="contact-tab">
+
+        <p><br></p>
+        <h5><strong><i class="bi bi-list-stars"></i> Jogos pendentes - {{ pending.first.division.name }}</strong>({{
+            division.get_phase_display }})</h5>
+        <p><br></p>
+        {% if pending %}
+        <table class="table">
+            <thead>
+                <tr>
+                    <th scope="col">ID Partida</th>
+                    <th scope="col">Data</th>
+                    <th scope="col"></th>
+                    <th></th>
+                    <th></th>
+                    <th></th>
+                    <th scope="col"></th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+
+                {% for match in pending %}
+                <tr>
+                    <td>{{ match.id }}</td>
+                    <td>{% if match.on_date is not None %}{{ match.on_date }}{% else %}À definir{% endif %} </td>
+                    <td><strong>{{ match.result_set.first.player.first_name }} {{
+                            match.result_set.first.player.last_name }}</strong>
+                        <h6 style="font-size: smaller">({{ match.result_set.first.player.username }})</h6>
+                    </td>
+                    <td><span class="badge bg-warning text-dark">{% if match.result_set.first.legs is None %} 0 {% else
+                            %} {{ match.result_set.first.legs }}{% endif %} </span></td>
+                    <td><strong>Vs.</strong></td>
+                    <td><span class="badge bg-warning text-dark">{% if match.result_set.last.legs is None %} 0 {% else
+                            %} {{ match.result_set.last.legs }} {% endif %}</span></td>
+                    <td><strong>{{ match.result_set.last.player.first_name }} {{ match.result_set.last.player.last_name
+                            }}</strong>
+                        <h6 style="font-size: smaller">({{ match.result_set.last.player.username }})</h6>
+                    </td>
+                    <td>
+                        <div class="dropdown">
+                            <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton2"
+                                data-bs-toggle="dropdown" aria-expanded="false">
+                                WO / Empate
+                            </button>
+                            <ul class="dropdown-menu dropdown-menu-dark" aria-labelledby="dropdownMenuButton2">
+                                <li><a class="dropdown-item" href="{% url 'league:draw' match=match.id %}"><i
+                                            class="bi bi-hand-thumbs-up"></i> Aplicar empate?</a></li>
+                                <li><a class="dropdown-item"
+                                        href="{% url 'league:walkover' match=match.id win=match.result_set.last.player.id los=match.result_set.first.player.id %}"><i
+                                            class="bi bi-clipboard-x"></i> Aplicar WO para {{
+                                        match.result_set.first.player.first_name }} {{
+                                        match.result_set.first.player.last_name }}?</a></li>
+                                <li><a class="dropdown-item"
+                                        href="{% url 'league:walkover' match=match.id win=match.result_set.first.player.id los=match.result_set.last.player.id %}"><i
+                                            class="bi bi-clipboard-x"></i> Aplicar WO para {{
+                                        match.result_set.last.player.first_name }} {{
+                                        match.result_set.last.player.last_name }}?</a></li>
+                                <li>
+                                    <hr class="dropdown-divider">
+                                </li>
+                            </ul>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <h6 style="font-size:medium" align="center"><strong>Atenção! </strong> O prazo para finalizar todos os jogos,
+            sem risco de WO, pela {{pending.first.division.name}} é até {{ division.league.end_date }}.</h6>
+        <p><br></p>
+
+        {% else %}
+        <p>Não há jogos pendentes para {{ finished.first.division.name }}</p>
+        {% endif %}
+
+    </div>
+
+    <div class="tab-pane fade" id="playoffs" role="tabpanel" aria-labelledby="home-tab">
+        <p><br></p>
+        <h5><strong><i class="bi bi-list-stars"></i> Playoffs - {{ division.name }} </strong>({{
+            division.get_phase_display }})</h5>
+        <p><br></p>
+
+        {% if playoffs %}
+        <table class="table">
+            <thead>
+                <tr>
+                    <th scope="col">ID Partida</th>
+                    <th scope="col">Data</th>
+                    <th scope="col"></th>
+                    <th></th>
+                    <th></th>
+                    <th></th>
+                    <th scope="col"></th>
+                </tr>
+            </thead>
+            <tbody>
+
+                {% for match in playoffs %}
+                <tr>
+                    <td>{{ match.id }}</td>
+                    <td>{% if match.on_date is not None %}{{ match.on_date }}{% else %}À definir{% endif %} </td>
+                    <td><strong>{{ match.result_set.first.player.first_name }} {{
+                            match.result_set.first.player.last_name }}</strong>
+                        <h6 style="font-size: smaller">({{ match.result_set.first.player.username }})</h6>
+                    </td>
+                    <td><span class="badge bg-warning text-dark">{% if match.result_set.first.legs is None %} 0 {% else
+                            %} {{ match.result_set.first.legs }}{% endif %} </span></td>
+                    <td><strong>Vs.</strong></td>
+                    <td><span class="badge bg-warning text-dark">{% if match.result_set.last.legs is None %} 0 {% else
+                            %} {{ match.result_set.last.legs }} {% endif %}</span></td>
+                    <td><strong>{{ match.result_set.last.player.first_name }} {{ match.result_set.last.player.last_name
+                            }}</strong>
+                        <h6 style="font-size: smaller">({{ match.result_set.last.player.username }})</h6>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <h6 style="font-size:medium" align="center"><strong>Atenção! </strong> O prazo para finalizar todos os jogos,
+            sem risco de WO, pela {{pending.first.division.name}} é até {{ division.league.end_date }}.</h6>
+        <p><br></p>
+
+        {% else %}
+        <p>Não há playoffs no momento para esta divisão.</p>
+        {% endif %}
+
+
+    </div>
+    <p><br></p>
+
+    <div class="tab-pane fade" id="finals" role="tabpanel" aria-labelledby="home-tab2">
+        <p><br></p>
+        <h5><strong><i class="bi bi-list-stars"></i> Final - {{ division.name }} </strong>({{ division.get_phase_display
+            }})</h5>
+        <p><br></p>
+
+        {% if finals %}
+        <table class="table">
+            <thead>
+                <tr>
+                    <th scope="col">ID Partida</th>
+                    <th scope="col">Data</th>
+                    <th scope="col"></th>
+                    <th></th>
+                    <th></th>
+                    <th></th>
+                    <th scope="col"></th>
+                </tr>
+            </thead>
+            <tbody>
+
+                {% for match in finals %}
+                <tr>
+                    <td>{{ match.id }}</td>
+                    <td>{% if match.on_date is not None %}{{ match.on_date }}{% else %}À definir{% endif %} </td>
+                    <td><strong>{{ match.result_set.first.player.first_name }} {{
+                            match.result_set.first.player.last_name }}</strong>
+                        <h6 style="font-size: smaller">({{ match.result_set.first.player.username }})</h6>
+                    </td>
+                    <td><span class="badge bg-warning text-dark">{% if match.result_set.first.legs is None %} 0 {% else
+                            %} {{ match.result_set.first.legs }}{% endif %} </span></td>
+                    <td><strong>Vs.</strong></td>
+                    <td><span class="badge bg-warning text-dark">{% if match.result_set.last.legs is None %} 0 {% else
+                            %} {{ match.result_set.last.legs }} {% endif %}</span></td>
+                    <td><strong>{{ match.result_set.last.player.first_name }} {{ match.result_set.last.player.last_name
+                            }}</strong>
+                        <h6 style="font-size: smaller">({{ match.result_set.last.player.username }})</h6>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <h6 style="font-size:medium" align="center"><strong>Atenção! </strong> O prazo para finalizar todos os jogos,
+            sem risco de WO, pela {{pending.first.division.name}} é até {{ division.league.end_date }}.</h6>
+        <p><br></p>
+
+        {% else %}
+        <p>Não há final registrada no momento para esta divisão.</p>
+        {% endif %}
+    </div>
+    <p><br></p>
+
+</div>
+
+
+
+
+
+
+
+{% endblock %}
+{% block jslib %}
+{% endblock %}

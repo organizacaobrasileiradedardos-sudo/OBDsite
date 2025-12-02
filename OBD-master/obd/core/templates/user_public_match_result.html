@@ -1,0 +1,160 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block csslib %}
+{% endblock %}
+{% block title %} Relatório de Partida OBD {% now "Y" %} {% endblock %}
+{% block styles %} {% endblock %}
+{% block content %}
+<p><br></p>
+
+{% if messages %}
+{% for message in messages %}
+<div class="alert {{ alert }} alert-dismissible fade show" role="alert">
+    {{ message}}
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+</div>
+{% endfor %}
+{% endif %}
+
+{% if form.errors %}
+{% for field in form %}
+{% for error in field.errors %}
+<div class="alert alert-danger alert-dismissible fade show" role="alert">
+    <strong>{{ error|escape }}</strong>
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+</div>
+{% endfor %}
+{% endfor %}
+{% for error in form.non_field_errors %}
+<div class="alert alert-danger">
+    <strong>{{ error|escape }}</strong>
+</div>
+{% endfor %}
+{% endif %}
+
+
+<div class="row">
+
+    <div class="col-6 col-md-1"></div>
+
+    <div class="col-6 col-md-10">
+
+        <div class="card mb-3">
+            <img src="{% static '/media/logos/1230x200-banner-fundo-escuro.jpg' %}"
+                class="card-img figure-img img-fluid rounded" alt="...">
+            <div class="card-body">
+                <p><br></p>
+                <h2><strong><i class="bi bi-file-earmark-text-fill"></i> Relatório de Partida #{{ game.id }} {{
+                        game.division.league.name }} | Divisão {{ game.division.get_formation_display }}</strong> | <a
+                        class="btn btn-primary" href="{% url 'boadivisionview' slug=division.slug %}" role="button">Ver
+                        Ranking</a></h2>
+                <p class="card-text"><small class="text-muted">A melhor liga online de Dardos do Brasil! </small></p>
+            </div>
+        </div>
+
+
+        <p><br></p>
+        <table class="table table-sm table-dark ">
+            <thead>
+                <tr>
+                    <th scope="col" style="text-align: center; vertical-align: middle;">Jogador(a)</th>
+                    <th scope="col" style="text-align: center; vertical-align: middle;">Resultado Final</th>
+                    <th scope="col" style="text-align: center; vertical-align: middle;">Walkover (WO)</th>
+                    <th scope="col" style="text-align: center; vertical-align: middle;">Set</th>
+                    <th scope="col" style="text-align: center; vertical-align: middle;">Legs</th>
+                    <th scope="col" style="text-align: center; vertical-align: middle;">Média</th>
+                    <th scope="col" style="text-align: center; vertical-align: middle;">Melhor Fechada</th>
+                    <th scope="col" style="text-align: center; vertical-align: middle;">Melhor Leg</th>
+                    <th scope="col" style="text-align: center; vertical-align: middle;">100+</th>
+                    <th scope="col" style="text-align: center; vertical-align: middle;">140+</th>
+                    <th scope="col" style="text-align: center; vertical-align: middle;">170+</th>
+                    <th scope="col" style="text-align: center; vertical-align: middle;">180</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <th scope="row" style="text-align: center; vertical-align: middle;">{{ p1.player.first_name }} {{
+                        p1.player.last_name }}</th>
+                    <td style="text-align: center; vertical-align: middle;">{{ p1.get_final_display }}</td>
+                    <td style="text-align: center; vertical-align: middle;">{% if p1.walkover %}Sim{% else %}Não{% endif
+                        %}</td>
+                    <td style="text-align: center; vertical-align: middle;">{{ p1.sets }}</td>
+                    <td style="text-align: center; vertical-align: middle;">{{ p1.legs }}</td>
+                    <td style="text-align: center; vertical-align: middle;">{{ p1.average | floatformat:"2"}}</td>
+                    <td style="text-align: center; vertical-align: middle;">{{ p1.highest_out }}</td>
+                    <td style="text-align: center; vertical-align: middle;">{{ p1.best_leg }}</td>
+                    <td style="text-align: center; vertical-align: middle;">{{ p1.ton }}</td>
+                    <td style="text-align: center; vertical-align: middle;">{{ p1.ton40 }}</td>
+                    <td style="text-align: center; vertical-align: middle;">{{ p1.ton70 }}</td>
+                    <td style="text-align: center; vertical-align: middle;">{{ p1.ton80 }}</td>
+                </tr>
+                <tr>
+                    <th scope="row" style="text-align: center; vertical-align: middle;">{{ p2.player.first_name }} {{
+                        p2.player.last_name }}</th>
+                    <td style="text-align: center; vertical-align: middle;">{{ p2.get_final_display }}</td>
+                    <td style="text-align: center; vertical-align: middle;">{% if p2.walkover %}Sim{% else %}Não{% endif
+                        %}</td>
+                    <td style="text-align: center; vertical-align: middle;">{{ p2.sets }}</td>
+                    <td style="text-align: center; vertical-align: middle;">{{ p2.legs }}</td>
+                    <td style="text-align: center; vertical-align: middle;">{{ p2.average | floatformat:"2"}}</td>
+                    <td style="text-align: center; vertical-align: middle;">{{ p2.highest_out }}</td>
+                    <td style="text-align: center; vertical-align: middle;">{{ p2.best_leg }}</td>
+                    <td style="text-align: center; vertical-align: middle;">{{ p2.ton }}</td>
+                    <td style="text-align: center; vertical-align: middle;">{{ p2.ton40 }}</td>
+                    <td style="text-align: center; vertical-align: middle;">{{ p2.ton70 }}</td>
+                    <td style="text-align: center; vertical-align: middle;">{{ p2.ton80 }}</td>
+                </tr>
+
+            </tbody>
+        </table>
+
+        <p><br></p>
+        <p>
+            <strong><i class="bi bi-asterisk"></i> Servidor:</strong> {{ game.get_server_display }}<br>
+            <strong><i class="bi bi-asterisk"></i> Link:</strong> <a href="{{ game.link }}" target="_blank">{{ game.link
+                }}</a> <br>
+            <strong><i class="bi bi-asterisk"></i> Anexo:</strong> <a href="{{ game.photo }}" target="_blank">{{
+                game.photo }}</a><br>
+            <strong><i class="bi bi-asterisk"></i> Registrado por:</strong> {{ game.submited_by }}<br>
+            <strong><i class="bi bi-asterisk"></i> Registrado em:</strong> {{ game.on_date }}<br>
+            <strong><i class="bi bi-asterisk"></i> Comentários:</strong> {{ game.comment }}<br>
+        </p>
+        <p><br></p>
+
+
+        {% if game.server == 'WED' %}
+        <div align="center">
+            <h2>Exibindo resultado em {{ game.get_server_display }}</h2>
+            <iframe src="{{ game.link }}" name="iframea" height="800px" width="800px" title="Iframe Example"></iframe>
+        </div>
+        {% endif %}
+
+        {% if game.server == 'N01' %}
+        <div align="center">
+            <h2>Exibindo resultado em {{ game.get_server_display }}</h2>
+            <iframe src="{{ game.link }}" name="iframea" height="800px" width="800px" title="Iframe Example"></iframe>
+        </div>
+        {% endif %}
+
+
+        {% if game.server == 'OTH' %}
+        <div align="center">
+            <h2>Exibindo conteúdo do anexo | Lançamento Manual</h2>
+            <div class="rect-img-container">
+                <img class="rect-img figure-img img-fluid rounded" src="{{ game.photo }}" align="center"
+                    title="{{ game.division.league.name }}" alt="{{ game.photo}}">
+            </div>
+        </div>
+        {% endif %}
+
+    </div>
+
+    <div class="col-6 col-md-1"></div>
+
+
+</div>
+
+
+{% endblock %}
+{% block jslib %}
+{% endblock %}

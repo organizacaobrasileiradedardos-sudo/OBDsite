@@ -1,0 +1,152 @@
+<!--
+Project name: OBD - Organização Brasileira de Dardos
+Property: Organização Brasileira de Dardos
+Developers: Guilherme Altomar by IA
+Page name: subscription.html (Página de Cadastro de Novos Associados)
+Start date of this page: Nov-19-2025    
+Last update: Nov-19-2025
+Description: This is the page where new players can join OBD board.
+-->
+{% extends 'base.html' %}
+{% block csslib %}
+{% endblock %}
+{% block title %}Página de Associação à OBD{% endblock %}
+{% block styles %}
+{% endblock %}
+{% block content %}
+
+<div class="container">
+    <div class="row">
+        <div class="col-1"></div>
+        <div class="col-6">
+            <h3><strong>Seja bem-vindo à OBD!</strong></h3>
+            <p>Antes de partir para os 180, 9 dardos ou aquela fechada em 170, vale a pena conhecer os princípios e
+                informações abaixo. A Liga da OBD tem por finalidade unir toda a comunidade de dardos em prol do esporte
+                no Brasil
+                e proporcionar muita diversão para você!
+            </p>
+            <br>
+            <p><i class="bi bi-emoji-heart-eyes-fill"></i> Este é um ambiente com pessoas incríveis de diferentes
+                lugares
+                do Brasil;</p>
+            <p><i class="bi bi-emoji-heart-eyes-fill"></i> Competir é importante, mas a amizade e o respeito são ainda
+                mais; </p>
+            <p><i class="bi bi-emoji-heart-eyes-fill"></i> Respeito, ética e honestidade estão acima de qualquer vitória
+                ou fechada em 170;</p>
+            <p><i class="bi bi-emoji-heart-eyes-fill"></i> Caso não consiga cumprir o horário acordado de seu jogo,
+                comunique sua ausência com antecedência;</p>
+            <p><i class="bi bi-emoji-heart-eyes-fill"></i> Venceu sua partida? Agradeça ao seu adversário pelo jogo e
+                reconheça seu esforço;</p>
+            <p><i class="bi bi-emoji-heart-eyes-fill"></i> A organização da OBD é ativa e presente. Reserve um tempo
+                para ler
+                os avisos e comunicados importantes;</p>
+            <p><i class="bi bi-emoji-heart-eyes-fill"></i> A OBD é uma iniciativa de um grupo de entusiastas de dardos.
+                Você
+                pode colaborar de diversas formas com este projeto;</p>
+            <p><i class="bi bi-emoji-heart-eyes-fill"></i> Para qualquer dúvida sobre a OBD, entre em contato pelo
+                e-mail:
+                <strong><a
+                        href="mailto:organizacaobrasileiradedardos@gmail.com">organizacaobrasileiradedardos@gmail.com</a></strong>
+            </p>
+            <p><i class="bi bi-emoji-heart-eyes-fill"></i> A comunidade de dardos no Brasil cresce com você. Convide
+                seus familiares, amigos e colegas para fazer parte!</p>
+        </div>
+        <div class="col-4">
+            <div class="alert alert-dark" role="alert" align="center">
+                <strong><i class="bi bi-person-circle"></i> Formulário de Cadastro</strong>
+            </div>
+
+            {% if messages %}
+            {% for message in messages %}
+            <div class="alert alert-success" role="alert">
+                <a class="btn-link" href="{% url 'players:login' %}">Cadastro realizado com sucesso, {{ message }}!
+                    Clique aqui para fazer o seu
+                    login.</a>
+            </div>
+
+            {% endfor %}
+            {% endif %}
+
+            <form action="." method="post">
+                {% csrf_token %}
+
+                {% if form.errors %}
+                {% for field in form %}
+                {% for error in field.errors %}
+                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                    <h6><strong>{{ error|escape }}</strong></h6>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+                {% endfor %}
+                {% endfor %}
+                {% endif %}
+
+                <div class="input-group mb-3">
+                    <span class="input-group-text" id="basic-addon1"> <label for="{{ form.username.id_for_label }}"
+                            class="form-label">{{ form.username.label }} </label></span>
+                    <input minlength="4" maxlength="30" id="{{ form.username.id_for_label }}" type="text"
+                        name="{{ form.username.html_name }}" required class="form-control"
+                        pattern="[a-zA-Z0-9_\s]{4,30}" placeholder="Escolha seu nome de usuário (4-30 caracteres)"
+                        aria-label="Username" aria-describedby="basic-addon1">
+                </div>
+
+                <div class="input-group mb-3">
+                    <span class="input-group-text" id="basic-addon1"> <label for="{{ form.email.id_for_label }}"
+                            class="form-label">{{ form.email.label }} </label></span>
+                    <input id="{{ form.email.id_for_label }}" type="email" name="{{ form.email.html_name }}" required
+                        class="form-control" placeholder="Digite seu melhor e-mail" aria-label="Username"
+                        aria-describedby="basic-addon1">
+                </div>
+
+                <div class="input-group mb-3">
+                    <span class="input-group-text" id="basic-addon1"> <label for="{{ form.password.id_for_label }}"
+                            class="form-label">{{ form.password.label }} </label></span>
+                    <input minlength="7" maxlength="51" id="{{ form.password.id_for_label }}" type="password"
+                        name="{{ form.password.html_name }}" required class="form-control"
+                        placeholder="Crie sua senha (mínimo 7 caracteres)" aria-label="Username"
+                        aria-describedby="basic-addon1">
+                </div>
+
+                <div class="input-group mb-3">
+                    <span class="input-group-text" id="basic-addon1"> <label for="{{ form.password2.id_for_label }}"
+                            class="form-label">{{ form.password2.label }} </label></span>
+                    <input minlength="3" maxlength="40" id="{{ form.password2.id_for_label }}" type="password"
+                        name="{{ form.password2.html_name }}" required class="form-control"
+                        placeholder="Digite a senha novamente" aria-label="Username" aria-describedby="basic-addon1">
+                </div>
+
+                <div class="input-group mb-3">
+                    <span class="input-group-text" id="basic-addon1"> <label for="{{ form.first_name.id_for_label }}"
+                            class="form-label">{{ form.first_name.label }} </label></span>
+                    <input minlength="2" maxlength="20" id="{{ form.first_name.id_for_label }}" type="text"
+                        name="{{ form.first_name.html_name }}" required class="form-control" pattern="[a-zA-Z]{2,20}"
+                        placeholder="Digite seu primeiro nome" aria-label="Username" aria-describedby="basic-addon1">
+                </div>
+
+                <div class="input-group mb-3">
+                    <span class="input-group-text" id="basic-addon1"> <label for="{{ form.last_name.id_for_label }}"
+                            class="form-label">{{ form.last_name.label }} </label></span>
+                    <input minlength="2" maxlength="20" id="{{ form.last_name.id_for_label }}" type="text"
+                        name="{{ form.last_name.html_name }}" required class="form-control" pattern="[a-zA-Z]{2,20}"
+                        placeholder="Digite seu sobrenome" aria-label="Username" aria-describedby="basic-addon1">
+                </div>
+
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" value="" id="invalidCheck" required>
+                    <label class="form-check-label" for="invalidCheck">
+                        Li e concordo com os princípios e termos de uso da OBD
+                    </label>
+                    <p></p>
+                </div>
+                <button type="submit" class="btn btn-success mb-3">Tornar-me membro da OBD</button>
+            </form>
+        </div>
+        <div class="col">
+            <p></p>
+        </div>
+    </div>
+</div>
+<br>
+{% endblock %}
+{% block jslib %}
+{% endblock %}

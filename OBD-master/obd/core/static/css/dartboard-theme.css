@@ -1,0 +1,617 @@
+/*
+ * Dartboard Theme - OBD (Organização Brasileira de Dardos)
+ * Tema inspirado nas cores clássicas de um alvo de dardos
+ * Cores: Vermelho, Verde, Branco, Preto/Cinza
+ */
+
+/* ==========================================================================
+   Fontes Google
+   ========================================================================== */
+@import url('https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap');
+
+/* ==========================================================================
+   Variáveis CSS - Paleta de Cores do Alvo
+   ========================================================================== */
+:root {
+    /* Vermelho - Ação, Destaque, Botões Primários */
+    --dartboard-red: #DC2626;
+    --dartboard-red-dark: #B91C1C;
+    --dartboard-red-light: #FCA5A5;
+    --dartboard-red-rgb: 220, 38, 38;
+
+    /* Verde - Sucesso, Confirmação, Elementos Secundários */
+    --dartboard-green: #059669;
+    --dartboard-green-dark: #047857;
+    --dartboard-green-light: #6EE7B7;
+    --dartboard-green-rgb: 5, 150, 105;
+
+    /* Preto/Cinza Escuro - Fundo, Texto, Navegação */
+    --dartboard-black: #1F2937;
+    --dartboard-gray-dark: #374151;
+    --dartboard-gray: #6B7280;
+    --dartboard-gray-light: #D1D5DB;
+
+    /* Branco/Cinza Claro - Fundo de Cards, Texto em Fundos Escuros */
+    --dartboard-white: #FFFFFF;
+    --dartboard-off-white: #F9FAFB;
+    --dartboard-gray-lighter: #F3F4F6;
+
+    /* Dourado - Destaques, Badges, Campeões */
+    --dartboard-gold: #F59E0B;
+    --dartboard-gold-dark: #D97706;
+    --dartboard-gold-light: #FCD34D;
+
+    /* Fontes */
+    --font-heading: 'Rajdhani', sans-serif;
+    --font-body: 'Inter', sans-serif;
+
+    /* Espaçamento */
+    --spacing-xs: 0.25rem;
+    --spacing-sm: 0.5rem;
+    --spacing-md: 1rem;
+    --spacing-lg: 1.5rem;
+    --spacing-xl: 2rem;
+    --spacing-2xl: 3rem;
+
+    /* Border Radius */
+    --radius-sm: 0.375rem;
+    --radius-md: 0.5rem;
+    --radius-lg: 0.75rem;
+    --radius-xl: 1rem;
+
+    /* Sombras */
+    --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+    --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+
+    /* Transições */
+    --transition-fast: 0.15s ease;
+    --transition-base: 0.3s ease;
+    --transition-slow: 0.5s ease;
+}
+
+/* ==========================================================================
+   Reset e Base
+   ========================================================================== */
+body {
+    font-family: var(--font-body);
+    background-color: var(--dartboard-off-white);
+    background-image:
+        url('../media/dartboard-bg.jpg'),
+        radial-gradient(circle at 20% 50%, rgba(var(--dartboard-red-rgb), 0.03) 0%, transparent 50%),
+        radial-gradient(circle at 80% 80%, rgba(var(--dartboard-green-rgb), 0.03) 0%, transparent 50%);
+    background-position: center center;
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    color: var(--dartboard-gray-dark);
+    line-height: 1.6;
+    position: relative;
+}
+
+/* Overlay sutil para melhorar legibilidade */
+body::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(249, 250, 251, 0.85);
+    z-index: -1;
+    pointer-events: none;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+    font-family: var(--font-heading);
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    color: var(--dartboard-black);
+}
+
+/* ==========================================================================
+   Navbar - Barra de Navegação Temática
+   ========================================================================== */
+.navbar-dartboard {
+    background: linear-gradient(135deg, var(--dartboard-black) 0%, var(--dartboard-gray-dark) 100%);
+    border-bottom: 3px solid var(--dartboard-red);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+    padding: 0.75rem 0;
+}
+
+.navbar-dartboard .navbar-brand {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.navbar-dartboard .brand-text {
+    font-family: var(--font-heading);
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: var(--dartboard-white);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+}
+
+.navbar-dartboard .nav-link {
+    color: var(--dartboard-white) !important;
+    font-family: var(--font-heading);
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 0.9rem;
+    letter-spacing: 1px;
+    padding: 0.5rem 1rem !important;
+    transition: all var(--transition-base);
+    position: relative;
+}
+
+.navbar-dartboard .nav-link::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    width: 0;
+    height: 2px;
+    background: var(--dartboard-red);
+    transition: all var(--transition-base);
+    transform: translateX(-50%);
+}
+
+.navbar-dartboard .nav-link:hover {
+    color: var(--dartboard-red) !important;
+}
+
+.navbar-dartboard .nav-link:hover::after {
+    width: 80%;
+}
+
+.navbar-dartboard .dropdown-menu {
+    background: var(--dartboard-gray-dark);
+    border: 2px solid var(--dartboard-red);
+    border-radius: var(--radius-lg);
+    margin-top: 8px;
+    padding: 0.5rem 0;
+}
+
+.navbar-dartboard .dropdown-item {
+    color: var(--dartboard-white);
+    padding: 12px 20px;
+    font-family: var(--font-heading);
+    font-weight: 500;
+    transition: all var(--transition-fast);
+}
+
+.navbar-dartboard .dropdown-item:hover {
+    background: var(--dartboard-red);
+    color: var(--dartboard-white);
+    transform: translateX(5px);
+}
+
+/* ==========================================================================
+   Botões - Estilo Dartboard
+   ========================================================================== */
+.btn-dartboard-primary {
+    background: linear-gradient(135deg, var(--dartboard-red) 0%, var(--dartboard-red-dark) 100%);
+    color: var(--dartboard-white);
+    border: none;
+    padding: 12px 28px;
+    font-family: var(--font-heading);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    border-radius: var(--radius-lg);
+    box-shadow: 0 4px 12px rgba(var(--dartboard-red-rgb), 0.4);
+    transition: all var(--transition-base);
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.btn-dartboard-primary:hover {
+    background: linear-gradient(135deg, var(--dartboard-red-dark) 0%, var(--dartboard-red) 100%);
+    transform: translateY(-3px);
+    box-shadow: 0 6px 20px rgba(var(--dartboard-red-rgb), 0.6);
+    color: var(--dartboard-white);
+}
+
+.btn-dartboard-secondary {
+    background: linear-gradient(135deg, var(--dartboard-green) 0%, var(--dartboard-green-dark) 100%);
+    color: var(--dartboard-white);
+    border: none;
+    padding: 12px 28px;
+    font-family: var(--font-heading);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    border-radius: var(--radius-lg);
+    box-shadow: 0 4px 12px rgba(var(--dartboard-green-rgb), 0.4);
+    transition: all var(--transition-base);
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.btn-dartboard-secondary:hover {
+    background: linear-gradient(135deg, var(--dartboard-green-dark) 0%, var(--dartboard-green) 100%);
+    transform: translateY(-3px);
+    box-shadow: 0 6px 20px rgba(var(--dartboard-green-rgb), 0.6);
+    color: var(--dartboard-white);
+}
+
+.btn-dartboard-outline {
+    background: transparent;
+    color: var(--dartboard-red);
+    border: 2px solid var(--dartboard-red);
+    padding: 10px 26px;
+    font-family: var(--font-heading);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    border-radius: var(--radius-lg);
+    transition: all var(--transition-base);
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.btn-dartboard-outline:hover {
+    background: var(--dartboard-red);
+    color: var(--dartboard-white);
+    transform: translateY(-2px);
+}
+
+.btn-dartboard-outline.green {
+    color: var(--dartboard-green);
+    border-color: var(--dartboard-green);
+}
+
+.btn-dartboard-outline.green:hover {
+    background: var(--dartboard-green);
+    color: var(--dartboard-white);
+}
+
+/* Tamanhos de Botões */
+.btn-dartboard-sm {
+    padding: 8px 20px;
+    font-size: 0.875rem;
+}
+
+.btn-dartboard-lg {
+    padding: 16px 36px;
+    font-size: 1.125rem;
+}
+
+/* ==========================================================================
+   Cards - Estilo Dartboard
+   ========================================================================== */
+.card-dartboard {
+    background: var(--dartboard-white);
+    border: none;
+    border-radius: var(--radius-xl);
+    overflow: hidden;
+    box-shadow: var(--shadow-md);
+    transition: all var(--transition-base);
+}
+
+.card-dartboard:hover {
+    transform: translateY(-8px);
+    box-shadow: var(--shadow-xl);
+}
+
+.card-header-dartboard {
+    background: linear-gradient(135deg, var(--dartboard-red) 0%, var(--dartboard-red-dark) 100%);
+    color: var(--dartboard-white);
+    padding: 16px 24px;
+    font-family: var(--font-heading);
+    font-weight: 700;
+    font-size: 1.25rem;
+    letter-spacing: 0.5px;
+    border: none;
+}
+
+.card-header-dartboard.green {
+    background: linear-gradient(135deg, var(--dartboard-green) 0%, var(--dartboard-green-dark) 100%);
+}
+
+.card-header-dartboard.black {
+    background: linear-gradient(135deg, var(--dartboard-black) 0%, var(--dartboard-gray-dark) 100%);
+}
+
+.card-body-dartboard {
+    padding: 24px;
+}
+
+.card-footer-dartboard {
+    background: var(--dartboard-off-white);
+    border-top: 2px solid var(--dartboard-gray-lighter);
+    padding: 16px 24px;
+}
+
+/* ==========================================================================
+   Stats Cards - Estatísticas
+   ========================================================================== */
+.stat-card {
+    background: var(--dartboard-white);
+    padding: 28px 24px;
+    border-radius: var(--radius-xl);
+    border-left: 5px solid var(--dartboard-red);
+    box-shadow: var(--shadow-md);
+    transition: all var(--transition-base);
+    text-align: center;
+}
+
+.stat-card:hover {
+    border-left-width: 8px;
+    transform: translateX(4px) scale(1.02);
+    box-shadow: var(--shadow-lg);
+}
+
+.stat-card.green {
+    border-left-color: var(--dartboard-green);
+}
+
+.stat-card.gold {
+    border-left-color: var(--dartboard-gold);
+}
+
+.stat-number {
+    font-family: var(--font-heading);
+    font-size: 3rem;
+    font-weight: 700;
+    color: var(--dartboard-red);
+    line-height: 1;
+    margin-bottom: 8px;
+}
+
+.stat-number.green-text {
+    color: var(--dartboard-green);
+}
+
+.stat-number.gold-text {
+    color: var(--dartboard-gold);
+}
+
+.stat-label {
+    font-family: var(--font-heading);
+    text-transform: uppercase;
+    font-size: 0.875rem;
+    font-weight: 600;
+    letter-spacing: 1px;
+    color: var(--dartboard-gray);
+}
+
+/* ==========================================================================
+   Badges e Tags
+   ========================================================================== */
+.badge-dartboard {
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-family: var(--font-heading);
+    font-weight: 600;
+    font-size: 0.8rem;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.badge-red {
+    background: var(--dartboard-red);
+    color: var(--dartboard-white);
+}
+
+.badge-green {
+    background: var(--dartboard-green);
+    color: var(--dartboard-white);
+}
+
+.badge-gold {
+    background: var(--dartboard-gold);
+    color: var(--dartboard-black);
+}
+
+.badge-black {
+    background: var(--dartboard-black);
+    color: var(--dartboard-white);
+}
+
+/* ==========================================================================
+   Hero Section - Seção Principal
+   ========================================================================== */
+.hero-dartboard {
+    background: linear-gradient(135deg, var(--dartboard-black) 0%, var(--dartboard-gray-dark) 100%);
+    padding: 80px 0;
+    position: relative;
+    overflow: hidden;
+    color: var(--dartboard-white);
+}
+
+.hero-dartboard::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 50%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent 0%, rgba(var(--dartboard-red-rgb), 0.1) 100%);
+    pointer-events: none;
+}
+
+.hero-dartboard h1 {
+    color: var(--dartboard-white);
+    font-size: clamp(2.5rem, 5vw, 4rem);
+    margin-bottom: var(--spacing-lg);
+}
+
+.hero-dartboard .lead {
+    color: rgba(255, 255, 255, 0.85);
+    font-size: clamp(1.125rem, 2vw, 1.5rem);
+}
+
+/* ==========================================================================
+   Utilidades
+   ========================================================================== */
+.text-dartboard-red {
+    color: var(--dartboard-red) !important;
+}
+
+.text-dartboard-green {
+    color: var(--dartboard-green) !important;
+}
+
+.text-dartboard-gold {
+    color: var(--dartboard-gold) !important;
+}
+
+.text-dartboard-white {
+    color: var(--dartboard-white) !important;
+}
+
+.bg-dartboard-red {
+    background-color: var(--dartboard-red) !important;
+}
+
+.bg-dartboard-green {
+    background-color: var(--dartboard-green) !important;
+}
+
+.bg-dartboard-gold {
+    background-color: var(--dartboard-gold) !important;
+}
+
+.bg-dartboard-black {
+    background-color: var(--dartboard-black) !important;
+}
+
+.bg-dartboard-white {
+    background-color: var(--dartboard-white) !important;
+}
+
+/* Bordas */
+.border-dartboard-red {
+    border-color: var(--dartboard-red) !important;
+}
+
+.border-dartboard-green {
+    border-color: var(--dartboard-green) !important;
+}
+
+.border-dartboard-gold {
+    border-color: var(--dartboard-gold) !important;
+}
+
+/* ==========================================================================
+   Efeitos e Animações
+   ========================================================================== */
+.hover-lift {
+    transition: transform var(--transition-base), box-shadow var(--transition-base);
+}
+
+.hover-lift:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--shadow-xl);
+}
+
+.hover-glow-red {
+    transition: all var(--transition-base);
+}
+
+.hover-glow-red:hover {
+    box-shadow: 0 0 20px rgba(var(--dartboard-red-rgb), 0.5);
+}
+
+.hover-glow-green {
+    transition: all var(--transition-base);
+}
+
+.hover-glow-green:hover {
+    box-shadow: 0 0 20px rgba(var(--dartboard-green-rgb), 0.5);
+}
+
+/* Separador de Seção */
+.section-divider {
+    height: 4px;
+    background: linear-gradient(90deg,
+            var(--dartboard-red) 0%,
+            var(--dartboard-green) 50%,
+            var(--dartboard-red) 100%);
+    margin: 60px 0;
+    border-radius: 2px;
+}
+
+/* Spinner/Loader Temático */
+.dartboard-spinner {
+    border: 4px solid var(--dartboard-gray-light);
+    border-top: 4px solid var(--dartboard-red);
+    border-right: 4px solid var(--dartboard-green);
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+/* ==========================================================================
+   Responsividade
+   ========================================================================== */
+@media (max-width: 768px) {
+    .navbar-dartboard .brand-text {
+        font-size: 1.5rem;
+    }
+
+    .navbar-dartboard .nav-link {
+        font-size: 0.85rem;
+    }
+
+    .stat-number {
+        font-size: 2.5rem;
+    }
+
+    .hero-dartboard {
+        padding: 60px 0;
+    }
+}
+
+/* ==========================================================================
+   Overrides do Bootstrap (quando necessário)
+   ========================================================================== */
+.btn-primary {
+    background: linear-gradient(135deg, var(--dartboard-red) 0%, var(--dartboard-red-dark) 100%);
+    border-color: var(--dartboard-red);
+}
+
+.btn-primary:hover {
+    background: linear-gradient(135deg, var(--dartboard-red-dark) 0%, var(--dartboard-red) 100%);
+    border-color: var(--dartboard-red-dark);
+}
+
+.btn-success {
+    background: linear-gradient(135deg, var(--dartboard-green) 0%, var(--dartboard-green-dark) 100%);
+    border-color: var(--dartboard-green);
+}
+
+.btn-success:hover {
+    background: linear-gradient(135deg, var(--dartboard-green-dark) 0%, var(--dartboard-green) 100%);
+    border-color: var(--dartboard-green-dark);
+}
+
+.text-accent {
+    color: var(--dartboard-red) !important;
+}

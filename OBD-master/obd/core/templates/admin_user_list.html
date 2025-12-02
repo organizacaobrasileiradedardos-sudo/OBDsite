@@ -1,0 +1,58 @@
+{% extends 'baseadmin.html' %}
+{% block csslib %}
+{% endblock %}
+{% block title %} Membros do OBD {% endblock %}
+{% block styles %}
+{% endblock %}
+{% block page %}Principal Dashboard OBD{% endblock %}
+{% block boauser %} Administrador {% endblock %}
+{% block content %}
+
+<h5><strong><i class="bi bi-award-fill"></i> Sumário Geral Membros do OBD</strong></h5>
+<p></p>
+<table class="table table-bordered table-striped">
+   <caption>Lista de membros do OBD</caption>
+   <thead>
+      <tr>
+         <th scope="col" style="text-align: center; vertical-align: middle;">#</th>
+         <th scope="col" style="text-align: center; vertical-align: middle;">Nome</th>
+         <th scope="col" style="text-align: center; vertical-align: middle;">Usuário OBD</th>
+         <th scope="col" style="text-align: center; vertical-align: middle;">Email</th>
+         <th scope="col" style="text-align: center; vertical-align: middle;">Divisão</th>
+         <th scope="col" style="text-align: center; vertical-align: middle;">País</th>
+         <th scope="col" style="text-align: center; vertical-align: middle;">Permissão</th>
+         <th scope="col" style="text-align: center; vertical-align: middle;">Ações</th>
+      </tr>
+   </thead>
+   <tbody>
+      <tr>
+         {% for player in players %}
+         <td style="text-align: center; vertical-align: middle;">{{ forloop.counter }}</td>
+         <th style="text-align: center; vertical-align: middle;">{{ player.first_name }} {{ player.last_name }} #{{
+            player.id }}</th>
+         <td style="text-align: center; vertical-align: middle;">{{ player.username }}</td>
+         <td style="text-align: center; vertical-align: middle;">{{ player.email }}</td>
+         <td style="text-align: center; vertical-align: middle;">{{ player.stat.get_bcmDiv_display }}</td>
+         <td style="text-align: center; vertical-align: middle;">{{ player.profile.country }}</td>
+         <td style="text-align: center; vertical-align: middle;">{% if 'profiles.has_admin_role' in
+            player.get_user_permissions %}Admistrador{% else %}Jogador{% endif %}</td>
+         <td style="text-align: center; vertical-align: middle;"></td>
+      </tr>
+      {% endfor %}
+   </tbody>
+</table>
+
+<p><br></p>
+
+
+
+<p><br></p>
+
+
+
+
+
+
+{% endblock %}
+{% block jslib %}
+{% endblock %}

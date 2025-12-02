@@ -1,0 +1,183 @@
+{% extends 'baseadmin.html' %}
+{% block csslib %}
+{% endblock %}
+{% block title %} Administrar Inscrições em Ligas OBD {% now "Y" %} {% endblock %}
+{% block styles %} {% endblock %}
+{% block page %}Administração de Inscrições em Ligas OBD - {% now "Y" %}{% endblock %}
+{% block boauser %} {{ user.username }} {% endblock %}
+{% block content %}
+<p><br></p>
+
+{% if messages %}
+{% for message in messages %}
+<div class="alert {{ alert }} alert-dismissible fade show" role="alert">
+    {{ message}}
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+</div>
+{% endfor %}
+{% endif %}
+
+{% if form.errors %}
+{% for field in form %}
+{% for error in field.errors %}
+<div class="alert alert-danger alert-dismissible fade show" role="alert">
+    <strong>{{ error|escape }}</strong>
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+</div>
+{% endfor %}
+{% endfor %}
+{% for error in form.non_field_errors %}
+<div class="alert alert-danger">
+    <strong>{{ error|escape }}</strong>
+</div>
+{% endfor %}
+{% endif %}
+
+<table class="table table-sm table-dark ">
+    <thead>
+        <tr>
+            <th scope="col" style="text-align: center; vertical-align: middle;">Divisão / Liga - OBD</th>
+            <th scope="col" style="text-align: center; vertical-align: middle;">Média Divisão</th>
+            <th scope="col" style="text-align: center; vertical-align: middle;">Total partidas</th>
+            <th scope="col" style="text-align: center; vertical-align: middle;">Partidas finalizadas</th>
+            <th scope="col" style="text-align: center; vertical-align: middle;">Partidas em validação</th>
+            <th scope="col" style="text-align: center; vertical-align: middle;">Jogos pendentes</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for div,avg in database %}
+        <tr>
+            <th scope="row" style="text-align: center; vertical-align: middle;">{{ forloop.counter }}ª Divisão</th>
+            <td style="text-align: center; vertical-align: middle;">{{ avg.avg | floatformat:"2"}}</td>
+            <td style="text-align: center; vertical-align: middle;">{{ div.matches }}</td>
+            <td style="text-align: center; vertical-align: middle;">{{ div.completed }}</td>
+            <td style="text-align: center; vertical-align: middle;">{{ div.hold }}</td>
+            <td style="text-align: center; vertical-align: middle;">{{ div.pending }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<p><br></p>
+
+
+{% for division in league.division_set.all.reverse %}
+<h5>
+    <strong>
+        <span class="badge bg-info text-dark">{{ division.get_phase_display }}</span>
+        Divisão {{ division.get_formation_display }} - {{ league.name }} |
+        <a href="{% url 'results:ranking_by_admin' slug=division.slug %}" class="link-primary"
+            title="Ver Ranking da Divisão">
+            Ver Ranking & Jogos</a>
+
+    </strong>
+</h5>
+<p></p>
+
+{% if division.formation == 0%}
+<table class="table table-sm">
+    <thead>
+        <tr>
+            <th scope="col">ID</th>
+            <th scope="col">Jogador</th>
+            <th scope="col">Divisão</th>
+            <th scope="col">AVG</th>
+            <th scope="col">OBD Class</th>
+            <th scope="col">Mudar Divisão?</th>
+            <th scope="col">Outras Ações</th>
+            <th scope="col"></th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for player in division.players.all %}
+        <tr>
+            <th scope="row">{{ player.id }}</th>
+            <td>
+                {{ player.first_name }} {{ player.last_name }}
+            </td>
+            <td>{{ player.stat.get_bcmDiv_display}}</td>
+            <td>{{ player.stat.bcmAvg}}</td>
+            <td>{{ player.stat.get_bcmClass_display }}</td>
+            <td>
+                {% for div in total_divs %}
+                <a href="{{ player.profile.pin }}/{{ div|add:" 1" }}" class="link-primary"
+                    title="Atribuir Divisão {{ div|add:" 1" }}?"><span
+                        class="badge {% if player.stat.bcmDiv == div|add:" 1" %} bg-success {% else %} bg-primary {%
+                        endif %} ">
+                                {% if div|add:" 1"==1 %}A{% endif %} {% if div|add:"1"==2 %}B{% endif %} {% if
+                        div|add:"1"==3 %}C{% endif %} {% if div|add:"1"==4 %}D{% endif %} {% if div|add:"1"==5 %}E{%
+                        endif %} {% if div|add:"1"==6 %}F{% endif %} {% if div|add:"1"==7 %}G{% endif %} {% if
+                        div|add:"1"==8 %}H{% endif %} {% if div|add:"1"==9 %}I{% endif %} {% if div|add:"1"==10 %}J{%
+                        endif %} </span></a>
+                {% endfor %}
+
+            </td>
+            <td>
+                <div class="dropdown">
+                    <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton2"
+                        data-bs-toggle="dropdown" aria-expanded="false">
+                        Ações Disponíveis
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-dark" aria-labelledby="dropdownMenuButton2">
+                        <li><a class="dropdown-item" href=""><i class="bi bi-person-x-fill"></i> Cancelar Inscrição</a>
+                        </li>
+                        <li>
+                            <hr class="dropdown-divider">
+                        </li>
+                        <li><a class="dropdown-item" href="{% url 'index' %}"><i class="bi bi-house-door"></i> Página
+                                Inicial</a></li>
+                    </ul>
+                </div>
+            </td>
+        </tr>
+
+
+        {% endfor %}
+    </tbody>
+</table>
+<p></p>
+<p></p>
+<p></p>
+
+{% else %}
+<table class="table table-sm">
+    <thead>
+        <tr>
+            <th scope="col">ID</th>
+            <th scope="col">Jogador</th>
+            <th scope="col">Divisão</th>
+            <th scope="col">AVG</th>
+            <th scope="col">OBD Class</th>
+            <th scope="col">Webcamdarts</th>
+            <th scope="col">Nakka</th>
+            <th scope="col"></th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for player in division.players.all %}
+        <tr>
+            <th scope="row">{{ player.id }}</th>
+            <td>
+                {{ player.first_name }} {{ player.last_name }}
+            </td>
+            <td>{{ player.stat.get_bcmDiv_display}}</td>
+            <td>{{ player.stat.bcmAvg}}</td>
+            <td>{{ player.stat.get_bcmClass_display }}</td>
+            <td>{{ player.profile.webcamdarts }}</td>
+            <td>{{ player.profile.nakka }}</td>
+        </tr>
+
+
+        {% endfor %}
+    </tbody>
+</table>
+<p></p>
+<p></p>
+<p></p>
+{% endif %}
+
+{% endfor %}
+
+{% endblock %}
+{% block jslib %}
+{% endblock %}

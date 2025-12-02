@@ -1,0 +1,203 @@
+<!--
+Project name: OBD - Organização Brasileira de Dardos
+Property: Nathan Perkes
+Developers: Walisson Oliveira
+Page name: Order Of merit Ranking *Público*
+Start date of this page: Ago-07-2021
+Last update: Jul-03-2021
+Description: This is the page where main data will remains.
+-->
+{% extends 'base.html' %}
+{% load static %}
+{% block csslib %}
+{% endblock %}
+{% block title %}OBD Order Of Merit{% endblock %}
+{% block styles %}
+
+<style>
+    .centerimg {
+        display: table-cell;
+        text-align: center;
+        vertical-align: middle;
+    }
+</style>
+
+
+
+{% endblock %}
+{% block content %}
+
+<div class="container">
+    <div class="row">
+
+        <div class="col-6 col-md-1"></div>
+
+        <div class="col-6 col-md-10">
+
+            <div class="card mb-3">
+                <img src="{% static '/media/logos/1230x200-banner-fundo-escuro.jpg' %}"
+                    class="card-img figure-img img-fluid rounded" alt="...">
+                <div class="card-body">
+                    <p><br></p>
+                    <h2><strong><i class="bi bi-bookmark-star-fill"></i> OBD Order Of Merit</strong></h2>
+                    <p class="card-text"><small class="text-muted">Ranking geral dos jogadores do OBD.</small></p>
+                </div>
+            </div>
+
+            <table class="table table-striped table-bordered caption-top">
+                <caption>Estatísticas com base nos últimos 12 meses. Critérios: pontos - vitórias - média</caption>
+                <thead>
+                    <tr>
+                        <th scope="col" style="font-size: small" align="center">#</th>
+                        <th scope="col" style="font-size: small" align="center">Jogador</th>
+                        <th scope="col" style="font-size: small" align="center"><i class="bi bi-star"></i> Pontos
+                            (Merits)</th>
+                        <th scope="col" style="font-size: small" align="center">Vitórias</th>
+                        <th scope="col" style="font-size: small" align="center">Partidas</th>
+                        <th scope="col" style="font-size: small" align="center">Média</th>
+                        <th scope="col" style="font-size: small" align="center">Melhor Leg</th>
+                        <th scope="col" style="font-size: small" align="center">Melhor Fechada</th>
+                        <th scope="col" style="font-size: small" align="center">100+</th>
+                        <th scope="col" style="font-size: small" align="center">140+</th>
+                        <th scope="col" style="font-size: small" align="center">170+</th>
+                        <th scope="col" style="font-size: small" align="center">180s</th>
+                        <th scope="col" style="font-size: small" align="center">Classe</th>
+                        <th scope="col" style="font-size: small" align="center">Membro Desde</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for player in players %}
+                    <tr>
+                        <th scope="row">{{ forloop.counter }}</th>
+                        <td>
+                            <h6 style="font-size: small" align="center">{{ player.user.first_name}}
+                                {{player.user.last_name }}</h6>
+                        </td>
+                        <td>
+                            <h6 style="font-size: small" align="center">{{ player.bcmPoints }}</h6>
+                        </td>
+                        <td>
+                            <h6 style="font-size: small" align="center">{{ player.bcmWin }}</h6>
+                        </td>
+                        <td>
+                            <h6 style="font-size: small" align="center">{{ player.bcmMatches }}</h6>
+                        </td>
+                        <td>
+                            <h6 style="font-size: small" align="center">{{ player.bcmAvg }}</h6>
+                        </td>
+                        <td>
+                            <h6 style="font-size: small" align="center">{{ player.bcmLeg }}</h6>
+                        </td>
+                        <td>
+                            <h6 style="font-size: small" align="center">{{ player.bcmOut }}</h6>
+                        </td>
+                        <td>
+                            <h6 style="font-size: small" align="center">{{ player.bcmTon }}</h6>
+                        </td>
+                        <td>
+                            <h6 style="font-size: small" align="center">{{ player.bcmTon40 }}</h6>
+                        </td>
+                        <td>
+                            <h6 style="font-size: small" align="center">{{ player.bcmTon70 }}</h6>
+                        </td>
+                        <td>
+                            <h6 style="font-size: small" align="center">{{ player.bcmTon80 }}</h6>
+                        </td>
+                        <td>
+                            <h6 style="font-size: small" align="center">{{ player.get_bcmClass_display }}</h6>
+                        </td>
+                        <td>
+                            <h6 style="font-size: small" align="center">{{ player.created_at | date:"d/M/y" }}</h6>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+
+
+            <table class="table table-striped table-bordered caption-top">
+                <caption>Saiba aqui quantos pontos cada jogador pode ganhar:</caption>
+                <thead>
+                    <tr>
+                        <th scope="col">Liga / Divisão</th>
+                        <th scope="col">Empate/Derrota</th>
+                        <th scope="col">Vitória</th>
+                        <th scope="col">Bônus Campeão</th>
+                        <th scope="col">Bônus 2º Lugar</th>
+                        <th scope="col">Bônus 3º Lugar</th>
+                        <th scope="col">Criado em</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for division in divisions%}
+                    <tr>
+                        <th scope="row">{{ division.league.name}} - Divisão {{ division.get_formation_display }}</th>
+                        <td>
+                            <h6 style="font-size: small" align="center">1</h6>
+                        </td>
+                        {% if division.formation == 1 %}
+                        <td>
+                            <h6 style="font-size: small" align="center">{{ division.league.enviroment.meritDivAPoints}}
+                            </h6>
+                        </td>
+                        <td>
+                            <h6 style="font-size: small" align="center">{{ division.league.enviroment.meritChampionBonus
+                                }}</h6>
+                        </td>
+                        <td>
+                            <h6 style="font-size: small" align="center">{{ division.league.enviroment.meritSecondBonus
+                                }}</h6>
+                        </td>
+                        <td>
+                            <h6 style="font-size: small" align="center">{{ division.league.enviroment.meritThirdBonus }}
+                            </h6>
+                        </td>
+
+                        {% else %}
+                        {% if division.formation == 2 %}
+                        <td>
+                            <h6 style="font-size: small" align="center">{{ division.league.enviroment.meritDivBPoints}}
+                            </h6>
+                        </td>
+                        {% endif %}
+                        {% if division.formation == 3 %}
+                        <td>
+                            <h6 style="font-size: small" align="center">{{ division.league.enviroment.meritDivCPoints}}
+                            </h6>
+                        </td>
+                        {% endif %}
+                        {% if division.formation > 3 %}
+                        <td>
+                            <h6 style="font-size: small" align="center">{{
+                                division.league.enviroment.meritDivOthersPoints}}</h6>
+                        </td>
+                        {% endif %}
+                        <td>
+                            <h6 style="font-size: small" align="center">0</h6>
+                        </td>
+                        <td>
+                            <h6 style="font-size: small" align="center">0</h6>
+                        </td>
+                        <td>
+                            <h6 style="font-size: small" align="center">0</h6>
+                        </td>
+                        {% endif %}
+                        <td>
+                            <h6 style="font-size: small" align="center">{{ division.league.created_at | date:"d/M/y" }}
+                            </h6>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+
+        </div>
+    </div>
+    <div class="col-6 col-md-1"></div>
+</div>
+</div>
+<p><br></p>
+
+{% endblock %}
+{% block jslib %}
+{% endblock %}

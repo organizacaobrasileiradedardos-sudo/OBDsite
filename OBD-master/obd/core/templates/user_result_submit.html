@@ -1,0 +1,387 @@
+{% extends 'baseuser.html' %}
+{% load l10n %}
+{% block csslib %}
+{% endblock %}
+{% block title %} Formulário de Resultados OBD {% now "Y" %} {% endblock %}
+{% block styles %} {% endblock %}
+{% block page %}Formulário de Resultados OBD {% now "Y" %}{% endblock %}
+{% block content %}
+<p><br></p>
+
+{% if messages %}
+{% for message in messages %}
+<div class="alert {{ alert }} alert-dismissible fade show" role="alert">
+    {{ message}}
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+</div>
+{% endfor %}
+{% endif %}
+
+{% if form.errors %}
+{% for field in form %}
+{% for error in field.errors %}
+<div class="alert alert-danger alert-dismissible fade show" role="alert">
+    <strong>{{ error|escape }}</strong>
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+</div>
+{% endfor %}
+{% endfor %}
+{% for error in form.non_field_errors %}
+<div class="alert alert-danger">
+    <strong>{{ error|escape }}</strong>
+</div>
+{% endfor %}
+{% endif %}
+
+<h5><strong><i class="bi bi-list-stars"></i> Liga do OBD | {{ division.name }}</strong></h5>
+
+{% if not html.validated %}
+
+<form action="{% url 'results:setserver' slug=division.slug match=match.id %}" method="post">
+    {% csrf_token %}
+    <p> Informações Gerais da Partida</p>
+    <div class="row mb-3">
+        <div class="input-group">
+            <span class="input-group-text col-sm-2">Liga/Divisão</span><br>
+            <div class="col-sm-4">
+                <select class="form-select" id="{{ form.division.id_for_label }}" name="{{ form.division.html_name }}">
+                    <option value="{{ division.id }}">{{ division.name }}</option>
+                </select>
+            </div>
+        </div>
+
+
+        <div class="input-group">
+            <span class="input-group-text col-sm-2">#ID Partida</span><br>
+            <div class="col-sm-4">
+                <select class="form-select" id="{{ form.match.id_for_label }}" name="{{ form.match.html_name }}">
+                    <option value="{{ match.id }}">{{ match.id }}</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="input-group">
+            <span class="input-group-text col-sm-2">Jogador(a) 1</span><br>
+            <div class="col-sm-4">
+                <select class="form-select" id="{{ form.player1.id_for_label }}" name="{{ form.player1.html_name }}">
+                    <option value="{{match.result_set.first.player.id}}">{{match.result_set.first.player.first_name}}
+                        {{match.result_set.first.player.last_name}}</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="input-group">
+            <span class="input-group-text col-sm-2">Jogador(a) 2</span><br>
+            <div class="col-sm-4">
+                <select class="form-select" id="{{ form.player2.id_for_label }}" name="{{ form.player2.html_name }}">
+                    <option value="{{match.result_set.last.player.id}}">{{match.result_set.last.player.first_name}}
+                        {{match.result_set.last.player.last_name}}</option>
+                </select>
+            </div>
+        </div>
+
+        <p></p>
+        <p></p>
+        <p> <strong>*** Informar</strong> dados do servidor.</p>
+        <div class="input-group">
+            <span class="input-group-text col-sm-2">Servidor</span><br>
+            <div class="col-sm-4">
+                <select class="form-select" id="{{ form.server.id_for_label }}" name="{{ form.server.html_name }}"
+                    required>
+
+                    <optgroup label="Aplicativou ou Evento">
+                        <option {% if form.server.value=="N01" %} selected {% endif %} value="N01">NAKKA</option>
+                        <option {% if form.server.value=="WED" %} selected {% endif %} value="WED">WEBCAMDARTS</option>
+                        <option {% if form.server.value=="OTH" %} selected {% endif %} value="OTH">MANUAL</option>
+                    </optgroup>
+                </select>
+            </div>
+        </div>
+
+        <div class="input-group">
+            <span class="input-group-text col-sm-2">Link da partida</span><br>
+            <div class="col-sm-4">
+                <input type="url" id="{{ form.link.id_for_label }}" name="{{ form.link.html_name }}" {% if
+                    form.link.value is not None %} value="{{ form.link.value }}" {% else %} value="" {% endif %}
+                    aria-label="Link" class="form-control">
+            </div>
+        </div>
+
+        <div class="input-group">
+            <span class="input-group-text col-sm-2">Comentários</span><br>
+            <div class="col-sm-4">
+                <input type="text" id="{{ form.comment.id_for_label }}" name="{{ form.comment.html_name }}" {% if
+                    form.comment.value is not None %} value="{{ form.comment.value }}" {% else %} value="" {% endif %}
+                    aria-label="Comment" class="form-control">
+            </div>
+        </div>
+    </div>
+    <button type="submit" class="btn {{html.color_submit}} mb-3"><i class="bi bi-box-arrow-in-right">
+        </i>{{html.text_submit}}</button>
+</form>
+
+{% else %}
+
+<form action="{% url 'results:submit' slug=division.slug match=match.id %}" enctype="multipart/form-data" method="post">
+    {% csrf_token %}
+    <p> Informações Gerais da Partida</p>
+    <div class="row mb-3">
+        <div class="input-group">
+            <span class="input-group-text col-sm-2">Liga/Divisão</span><br>
+            <div class="col-sm-4">
+                <select class="form-select" id="{{ form.division.id_for_label }}" name="{{ form.division.html_name }}">
+                    <option value="{{ division.id }}">{{ division.name }}</option>
+                </select>
+            </div>
+        </div>
+
+
+        <div class="input-group">
+            <span class="input-group-text col-sm-2">#ID Partida</span><br>
+            <div class="col-sm-4">
+                <select class="form-select" id="{{ form.match.id_for_label }}" name="{{ form.match.html_name }}">
+                    <option value="{{ match.id }}">{{ match.id }}</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="input-group">
+            <span class="input-group-text col-sm-2">Jogador(a) 1</span><br>
+            <div class="col-sm-4">
+                <select class="form-select" id="{{ form.player1.id_for_label }}" name="{{ form.player1.html_name }}">
+                    <option value="{{match.result_set.first.player.id}}">{{match.result_set.first.player.first_name}}
+                        {{match.result_set.first.player.last_name}}</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="input-group">
+            <span class="input-group-text col-sm-2">Jogador(a) 2</span><br>
+            <div class="col-sm-4">
+                <select class="form-select" id="{{ form.player2.id_for_label }}" name="{{ form.player2.html_name }}">
+                    <option value="{{match.result_set.last.player.id}}">{{match.result_set.last.player.first_name}}
+                        {{match.result_set.last.player.last_name}}</option>
+                </select>
+            </div>
+        </div>
+
+        <p></p>
+        <p></p>
+        <p> <strong>*** Informar</strong> dados do servidor.</p>
+        <div class="input-group">
+            <span class="input-group-text col-sm-2">Servidor</span><br>
+            <div class="col-sm-4">
+                <select class="form-select" id="{{ form.server.id_for_label }}" name="{{ form.server.html_name }}"
+                    required>
+                    {% if form.server.value is None %}
+                    {% if server.code == 'WED' %}<option value="WED">WEBCAMDARTS</option>{% endif %}
+                    {% if server.code == 'N01' %}<option value="N01">NAKKA</option>{% endif %}
+                    {% if server.code == 'OTH' %}<option value="OTH">MANUAL</option>{% endif %}
+                    {% else %}
+                    {% if form.server.value == 'WED' %}<option value="WED">WEBCAMDARTS</option>{% endif %}
+                    {% if form.server.value == 'N01' %}<option value="N01">NAKKA</option>{% endif %}
+                    {% if form.server.value == 'OTH' %}<option value="OTH">MANUAL</option>{% endif %}
+
+                    {% endif %}
+                </select>
+            </div>
+        </div>
+
+        <div class="input-group">
+            <span class="input-group-text col-sm-2">Link da partida</span><br>
+            <div class="col-sm-4">
+                <input {{ html.readonly_server }} type="url" id="{{ form.link.id_for_label }}"
+                    name="{{ form.link.html_name }}" {% if form.link.value is not None %} value="{{ form.link.value }}"
+                    {% else %} value="{{ server.link }}" {% endif %} aria-label="Link" class="form-control" required>
+            </div>
+        </div>
+
+        <p></p>
+        <p></p>
+        <p><strong>*** Informar</strong> estatísticas da partida. </p>
+        <div class="input-group">
+            <span class="input-group-text col-sm-2">Dado</span><br>
+            <span class="input-group-text col-sm-2">{{match.result_set.first.player.first_name}}
+                {{match.result_set.first.player.last_name}}</span><br>
+            <span class="input-group-text col-sm-2">{{match.result_set.last.player.first_name}}
+                {{match.result_set.last.player.last_name}}</span><br>
+        </div>
+
+
+        <div class="input-group">
+            <span class="input-group-text col-sm-2">Sets (Ganho)</span><br>
+            <div class="col-sm-2">
+                <input type="number" {{ html.readonly_data }} min="0" id="{{ form.sets_p1.id_for_label }}"
+                    name="{{ form.sets_p1.html_name }}" {% if form.sets_p1.value is not None %}
+                    value="{{ form.sets_p1.value }}" {% else %} value="{{ p1.sets }}" {% endif %} aria-label="Set P1"
+                    class="form-control" {{ html.required }}>
+            </div>
+            <div class="col-sm-2">
+                <input type="number" {{ html.readonly_data }} min="0" id="{{ form.sets_p2.id_for_label }}"
+                    name="{{ form.sets_p2.html_name }}" {% if form.sets_p2.value is not None %}
+                    value="{{ form.sets_p2.value }}" {% else %} value="{{ p2.sets }}" {% endif %} aria-label="Set P1"
+                    class="form-control" {{ html.required }}>
+            </div>
+        </div>
+
+        <div class="input-group">
+            <span class="input-group-text col-sm-2">Legs</span>
+            <div class="col-sm-2">
+                <input {{ html.readonly_data }} type="number" min="0" id="{{ form.legs_p1.id_for_label }}"
+                    name="{{ form.legs_p1.html_name }}" {% if form.legs_p1.value is not None %}
+                    value="{{ form.legs_p1.value }}" {% else %} value="{{ p1.legs }}" {% endif %} aria-label="Legs P1"
+                    class="form-control" {{ html.required }}>
+            </div>
+            <div class="col-sm-2">
+                <input type="number" {{ html.readonly_data }} min="0" id="{{ form.legs_p2.id_for_label }}"
+                    name="{{ form.legs_p2.html_name }}" {% if form.legs_p2.value is not None %}
+                    value="{{ form.legs_p2.value }}" {% else %} value="{{ p2.legs }}" {% endif %} aria-label="Legs P2"
+                    class="form-control" {{ html.required }}d>
+            </div>
+        </div>
+
+        <div class="input-group">
+            <span class="input-group-text col-sm-2">Average (3DT)</span>
+            <div class="col-sm-2">
+                <input type="number" {{ html.readonly_data }} min="0" id="{{ form.average_p1.id_for_label }}"
+                    name="{{ form.average_p1.html_name }}" step="0.01" {% if form.average_p1.value is not None %}
+                    value="{{ form.average_p1.value }}" {% else %} value="{{ p1.average | unlocalize}}" {% endif %}
+                    aria-label="AVG P2" class="form-control" {{ html.required }}>
+            </div>
+            <div class="col-sm-2">
+                <input type="number" {{ html.readonly_data }} id="{{ form.average_p2.id_for_label }}"
+                    name="{{ form.average_p2.html_name }}" step="0.01" {% if form.average_p2.value is not None %}
+                    value="{{ form.average_p2.value }}" {% else %} value="{{ p2.average | unlocalize}}" {% endif %}
+                    aria-label="AVG P2" class="form-control" {{ html.required }}>
+            </div>
+        </div>
+
+        <div class="input-group">
+            <span class="input-group-text col-sm-2">Highest Out</span>
+            <div class="col-sm-2">
+                <input type="number" {{ html.readonly_data }} min="0" id="{{ form.highest_out_p1.id_for_label }}"
+                    name="{{ form.highest_out_p1.html_name }}" {% if form.highest_out_p1.value is not None %}
+                    value="{{ form.highest_out_p1.value }}" {% else %} value="{{ p1.highest_out }}" {% endif %}
+                    aria-label="Best Out P1" class="form-control" {{ html.required }}>
+            </div>
+            <div class="col-sm-2">
+                <input type="number" {{ html.readonly_data }} min="0" id="{{ form.highest_out_p2.id_for_label }}"
+                    name="{{ form.highest_out_p2.html_name }}" {% if form.highest_out_p2.value is not None %}
+                    value="{{ form.highest_out_p2.value }}" {% else %} value="{{ p2.highest_out }}" {% endif %}
+                    aria-label="Best Out P2" class="form-control" {{ html.required }}>
+            </div>
+        </div>
+
+        <div class="input-group">
+            <span class="input-group-text col-sm-2">Best Leg</span>
+            <div class="col-sm-2">
+                <input type="number" {{ html.readonly_data }} min="0" id="{{ form.best_leg_p1.id_for_label }}"
+                    name="{{ form.best_leg_p1.html_name }}" {% if form.best_leg_p1.value is not None %}
+                    value="{{ form.best_leg_p1.value }}" {% else %} value="{{ p1.best_leg }}" {% endif %}
+                    aria-label="Best Leg P1" class="form-control" {{ html.required }}>
+            </div>
+            <div class="col-sm-2">
+                <input type="number" {{ html.readonly_data }} min="0" id="{{ form.best_leg_p2.id_for_label }}"
+                    name="{{ form.best_leg_p2.html_name }}" {% if form.best_leg_p2.value is not None %}
+                    value="{{ form.best_leg_p2.value }}" {% else %} value="{{ p2.best_leg }}" {% endif %}
+                    aria-label="Best Leg P2" class="form-control" {{ html.required }}>
+            </div>
+        </div>
+
+        <div class="input-group">
+            <span class="input-group-text col-sm-2">100+</span>
+            <div class="col-sm-2">
+                <input type="number" {{ html.readonly_data }} min="0" id="{{ form.ton_p1.id_for_label }}"
+                    name="{{ form.ton_p1.html_name }}" {% if form.ton_p1.value is not None %}
+                    value="{{ form.ton_p1.value }}" {% else %} value="{{ p1.tons }}" {% endif %} aria-label="TON P1"
+                    class="form-control" {{ html.required }}>
+            </div>
+            <div class="col-sm-2">
+                <input type="number" {{ html.readonly_data }} min="0" id="{{ form.ton_p2.id_for_label }}"
+                    name="{{ form.ton_p2.html_name }}" {% if form.ton_p2.value is not None %}
+                    value="{{ form.ton_p2.value }}" {% else %} value="{{ p2.tons }}" {% endif %} aria-label="TON P2"
+                    class="form-control" {{ html.required }}>
+            </div>
+        </div>
+
+        <div class="input-group">
+            <span class="input-group-text col-sm-2">140+</span>
+            <div class="col-sm-2">
+                <input type="number" {{ html.readonly_data }} min="0" id="{{ form.ton40_p1.id_for_label }}"
+                    name="{{ form.ton40_p1.html_name }}" {% if form.ton40_p1.value is not None %}
+                    value="{{ form.ton40_p1.value }}" {% else %} value="{{ p1.ton40 }}" {% endif %}
+                    aria-label="TON40 P1" class="form-control" {{ html.required }}>
+            </div>
+            <div class="col-sm-2">
+                <input type="number" {{ html.readonly_data }} min="0" id="{{ form.ton40_p2.id_for_label }}"
+                    name="{{ form.ton40_p2.html_name }}" {% if form.ton40_p2.value is not None %}
+                    value="{{ form.ton40_p2.value }}" {% else %} value="{{ p2.ton40 }}" {% endif %}
+                    aria-label="TON40 P2" class="form-control" {{ html.required }}>
+            </div>
+        </div>
+
+        <div class="input-group">
+            <span class="input-group-text col-sm-2">170+</span>
+            <div class="col-sm-2">
+                <input type="number" {{ html.readonly_data }} min="0" id="{{ form.ton70_p1.id_for_label }}"
+                    name="{{ form.ton70_p1.html_name }}" {% if form.ton70_p1.value is not None %}
+                    value="{{ form.ton70_p1.value }}" {% else %} value="{{ p1.ton70 }}" {% endif %}
+                    aria-label="TON70 P1" class="form-control" {{ html.required }}>
+            </div>
+            <div class="col-sm-2">
+                <input type="number" {{ html.readonly_data }} min="0" id="{{ form.ton70_p2.id_for_label }}"
+                    name="{{ form.ton70_p2.html_name }}" {% if form.ton70_p2.value is not None %}
+                    value="{{ form.ton70_p2.value }}" {% else %} value="{{ p2.ton70 }}" {% endif %}
+                    aria-label="TON70 P2" class="form-control" {{ html.required }}>
+            </div>
+        </div>
+
+        <div class="input-group">
+            <span class="input-group-text col-sm-2">180s</span>
+            <div class="col-sm-2">
+                <input type="number" {{ html.readonly_data }} min="0" id="{{ form.ton80_p1.id_for_label }}"
+                    name="{{ form.ton80_p1.html_name }}" {% if form.ton80_p1.value is not None %}
+                    value="{{ form.ton80_p1.value }}" {% else %} value="{{ p1.ton80 }}" {% endif %}
+                    aria-label="TON80 P1" class="form-control" {{ html.required }}>
+            </div>
+            <div class="col-sm-2">
+                <input type="number" {{ html.readonly_data }} min="0" id="{{ form.ton80_p2.id_for_label }}"
+                    name="{{ form.ton80_p2.html_name }}" {% if form.ton80_p2.value is not None %}
+                    value="{{ form.ton80_p2.value }}" {% else %} value="{{ p2.ton80 }}" {% endif %}
+                    aria-label="TON80 P2" class="form-control" {{ html.required }}>
+            </div>
+        </div>
+    </div>
+
+    <div class="input-group">
+        <span class="input-group-text col-sm-2">Anexo</span>
+        <div class="col-sm-4">
+            <input type="file" {% if form.server.value=='OTH' or server.code=='OTH' %} required {% endif %}
+                class="form-control" id="{{ form.photo.id_for_label }}" name="{{ form.photo.html_name}}"
+                value="{{ form.photo.value }}">
+        </div>
+    </div>
+    </div>
+    <p></p>
+
+
+    <button type="submit" class="btn {{html.color_submit}} mb-3"><i class="bi bi-box-arrow-in-right">
+        </i>{{html.text_submit}}</button>
+
+</form>
+
+
+{% endif %}
+
+
+
+<p></p>
+<p></p>
+<p>
+    <strong>Atenção!</strong> A janela para lançamento dos resultados/jogos ficará ativa até {{
+    match.division.league.end_date }}
+</p>
+
+{% endblock %}
+{% block jslib %}
+{% endblock %}

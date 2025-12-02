@@ -1,0 +1,15 @@
+.ipynb_checkpoints
+*.ipynb
+.env
+.idea
+venv
+*.sqlite3
+*.pyc
+__pycache__
+staticfiles
+swap.html
+notes.boa
+keys.boa
+Notebook
+maketest
+dartsba

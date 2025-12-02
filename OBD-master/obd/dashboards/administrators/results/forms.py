@@ -1,0 +1,364 @@
+from decouple import config
+from django import forms
+from obd.core.obdlib.webscraping.webcamdarts import WebcamdartsScraping
+from obd.core.obdlib.webscraping.nakka import NakkaScraping
+import re
+
+# Class form for player to register results from match
+from obd.dashboards.administrators.fixtures.models import Fixture
+
+
+class ValidateServerForm(forms.Form):
+    # Subforms for general data/info
+    division = forms.IntegerField(label='Liga/Divisão', required=True)
+    match = forms.IntegerField(label='#ID Partida', required=True)
+    player1 = forms.IntegerField(label='Jogador(a) 1', required=True)
+    player2 = forms.IntegerField(label='Joagdor(a) 2', required=True)
+    server = forms.CharField(label='Servidor', required=True, max_length=40)
+    link = forms.CharField(label='Link da partida', required=False, max_length=250)
+
+    def clean_match(self):
+        try:
+            game = Fixture.objects.get(id=self.cleaned_data['match'])
+        except Fixture.DoesNotExist:
+            raise forms.ValidationError(f'Não foi possível encontrar a partida #{game.id}.')
+        else:
+            if game.validation == 1 and game.enabled:
+                raise forms.ValidationError(f'A partida #{game.id} já foi finalizada anteriormente.')
+            else:
+                return self.cleaned_data['match']
+
+
+    def clean_link(self):
+        server_match = self.cleaned_data['server']
+        game = Fixture.objects.get(id=self.cleaned_data['match'])
+        url_match = self.cleaned_data['link']
+
+        #Checking wich server, if WEBCAMDARTS or NAKKA or OTHER
+        if server_match == 'WED' or server_match == 'N01':
+            if server_match == 'WED':
+                pattern = re.compile(config('PATTERN_WEBCAMDARTS_LINK'))
+
+                #Checking if URL is a valid WEBCAMDARTS link
+                if pattern.match(url_match):
+                    webcamdarts_scrap = WebcamdartsScraping()
+                    p1_webcamdarts = game.result_set.first().player.profile.webcamdarts
+                    p1_webcamdarts = str(p1_webcamdarts).strip().lower()
+                    p2_webcamdarts = game.result_set.last().player.profile.webcamdarts
+                    p2_webcamdarts = str(p2_webcamdarts).strip().lower()
+
+                    #Checking if URL returns a valid WEBCAMDARTS match.
+                    webcamdarts_scrap.get_results(auto_only=False, link=url_match, page_max=10, name=p1_webcamdarts)
+                    if len(webcamdarts_scrap.matches[3]) == 0:
+                        raise forms.ValidationError(f'Não foi possível localizar sua partida utilizando o link informado')
+                    else:
+                        p1 = str(webcamdarts_scrap.matches[3]['p1']['name'].lower().strip())
+                        p2 = str(webcamdarts_scrap.matches[3]['p2']['name'].lower().strip())
+                        if (p1 == p1_webcamdarts) or (p1 == p2_webcamdarts):
+                            if p2 == p1_webcamdarts or p2 == p2_webcamdarts:
+                                return self.cleaned_data['link']
+                            else:
+                                raise forms.ValidationError(f'O link informado não correponde ao jogo entre {p1_webcamdarts.upper()} Vs {p2_webcamdarts}.upper()')
+                        else:
+                            raise forms.ValidationError(f'O link informado não correponde ao jogo entre {p1_webcamdarts.upper()} Vs {p2_webcamdarts}.upper()')
+
+                else:
+                    raise forms.ValidationError(f'Link WEBCAMDARTS inválido. Por favor verifique o link da partida.')
+            else:
+                pattern = re.compile(config('PATTERN_NAKKA_LINK'))
+                #Checking NAKKA URL pattern / format
+                if pattern.match(url_match):
+                    nakka_scrap = NakkaScraping()
+                    #Checking if the URL returns a valid match
+                    result = nakka_scrap.start_by(auto_only=False, link=url_match)
+                    if not result:
+                        raise forms.ValidationError(f'Não foi possível localizar uma partida válida no NAKKA com o link informado.')
+                    else:
+                        #Cheking if the URL, after players validated, belongs to its players.
+                        p1_nakka = game.result_set.first().player.profile.nakka
+                        p1_nakka = str(p1_nakka).strip().lower()
+                        p2_nakka = game.result_set.last().player.profile.nakka
+                        p2_nakka = str(p2_nakka).strip().lower()
+                        nicknames = (p1_nakka, p2_nakka)
+
+                        # result = nakka_scrap.start_by(auto_only=False, link=url_match)
+                        player1 = str(result['p1']['name']).lower().strip()
+                        player2 = str(result['p2']['name']).lower().strip()
+                        if (player2 in nicknames) and (player1 in nicknames):
+                            return self.cleaned_data['link']
+                        else:
+                            raise forms.ValidationError(f'O link informado não se refere a partida entre "{p1_nakka}" Vs. "{p2_nakka}" pelo NAKKA.')
+                else:
+                    raise forms.ValidationError('Link NAKKA inválido. Por favor verifique o link da partida.')
+        else:
+            return self.cleaned_data['link']
+
+
+class ResultForm(forms.Form):
+    # Subforms for general data/info
+    division = forms.IntegerField(label='Liga/Divisão', required=False)
+    match = forms.IntegerField(label='#ID Partida', required=False)
+    player1 = forms.IntegerField(label='Jogador(a) 1', required=False)
+    player2 = forms.IntegerField(label='Joagdor(a) 2', required=False)
+    server = forms.CharField(label='Servidor', required=False, max_length=40)
+    link = forms.CharField(label='Link da partida', required=False, max_length=250)
+    comment = forms.CharField(label='Comentários', required=False, max_length=250)
+
+    # Subforms for Player 01
+    sets_p1 = forms.IntegerField(label='Sets Jogador 1', required=False)
+    legs_p1 = forms.IntegerField(label='Legs Jogador 1', required=False)
+    highest_out_p1 = forms.IntegerField(label='Melhor Fechada Jogador 1', required=False)
+    best_leg_p1 = forms.IntegerField(label='Melhor Leg Jogador 1', required=False)
+    ton_p1 = forms.IntegerField(label='100+ JOgador 1', required=False)
+    ton40_p1 = forms.IntegerField(label='140+ JOgador 1', required=False)
+    ton70_p1 = forms.IntegerField(label='170+ JOgador 1', required=False)
+    ton80_p1 = forms.IntegerField(label='140+ JOgador 1', required=False)
+    average_p1 = forms.FloatField(label='Média Jogador 1', required=False)
+
+    # Subforms for Player 02
+    sets_p2 = forms.IntegerField(label='Sets Jogador 2', required=False)
+    legs_p2 = forms.IntegerField(label='Legs Jogador 2', required=False)
+    highest_out_p2 = forms.IntegerField(label='Melhor Fechada Jogador 2', required=False)
+    best_leg_p2 = forms.IntegerField(label='Melhor Leg Jogador 2', required=False)
+    ton_p2 = forms.IntegerField(label='100+ JOgador 2', required=False)
+    ton40_p2 = forms.IntegerField(label='140+ JOgador 2', required=False)
+    ton70_p2 = forms.IntegerField(label='170+ JOgador 2', required=False)
+    ton80_p2 = forms.IntegerField(label='140+ JOgador 2', required=False)
+    average_p2 = forms.FloatField(label='Média Jogador 2', required=False)
+
+    photo = forms.ImageField(label='Anexo', required=False)
+
+    def clean_server(self):
+        return self.cleaned_data['server']
+
+    def clean_link(self):
+        return self.cleaned_data['link']
+
+    def clean_sets_p2(self):
+        p2_sets = self.cleaned_data['sets_p2']
+        p1_sets = self.cleaned_data['sets_p1']
+        total = p1_sets + p2_sets
+        game = Fixture.objects.get(id=self.cleaned_data['match'])
+        division = game.division.formation
+
+
+        if total == 0:
+            return self.cleaned_data['sets_p2']
+
+        if division == 1:
+
+            # If division has playoffs, may return SETS without analyse it.
+            if game.division.league.enviroment.leagueAplayoffs:
+                return self.cleaned_data['sets_p2']
+
+            max_a = game.division.league.enviroment.leagueAMaxSet
+
+            if max_a % 2 == 1:
+                min_a = (max_a//2)+1
+            else:
+                min_a = max_a//2
+
+            if (total > max_a) or (total < min_a):
+                if max_a == 1:
+                    raise forms.ValidationError(f'De acordo com as regras OBD para divisão A, o total de SETS jogados deve ser igual a 1.')
+                raise forms.ValidationError(f'De acordo com as regras OBD para divisão A, o total de SETS jogados deve estar entre {min_a} e {max_a}.')
+            else:
+                return self.cleaned_data['sets_p2']
+
+        if division == 2:
+
+            # If division has playoffs, may return SETS without analyse it.
+            if game.division.league.enviroment.leagueBplayoffs:
+                return self.cleaned_data['sets_p2']
+
+            max_b = game.division.league.enviroment.leagueBMaxSet
+
+            if max_b % 2 == 1:
+                min_b = (max_b//2) + 1
+            else:
+                min_b = max_b//2
+
+            if (total > max_b) or (total < min_b):
+                if max_b == 1:
+                    raise forms.ValidationError(f'De acordo com as regras OBD para divisão B, o total de SETS jogados deve ser igual a 1.')
+                raise forms.ValidationError(f'De acordo com as regras OBD para divisão B, o total de SETS jogados deve estar entre {min_b} e {max_b}.')
+            else:
+                return self.cleaned_data['sets_p2']
+
+        if division == 3:
+
+            # If division has playoffs, may return SETS without analyse it.
+            if game.division.league.enviroment.leagueCplayoffs:
+                return self.cleaned_data['sets_p2']
+
+            max_c = game.division.league.enviroment.leagueCMaxSet
+
+            if max_c % 2 == 1:
+                min_c = (max_c//2) + 1
+            else:
+                min_c = max_c//2
+
+            if (total > max_c) or (total < min_c):
+                if max_c == 1:
+                    raise forms.ValidationError(f'De acordo com as regras OBD para divisão C, o total de SETS jogados deve ser igual a 1.')
+                raise forms.ValidationError(f'De acordo com as regras OBD para divisão C, o total de SETS jogados deve estar entre {min_c} e {max_c}.')
+            else:
+                return self.cleaned_data['sets_p2']
+
+        if division > 3:
+
+            # If division has playoffs, may return SETS without analyse it.
+            if game.division.league.enviroment.leagueOthersplayoffs:
+                return self.cleaned_data['sets_p2']
+
+            max_d = game.division.league.enviroment.leagueCMaxSet
+
+            if max_d % 2 == 1:
+                min_d = (max_d // 2) + 1
+            else:
+                min_d = max_d // 2
+
+            if (total > max_d) or (total < min_d):
+                if max_d == 1:
+                    raise forms.ValidationError(f'De acordo com as regras OBD para sua divisão, o total de SETS jogados deve ser igual a 1.')
+                raise forms.ValidationError(f'De acordo com as regras OBD para esta divisão, o total de SETS jogados deve estar entre {min_d} e {max_d}.')
+            else:
+                return self.cleaned_data['sets_p2']
+
+
+    def clean_legs_p2(self):
+        p2_legs = self.cleaned_data['legs_p2']
+        p1_legs = self.cleaned_data['legs_p1']
+        game = Fixture.objects.get(id=self.cleaned_data['match'])
+        division = game.division.formation
+
+        if division == 1:
+
+            # If division has playoffs, may return SETS without analyse it.
+            if game.division.league.enviroment.leagueAplayoffs:
+                return self.cleaned_data['legs_p2']
+
+            max_legs = game.division.league.enviroment.leagueAFirstTo
+            min_legs = game.division.league.enviroment.leagueABestof
+            if min_legs % 2 == 0:
+                min_legs = int(min_legs / 2)
+            else:
+                min_legs = int((min_legs + 1) / 2)
+
+            if (p2_legs + p1_legs) > min_legs*2:
+                raise forms.ValidationError(f'O número de LEGS total excedeu o máximo permitido de acordo com a regra "Melhor de {min_legs*2}" legs.')
+
+            if (p2_legs > max_legs) or (p1_legs > max_legs):
+                raise forms.ValidationError(f'De acordo com as regras OBD, "{max_legs}" é o número máximo de LEGS para a divisão A.')
+            else:
+                if ((p2_legs < min_legs) and (p1_legs < max_legs)) or ((p1_legs < min_legs) and (p2_legs < max_legs)):
+                    raise forms.ValidationError(f'Com base nos LEGS informados e regra OBD de "Melhor de {min_legs*2}", não é possível definir o resultado da partida.')
+                else:
+                    return self.cleaned_data['legs_p2']
+
+        if division == 2:
+
+            # If division has playoffs, may return SETS without analyse it.
+            if game.division.league.enviroment.leagueBplayoffs:
+                return self.cleaned_data['legs_p2']
+
+            max_legs = game.division.league.enviroment.leagueBFirstTo
+            min_legs = game.division.league.enviroment.leagueBBestof
+            if min_legs % 2 == 0:
+                min_legs = int(min_legs / 2)
+            else:
+                min_legs = int((min_legs + 1) / 2)
+
+            if (p2_legs + p1_legs) > min_legs*2:
+                raise forms.ValidationError(f'O número de LEGS total excedeu o máximo permitido de acordo com a regra "Melhor de {min_legs*2}" legs.')
+
+            if (p2_legs > max_legs) or (p1_legs > max_legs):
+                raise forms.ValidationError(f'De acordo com as regras OBD, "{max_legs}" é o número máximo de LEGS para a divisão B.')
+            else:
+                if ((p2_legs < min_legs) and (p1_legs < max_legs)) or ((p1_legs < min_legs) and (p2_legs < max_legs)):
+                    raise forms.ValidationError(f'Com base nos LEGS informados e regra OBD de "Melhor de {min_legs * 2}", não é possível definir o resultado da partida.')
+                else:
+                    return self.cleaned_data['legs_p2']
+
+
+        if division == 3:
+
+            # If division has playoffs, may return SETS without analyse it.
+            if game.division.league.enviroment.leagueCplayoffs:
+                return self.cleaned_data['legs_p2']
+
+            max_legs = game.division.league.enviroment.leagueCFirstTo
+            min_legs = game.division.league.enviroment.leagueCBestof
+            if min_legs % 2 == 0:
+                min_legs = int(min_legs / 2)
+            else:
+                min_legs = int((min_legs + 1) / 2)
+
+            if (p2_legs + p1_legs) > min_legs*2:
+                raise forms.ValidationError(f'O número de LEGS total excedeu o máximo permitido de acordo com a regra "Melhor de {min_legs*2}" legs.')
+
+            if (p2_legs > max_legs) or (p1_legs > max_legs):
+                raise forms.ValidationError(f'De acordo com as regras OBD, "{max_legs}" é o número máximo de LEGS para a divisão C.')
+            else:
+                if ((p2_legs < min_legs) and (p1_legs < max_legs)) or ((p1_legs < min_legs) and (p2_legs < max_legs)):
+                    raise forms.ValidationError(f'Com base nos LEGS informados e regra OBD de "Melhor de {min_legs * 2}", não é possível definir o resultado da partida.')
+                else:
+                    return self.cleaned_data['legs_p2']
+
+
+        if division > 3:
+
+            # If division has playoffs, may return SETS without analyse it.
+            if game.division.league.enviroment.leagueOthersplayoffs:
+                return self.cleaned_data['legs_p2']
+
+            max_legs = game.division.league.enviroment.leagueOthersFirstTo
+            min_legs = game.division.league.enviroment.leagueOthersBestof
+            if min_legs % 2 == 0:
+                min_legs = int(min_legs / 2)
+            else:
+                min_legs = int((min_legs + 1) / 2)
+
+            if (p2_legs + p1_legs) > min_legs*2:
+                raise forms.ValidationError(f'O número de LEGS total excedeu o máximo permitido de acordo com a regra "Melhor de {min_legs*2}" legs.')
+
+            if (p2_legs > max_legs) or (p1_legs > max_legs):
+                raise forms.ValidationError(f'De acordo com as regras OBD, "{max_legs}" é o número máximo de LEGS para a sua divisão.')
+            else:
+                if ((p2_legs < min_legs) and (p1_legs < max_legs)) or ((p1_legs < min_legs) and (p2_legs < max_legs)):
+                    raise forms.ValidationError(f'Com base nos LEGS informados e regra OBD de "Melhor de {min_legs * 2}", não é possível definir o resultado da partida.')
+                else:
+                    return self.cleaned_data['legs_p2']
+
+
+    def clean_average_p2(self):
+        avg_p2 = self.cleaned_data['average_p2']
+        avg_p1 = self.cleaned_data['average_p1']
+
+        if (avg_p2 > 167) or (avg_p1 > 167):
+            raise forms.ValidationError(f'Para o 501 (SD) a média máxima calculável é de 167.')
+        else:
+            return self.cleaned_data['average_p2']
+
+
+    def clean_highest_out_p2(self):
+        out_p2 = self.cleaned_data['highest_out_p2']
+        out_p1 = self.cleaned_data['highest_out_p1']
+
+        possibilities = (1, 159, 162, 163, 165, 166, 168, 169)
+
+        if ((out_p2 > 170) or (out_p1 > 170) or (out_p2 in possibilities) or (out_p1 in possibilities)):
+            raise forms.ValidationError(f'A fechada não pode ser maior que 170 ou igual a um dos valores: {possibilities}.')
+        else:
+            return self.cleaned_data['highest_out_p2']
+
+
+    def clean_best_leg_p2(self):
+        best_p2 = self.cleaned_data['best_leg_p2']
+        best_p1 = self.cleaned_data['best_leg_p1']
+
+        if (best_p2 < 9 and best_p2 != 0) or (best_p1 < 9 and best_p1 != 0):
+            raise forms.ValidationError(f'Para o 501 (SD), "9 dardos" é o menor número possível para vencer um leg.')
+        else:
+            return self.cleaned_data['best_leg_p2']
+

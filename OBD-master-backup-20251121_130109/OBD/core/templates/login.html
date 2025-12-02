@@ -1,0 +1,119 @@
+<!--
+Project name: OBD - Organização Brasileira de Dardos
+Property: Nathan Perkes
+Developers: Walisson Oliveira
+Page name: login.html (Página LOGIN dos jogadores o OBD)
+Start date of this page: Apr-11-2021
+Last update:
+Description: This is the page where players can log-in
+-->
+{% extends 'base.html' %}
+{% block csslib %}
+{% endblock %}
+{% block title %}Pagina de login do OBD {% endblock %}
+{% block styles %}
+{% endblock %}
+{% block content %}
+
+<div class="container">
+    <div class="row">
+
+        <div class="col-4"></div>
+        <div class="col-4">
+            {% if user.is_authenticated %}
+            <div class="alert alert-success" role="alert" align="center">
+                <strong>Você já está logado, {{ user.first_name }}.<a class="nav-link"
+                        href="{% url 'players:logout' %}">Clique AQUI para sair.</a></strong>
+            </div>
+            {% else %}
+            <div class="alert alert-success" role="alert" align="center">
+                <strong>LOGIN OBD</strong>
+            </div>
+            {% if messages %}
+            {% for message in messages %}
+            <div class="alert alert-success" role="alert">
+                {{ message }}
+            </div>
+            {% endfor %}
+            {% endif %}
+            <form action="{% url 'players:login' %}" method="post">
+                {% csrf_token %}
+
+                {% if form.errors %}
+                {% for field in form %}
+                {% for error in field.errors %}
+                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                    <h6><strong>{{ error|escape }}</strong></h6>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+                {% endfor %}
+                {% endfor %}
+                {% endif %}
+
+                <div class="input-group mb-3">
+                    <span class="input-group-text" id="basic-addon1"> <label for="{{ form.username.id_for_label }}"
+                            class="form-label"><i class="bi bi-person-fill"></i> {{ form.username.label }}
+                        </label></span>
+                    <input minlength="4" maxlength="40" id="{{ form.username.id_for_label }}" type="text"
+                        name="{{ form.username.html_name }}" {% if form.username.value is not None %}
+                        value="{{ form.username.value }}" {% endif %} required class="form-control"
+                        placeholder="Informe nome de usuário..." aria-label="Username" aria-describedby="basic-addon1">
+                </div>
+                <div class="input-group mb-3">
+                    <span class="input-group-text" id="basic-addon1"> <label for="{{ form.password.id_for_label }}"
+                            class="form-label"><i class="bi bi-eye-slash-fill"></i> {{ form.password.label }}
+                        </label></span>
+                    <input minlength="7" maxlength="51" id="{{ form.password.id_for_label }}" type="password"
+                        name="{{ form.password.html_name }}" required class="form-control"
+                        placeholder="Informe sua senha..." aria-label="Username" aria-describedby="basic-addon1">
+                </div>
+                <div class="input-group mb-3">
+                    <span class="input-group-text" id="basic-addon1"> <label for="{{ form.token.id_for_label }}"
+                            class="form-label">{{ token }}</label></span>
+                    <input minlength="7" maxlength="51" id="{{ form.token.id_for_label }}" type="text"
+                        name="{{ form.token.html_name }}" {% if form.token.value is not None %}
+                        value="{{ form.token.value }}" {% endif %} required class="form-control"
+                        placeholder="Informe o token ao lado ..." aria-label="Username" aria-describedby="basic-addon1">
+                </div>
+                <button type="submit" class="btn btn-success mb-3"><i class="bi bi-box-arrow-in-right"> </i>
+                    Entrar</button>
+            </form>
+            <div class="card text-dark bg-light mb-3" style="max-width: 30rem;">
+                <div class="card-header">Esqueceu usuário ou senha? Solicite aqui seu Login.</div>
+                <div class="card-body">
+                    <p align="JUSTIFY"><strong>Importante: </strong>Todas as senhas são amarzenadas utilizando métodos
+                        de criptografia/segurança.
+                        Por isso, caso esqueça sua senha, é impossível recuperar a mesma através de nosso banco de
+                        dados.
+                        Ao receber uma nova senha, você poderá atualizá-la em sua página Profile.
+                    </p>
+                    <form action="{% url 'players:recoverypassowrd' %}" method="post">
+                        {% csrf_token %}
+
+                        <div class="input-group mb-3">
+                            <span class="input-group-text" id="basic-addon1"> <label for="{{ form.email.id_for_label }}"
+                                    class="form-label"><i class="bi bi-envelope"></i> {{ form.email.label }}
+                                </label></span>
+                            <input minlength="7" maxlength="99" id="{{ form.email.id_for_label }}" type="email"
+                                name="{{ form.email.html_name }}" class="form-control" required
+                                placeholder="Informe seu email..." aria-label="Email" aria-describedby="basic-addon1">
+                        </div>
+
+                        <button type="submit" class="btn btn-warning mb-3"><i class="bi bi-arrow-clockwise"></i>
+                            Solicitar nova senha</button>
+                    </form>
+                    </p>
+                </div>
+            </div>
+            {% endif %}
+
+        </div>
+        <div class="col">
+            <p></p>
+        </div>
+    </div>
+</div>
+<br>
+{% endblock %}
+{% block jslib %}
+{% endblock %}

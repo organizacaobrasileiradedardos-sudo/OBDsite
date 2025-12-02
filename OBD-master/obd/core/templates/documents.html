@@ -1,0 +1,108 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Documentos Oficiais | OBD{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="row mb-4">
+        <div class="col-12">
+            <h1 class="fw-bold text-center mb-2 text-dartboard-black">
+                <i class="bi bi-file-earmark-text text-dartboard-gold"></i> Documentos Oficiais
+            </h1>
+            <p class="text-center text-muted">Estatutos, regras, regulamentos e guias da OBD</p>
+        </div>
+    </div>
+
+    <!-- Documents by Category -->
+    {% if documents_by_category %}
+    {% for category_name, documents in documents_by_category.items %}
+    <div class="row mb-5">
+        <div class="col-12">
+            <h2 class="h3 fw-bold mb-4">
+                <i class="bi bi-folder-fill text-primary"></i> {{ category_name }}
+            </h2>
+
+            <div class="row g-3">
+                {% for document in documents %}
+                <div class="col-md-6 col-lg-4">
+                    <div class="card card-dartboard h-100 hover-lift">
+                        <div class="card-body">
+                            <div class="d-flex align-items-start mb-3">
+                                <div class="document-icon me-3">
+                                    <i class="bi bi-file-earmark-pdf-fill text-danger" style="font-size: 2.5rem;"></i>
+                                </div>
+                                <div class="flex-grow-1">
+                                    <h5 class="card-title mb-1">{{ document.title }}</h5>
+                                    <span class="badge bg-secondary">v{{ document.version }}</span>
+                                </div>
+                            </div>
+
+                            <p class="card-text text-muted small">{{ document.description|truncatewords:20 }}</p>
+
+                            <div class="mt-3">
+                                <p class="small text-muted mb-2">
+                                    <i class="bi bi-calendar3"></i>
+                                    <strong>Publicado em:</strong> {{ document.publish_date|date:"d/m/Y" }}
+                                </p>
+                            </div>
+                        </div>
+                        <div class="card-footer card-footer-dartboard">
+                            <a href="{{ document.file.url }}" download class="btn btn-dartboard-primary btn-sm w-100">
+                                <i class="bi bi-download"></i> Baixar Documento
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+    {% else %}
+    <div class="row">
+        <div class="col-12">
+            <div class="alert alert-info text-center" role="alert">
+                <i class="bi bi-info-circle" style="font-size: 3rem;"></i>
+                <h4 class="mt-3">Nenhum documento disponível</h4>
+                <p class="mb-0">Os documentos oficiais da OBD serão publicados em breve.</p>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Information Box -->
+    <div class="row mt-5">
+        <div class="col-12">
+            <div class="card border-0 bg-light">
+                <div class="card-body text-center p-4">
+                    <i class="bi bi-info-circle text-primary" style="font-size: 2rem;"></i>
+                    <h5 class="mt-3 mb-2">Informação Importante</h5>
+                    <p class="text-muted mb-0">
+                        Todos os documentos estão em formato PDF. Certifique-se de ter um leitor de PDF instalado em seu
+                        dispositivo.
+                        Para dúvidas sobre os documentos, entre em contato através do email:
+                        <strong><a
+                                href="mailto:organizacaobrasileiradedardos@gmail.com">organizacaobrasileiradedardos@gmail.com</a></strong>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .document-card {
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .document-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
+    }
+
+    .document-icon {
+        min-width: 50px;
+    }
+</style>
+{% endblock %}
