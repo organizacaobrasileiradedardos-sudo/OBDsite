@@ -24,8 +24,7 @@ Description: This is the page where main data will remains.
             <img src="{% static '/media/logos/1230x200-banner-fundo-escuro.jpg' %}"
                 class="card-img figure-img img-fluid rounded" alt="...">
             <p><br></p>
-            <h2 class="card-title"><strong><i class="bi bi-list-stars"></i> Perfil Público de {{ profile.user.first_name
-                    }} {{ profile.user.last_name }} @{{ profile.nickname }}</strong></h2>
+            <h2 class="card-title"><strong><i class="bi bi-list-stars"></i> Perfil Público de {{ profile.user.first_name }} {{ profile.user.last_name }} @{{ profile.nickname }}</strong></h2>
             <p><br></p>
             <div class="card mb-3" style="max-width: 100%;">
                 <div class="row g-0">
@@ -38,22 +37,18 @@ Description: This is the page where main data will remains.
                     <div class="col-md-8">
                         <div class="card-body">
                             <br>
-                            <h6>{% if profile.facebook|length_is:"0" %}{% else %}<i class="bi bi-facebook"></i> {{
-                                profile.facebook }}{% endif %}
-                                {% if profile.twitter|length_is:"0" %}{% else %}<i class="bi bi-instagram"></i> {{
-                                profile.twitter }}{% endif %}</h6>
+                            <h6>{% if profile.facebook|length_is:"0" %}{% else %}<i class="bi bi-facebook"></i> {{ profile.facebook }}{% endif %}
+                                {% if profile.twitter|length_is:"0" %}{% else %}<i class="bi bi-instagram"></i> {{ profile.twitter }}{% endif %}</h6>
                             </h2>
                             <p class="card-text">{{profile.bio}}</p>
-                            <p class="card-text"><small class="text-muted">Membro desde {{ profile.created_at |
-                                    date:"d/M/y"}}</small></p>
+                            <p class="card-text"><small class="text-muted">Membro desde {{ profile.created_at|date:"d/M/y" }}</small></p>
                         </div>
                     </div>
                 </div>
             </div>
             <p><br></p>
 
-            <h5><strong><i class="bi bi-list-stars"></i> Estatísticas de {{ profile.user.first_name }} {{
-                    profile.user.last_name }}</strong></h5>
+            <h5><strong><i class="bi bi-list-stars"></i> Estatísticas de {{ profile.user.first_name }} {{ profile.user.last_name }}</strong></h5>
 
             <table class="table">
                 <thead>
@@ -76,16 +71,13 @@ Description: This is the page where main data will remains.
                 <tbody>
                     <tr>
                         <td scope="row" style="text-align: center; vertical-align: middle;">{{ profile.user.id }}</td>
-                        <td style="text-align: center; vertical-align: middle;">{{
-                            profile.user.stat.get_bcmClass_display }}</td>
+                        <td style="text-align: center; vertical-align: middle;">{{ profile.user.stat.get_bcmClass_display }}</td>
                         <td style="text-align: center; vertical-align: middle;">{{ profile.user.stat.bcmPoints }}</td>
                         <td style="text-align: center; vertical-align: middle;">{{ profile.user.stat.bcmLeg }}</td>
                         <td style="text-align: center; vertical-align: middle;">{{ profile.user.stat.bcmOut }}</td>
-                        <td style="text-align: center; vertical-align: middle;">{{ profile.user.stat.bcmAvg |
-                            floatformat:"2" }}</td>
+                        <td style="text-align: center; vertical-align: middle;">{{ profile.user.stat.bcmAvg|floatformat:"2" }}</td>
                         <td style="text-align: center; vertical-align: middle;">{{ total }}</td>
-                        <td style="text-align: center; vertical-align: middle;">{{ profile.user.stat.leagueParticipation
-                            }}</td>
+                        <td style="text-align: center; vertical-align: middle;">{{ profile.user.stat.leagueParticipation }}</td>
                         <td style="text-align: center; vertical-align: middle;">{{ profile.user.stat.bcmWin }}</td>
                         <td style="text-align: center; vertical-align: middle;">{{ profile.user.stat.bcmTon }}</td>
                         <td style="text-align: center; vertical-align: middle;">{{ profile.user.stat.bcmTon40 }}</td>
@@ -116,15 +108,11 @@ Description: This is the page where main data will remains.
                             <!-- Loop for last game comes here -->
                             {% for match in matches %}
                             <tr>
-                                <td>{{ match.on_date | date:"d/m/Y"}}</td>
-                                <td>{{ match.result_set.first.player.first_name }} {{
-                                    match.result_set.first.player.last_name }}</td>
-                                <th scope="row"><strong>{{ match.result_set.first.legs }} x {{
-                                        match.result_set.last.legs }}</strong></th>
-                                <td>{{ match.result_set.last.player.first_name }} {{
-                                    match.result_set.last.player.last_name }}</td>
-                                <td>{{match.division.league.name}} - Divisão {{match.division.get_formation_display}}
-                                </td>
+                                <td>{{ match.on_date|date:"d/m/Y" }}</td>
+                                <td>{{ match.result_set.first.player.first_name }} {{ match.result_set.first.player.last_name }}</td>
+                                <th scope="row"><strong>{{ match.result_set.first.legs }} x {{ match.result_set.last.legs }}</strong></th>
+                                <td>{{ match.result_set.last.player.first_name }} {{ match.result_set.last.player.last_name }}</td>
+                                <td>{{ match.division.league.name }} - Divisão {{ match.division.get_formation_display }}</td>
                                 <td>{{match.get_server_display}}</td>
                             </tr>
                             {% endfor %}
@@ -156,8 +144,7 @@ Description: This is the page where main data will remains.
 
             <h5><strong><i class="bi bi-list-stars"></i> Informações de perfil</strong></h5>
             <p></p>
-            <h6><strong><i class="bi bi-arrow-right-short"></i> Nome:</strong> {{ profile.user.first_name }} {{
-                profile.user.last_name }}</h6>
+            <h6><strong><i class="bi bi-arrow-right-short"></i> Nome:</strong> {{ profile.user.first_name }} {{ profile.user.last_name }}</h6>
             <h6><strong><i class="bi bi-arrow-right-short"></i> País:</strong> {{ profile.country }} </h6>
             <h6><strong><i class="bi bi-arrow-right-short"></i> Estado:</strong> {{ profile.state}} </h6>
 
@@ -170,9 +157,7 @@ Description: This is the page where main data will remains.
                 </div>
                 <div class="card-body">
                     <h5 class="card-title">E aí? O que está esperando para se tornar um membro OBD?</h5>
-                    <p class="card-text"><span class="badge bg-warning text-dark">Faça igual a {{
-                            profile.user.first_name }} {{ profile.user.last_name }} e se junte a nós! É grátis e com
-                            diversão e profissionalismo garantido!</span></p>
+                    <p class="card-text"><span class="badge bg-warning text-dark">Faça igual a {{ profile.user.first_name }} {{ profile.user.last_name }} e se junte a nós! É grátis e com diversão e profissionalismo garantido!</span></p>
                     <a href="/subscribe/" class="btn btn-primary">Seja um membro OBD!</a>
                 </div>
                 <div class="card-footer text-muted">

@@ -10,7 +10,7 @@ Email: {{ email }}
 Usuário de acesso: {{ username }}
 Senha: {{ password }}
 
-Entre no nosso grupo WhatsApp aqui:  https://chat.whatsapp.com/DpvgVZRi9lY3R7UQt881vZ
+Entre no nosso grupo WhatsApp aqui:  https://chat.whatsapp.com/DXtHYPEpmcb7sldYZuBaVz?mode=hqrc
 E-mail geral do OBD: organizacaobrasileiradedardos@gmail.com
 
 Agora que voce é um associado OBD, terá os seguintes benefícios:
