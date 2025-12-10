@@ -17,7 +17,7 @@ class Profile(models.Model):
     """Profile Class on OneToOne with User models"""
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     nickname = models.CharField(max_length=40, null=False, blank=True)
-    photo = models.ImageField(default='/static/media/defaults/default_profile.png')
+    photo = models.ImageField(default='/static/media/logos/Logo_OBD_3.jpeg')
     birth_date = models.DateField(blank=True, null=True)
     pin = models.CharField(max_length=10, null=False, blank=True)
     slug = models.CharField(max_length=180, null=False, blank=True)

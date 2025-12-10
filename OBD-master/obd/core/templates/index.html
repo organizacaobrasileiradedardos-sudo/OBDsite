@@ -7,13 +7,21 @@
 {% endblock %}
 {% block content %}
 
-<div class="container fade-in">
-    <div class="row justify-content-center">
+<div class="container-fluid fade-in">
+    <div class="row">
+        <!-- Left Sidebar (Sticky) -->
+        <div class="col-lg-1 d-none d-lg-block">
+            <div class="sticky-top" style="top: 80px;">
+                <!-- Future sponsor logo space -->
+            </div>
+        </div>
+
+        <!-- Main Content -->
         <div class="col-lg-10">
 
             <!-- Hero Banner -->
-            <div class="mb-2 text-center">
-                <img src="{% static '/media/logos/new_banner_obd.png' %}" class="img-fluid rounded shadow-lg"
+            <div class="mb-2 d-flex justify-content-center">
+                <img src="{% static '/media/logos/new_banner_obd.png' %}" class="img-fluid rounded shadow-lg w-100"
                     alt="OBD Banner">
             </div>
 
@@ -24,7 +32,8 @@
                 </div>
                 <div class="card-body py-3">
                     <h2 class="card-title mb-3 fw-bold">Organização Brasileira de Dardos</h2>
-                    <p class="card-text lead text-muted mb-4">Bem-vindo ao universo dos dardos no Brasil. Venha se divertir conosco!</p>
+                    <p class="card-text lead text-muted mb-4">Bem-vindo ao universo dos dardos no Brasil. Venha se
+                        divertir conosco!</p>
                     <div class="d-flex justify-content-center gap-3 flex-wrap">
                         {% if not user.is_authenticated %}
                         <a href="{% url 'players:login' %}" class="btn btn-dartboard-secondary btn-lg"><i
@@ -46,7 +55,7 @@
             </div>
 
             <!-- Content Grid -->
-            <div class="row g-4 mb-5">
+            <div class="row g-4 mb-5" id="obd-news">
                 <!-- Recent Games -->
                 <div class="col-lg-8">
                     <div class="card card-dartboard h-100">
@@ -56,8 +65,7 @@
                         <div class="card-body">
                             <div class="row">
                                 <!-- News Column -->
-                                <div
-                                    class="{% if user.is_authenticated %}col-md-6{% else %}col-md-12{% endif %} mb-3 mb-md-0">
+                                <div class="col-md-6 mb-3 mb-md-0">
                                     <h5 class="card-title fw-bold mb-3"><i
                                             class="bi bi-newspaper text-dartboard-green"></i> Notícias</h5>
                                     {% if news %}<div class="list-group list-group-flush">
@@ -82,7 +90,7 @@
                                     {% endif %}
                                 </div>
 
-                                {% if user.is_authenticated %}
+
                                 <!-- Documents Column -->
                                 <div class="col-md-6">
                                     <h5 class="card-title fw-bold mb-3"><i
@@ -111,7 +119,7 @@
                                     <p class="text-muted text-center my-4">Nenhum documento disponível.</p>
                                     {% endif %}
                                 </div>
-                                {% endif %}
+
                             </div>
                         </div>
                     </div>
@@ -127,15 +135,20 @@
                             <div id="sponsorsCarousel" class="carousel slide w-100" data-bs-ride="carousel">
                                 <div class="carousel-inner">
                                     <div class="carousel-item active">
-                                        <a href="https://www.petraagregados.com/" target="_blank">
-                                            <img src="{% static '/media/sponsors/petra.png' %}" class="d-block w-100"
-                                                style="height: 300px; object-fit: contain;" alt="Petra">
-                                        </a>
+                                        <img src="{% static '/media/sponsors/redstone_dartboards.jpg' %}"
+                                            class="d-block w-100" style="height: 300px; object-fit: contain;"
+                                            alt="RedStone Prescott Dartboards">
                                     </div>
                                     <div class="carousel-item">
                                         <a href="https://ongclubeup.org/" target="_blank">
                                             <img src="{% static '/media/sponsors/clube_up.png' %}" class="d-block w-100"
                                                 style="height: 300px; object-fit: contain;" alt="Clube Up">
+                                        </a>
+                                    </div>
+                                    <div class="carousel-item">
+                                        <a href="https://www.petraagregados.com/" target="_blank">
+                                            <img src="{% static '/media/sponsors/petra.png' %}" class="d-block w-100"
+                                                style="height: 300px; object-fit: contain;" alt="Petra">
                                         </a>
                                     </div>
                                 </div>
@@ -465,14 +478,17 @@
             {% endif %}
 
             <!-- Videos -->
-            <div class="row g-4 mb-5">
+            <div class="row g-4 mb-5" id="obd-videos">
                 <div class="col-md-6">
                     <div class="card h-100">
                         <div class="card-header bg-danger text-white"><i class="bi bi-youtube"></i> OBD TV</div>
                         <div class="card-body p-0">
                             <div class="ratio ratio-16x9">
-                                <iframe src="https://www.youtube.com/embed/JNej-H_dYjw" title="OBD TV"
-                                    allowfullscreen></iframe>
+                                <a href="https://www.youtube.com/@OBDardos" target="_blank">
+                                    <img src="{% static '/media/logos/Logo_OBD_3.jpeg' %}" class="img-fluid"
+                                        alt="OBD TV"
+                                        style="object-fit: contain; width: 100%; height: 100%; background-color: #000;">
+                                </a>
                             </div>
                         </div>
                         <div class="card-footer text-center">
@@ -487,8 +503,11 @@
                         </div>
                         <div class="card-body p-0">
                             <div class="ratio ratio-16x9">
-                                <iframe src="https://www.youtube.com/embed/3iw_-KbZB-k" title="Diogo Portela TV"
-                                    allowfullscreen></iframe>
+                                <a href="https://www.youtube.com/channel/UC6spzS1PJkv9rw9UfyZTpGg" target="_blank">
+                                    <img src="{% static '/media/logos/diogo_portela_tv.png' %}" class="img-fluid"
+                                        alt="Diogo Portela TV"
+                                        style="object-fit: contain; width: 100%; height: 100%; background-color: #000;">
+                                </a>
                             </div>
                         </div>
                         <div class="card-footer text-center">
@@ -500,8 +519,173 @@
             </div>
 
         </div>
+
+        <!-- Right Sidebar (Sticky) - Sponsor -->
+        <div class="col-lg-1 d-none d-lg-block">
+            <div class="sticky-top" style="top: 50vh; transform: translateY(-50%);">
+                <div class="card border-0 shadow-sm">
+                    <img src="{% static '/media/sponsors/redstone_dartboards.jpg' %}" class="img-fluid rounded"
+                        alt="RedStone Prescott Dartboards" style="width: 100%; height: auto;">
+                </div>
+            </div>
+        </div>
     </div>
 </div>
+
+<!-- Floating Sidebar Navigation -->
+<div class="floating-nav-left d-none d-xl-block">
+    <a href="#obd-stats" class="nav-float-btn" data-bs-toggle="tooltip" data-bs-placement="right"
+        title="Estatísticas OBD">
+        <i class="bi bi-graph-up"></i>
+    </a>
+    <a href="/obd/league/all/champions" class="nav-float-btn" data-bs-toggle="tooltip" data-bs-placement="right"
+        title="Hall dos Campeões">
+        <i class="bi bi-trophy"></i>
+    </a>
+    <a href="#obd-news" class="nav-float-btn" data-bs-toggle="tooltip" data-bs-placement="right" title="Notícias">
+        <i class="bi bi-newspaper"></i>
+    </a>
+    <a href="#obd-videos" class="nav-float-btn" data-bs-toggle="tooltip" data-bs-placement="right" title="Vídeos">
+        <i class="bi bi-play-circle"></i>
+    </a>
+    <a href="#top" class="nav-float-btn nav-top" data-bs-toggle="tooltip" data-bs-placement="right"
+        title="Voltar ao Topo">
+        <i class="bi bi-arrow-up-circle"></i>
+    </a>
+</div>
+
+<style>
+    /* Floating Navigation Sidebar */
+    .floating-nav-left {
+        position: fixed;
+        left: 2%;
+        top: 50%;
+        transform: translateY(-50%);
+        z-index: 1000;
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+    }
+
+    .nav-float-btn {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 50px;
+        height: 50px;
+        background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+        color: #ffc107;
+        border-radius: 50%;
+        text-decoration: none;
+        font-size: 1.3rem;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+        border: 2px solid rgba(255, 193, 7, 0.3);
+        backdrop-filter: blur(10px);
+    }
+
+    .nav-float-btn:hover {
+        background: linear-gradient(135deg, #ffc107 0%, #ff9800 100%);
+        color: #000;
+        transform: scale(1.15) translateX(5px);
+        box-shadow: 0 6px 25px rgba(255, 193, 7, 0.5);
+        border-color: #ffc107;
+    }
+
+    .nav-float-btn i {
+        transition: transform 0.3s ease;
+    }
+
+    .nav-float-btn:hover i {
+        transform: scale(1.1);
+    }
+
+    .nav-float-btn.nav-top {
+        background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+        border-color: rgba(220, 53, 69, 0.3);
+    }
+
+    .nav-float-btn.nav-top:hover {
+        background: linear-gradient(135deg, #ff4757 0%, #dc3545 100%);
+        border-color: #dc3545;
+    }
+
+    /* Smooth scroll behavior */
+    html {
+        scroll-behavior: smooth;
+    }
+
+    /* Animation on page load */
+    @keyframes slideInLeft {
+        from {
+            opacity: 0;
+            transform: translateX(-50px) translateY(-50%);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateX(0) translateY(-50%);
+        }
+    }
+
+    .floating-nav-left {
+        animation: slideInLeft 0.8s ease-out;
+    }
+
+    /* Show only on larger screens */
+    @media (max-width: 1199.98px) {
+        .floating-nav-left {
+            display: none !important;
+        }
+    }
+</style>
+
+<script>
+    // Initialize tooltips for floating navigation
+    document.addEventListener('DOMContentLoaded', function () {
+        var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+        var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+            return new bootstrap.Tooltip(tooltipTriggerEl);
+        });
+
+        // Generic smooth scroll function with navbar offset
+        function smoothScrollToTarget(targetSelector) {
+            if (targetSelector === '#top' || targetSelector === '') {
+                window.scrollTo({
+                    top: 0,
+                    behavior: 'smooth'
+                });
+            } else {
+                const target = document.querySelector(targetSelector);
+                if (target) {
+                    // Get navbar height to offset scroll position
+                    const navbar = document.querySelector('.navbar-dartboard');
+                    const navbarHeight = navbar ? navbar.offsetHeight : 70;
+                    const targetPosition = target.getBoundingClientRect().top + window.pageYOffset;
+                    const offsetPosition = targetPosition - navbarHeight - 20; // 20px extra padding
+
+                    window.scrollTo({
+                        top: offsetPosition,
+                        behavior: 'smooth'
+                    });
+                }
+            }
+        }
+
+        // Apply smooth scroll to ALL anchor links on the page
+        document.querySelectorAll('a[href^="#"]').forEach(function (anchor) {
+            anchor.addEventListener('click', function (e) {
+                const href = this.getAttribute('href');
+
+                // Only handle internal anchors
+                if (href && href.startsWith('#') && href !== '#') {
+                    e.preventDefault();
+                    smoothScrollToTarget(href);
+                }
+            });
+        });
+    });
+</script>
 
 {% endblock %}
 {% block jslib %}

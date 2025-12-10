@@ -73,10 +73,8 @@ Description: This is the BASE template of all OBD pages. It cotains the main men
                                     Calendário de Eventos</a></li>
                             <li><a class="dropdown-item" href="{% url 'news' %}"><i class="bi bi-newspaper"></i>
                                     Notícias</a></li>
-                            {% if user.is_authenticated %}
                             <li><a class="dropdown-item" href="{% url 'documents' %}"><i
                                         class="bi bi-file-earmark-text"></i> Documentos</a></li>
-                            {% endif %}
                         </ul>
                     </li>
 
