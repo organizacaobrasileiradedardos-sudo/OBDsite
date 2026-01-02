@@ -62,12 +62,12 @@ Description: This is the page where main data will remains.
           <div class="card h-100">
             {% if player.profile.pin and player.first_name and player.last_name %}
             <a href="{% url 'profiles:publicprofile' pin=player.profile.pin first=player.first_name last=player.last_name %}"
-              class="list-group-item list-group-item-action active" aria-current="true">
-              {{ player.first_name }} {{ player.last_name }} | Div. {{ player.stat.get_bcmDiv_display }}
+              class="list-group-item list-group-item-action active text-white" aria-current="true">
+              {{ player.first_name }} {{ player.last_name }}
             </a>
             {% else %}
-            <div class="list-group-item list-group-item-action active" aria-current="true">
-              {{ player.first_name }} {{ player.last_name }} | Div. {{ player.stat.get_bcmDiv_display }}
+            <div class="list-group-item list-group-item-action active text-white" aria-current="true">
+              {{ player.first_name }} {{ player.last_name }}
             </div>
             {% endif %}
             <div class="rect-img-container">

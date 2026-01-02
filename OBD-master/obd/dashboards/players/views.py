@@ -48,12 +48,49 @@ def dashboard(request):
         avg = request.user.stat.bcmAvg
         title = f'Mín: {min_data}, Média: {avg}, Máx: {max_data}'
 
+    # QR Code Generation
+    try:
+        import qrcode
+        import base64
+        from django.urls import reverse
+
+        # Build the public profile URL
+        profile_url = reverse('profiles:publicprofile', kwargs={
+            'pin': request.user.profile.pin,
+            'first': request.user.first_name,
+            'last': request.user.last_name
+        })
+        full_url = request.build_absolute_uri(profile_url)
+
+        # Generate QR Code
+        qr = qrcode.QRCode(
+            version=1,
+            error_correction=qrcode.constants.ERROR_CORRECT_L,
+            box_size=10,
+            border=4,
+        )
+        qr.add_data(full_url)
+        qr.make(fit=True)
+
+        img = qr.make_image(fill_color="black", back_color="white")
+        
+        # Save to BytesIO
+        buffer = io.BytesIO()
+        img.save(buffer, format="PNG")
+        qr_image = base64.b64encode(buffer.getvalue()).decode()
+        qr_code_base64 = f"data:image/png;base64,{qr_image}"
+        
+    except Exception as e:
+        print(f"Error generating QR code: {e}")
+        qr_code_base64 = None
+
     context = {'total': total,
                'fullname': fullname,
                'labels': labels,
                'data': data,
                'title': title,
-               'graph': totals}
+               'graph': totals,
+               'qr_code': qr_code_base64}
 
     return render(request, 'dashuser.html', context)
 

@@ -161,8 +161,7 @@ Description: This is the BASE template of all OBD DASHOBDRD pages. It cotains th
                             Público</a>
                         <a href="{% url 'players:logout' %}" class="btn btn-secondary"><i
                                 class="bi bi-box-arrow-left"></i> Sair do Sistema</a>
-                        <a href="https://forms.gle/ke92g2pztnd4Jk99A" class="btn btn-danger">Reportar Erro/Melhoria.
-                        </a>
+
                     </div>
 
 
@@ -180,7 +179,8 @@ Description: This is the BASE template of all OBD DASHOBDRD pages. It cotains th
                 <div class="col-8">
                     <div class="row">
                         <div class="alert alert-info" role="alert">Você está na página <i class="bi bi-arrow-right"></i>
-                            <strong>{% block page %} {% endblock %}</strong> / Logado como: {{ user.username|upper }}<strong></strong>
+                            <strong>{% block page %} {% endblock %}</strong> / Logado como: {{ user.username|upper
+                            }}<strong></strong>
                         </div>
                         {% block content %}
                         {% endblock %}

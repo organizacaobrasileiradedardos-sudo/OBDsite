@@ -12,7 +12,8 @@
 <p></p>
 <p>
     <i class="bi bi-whatsapp"></i> <strong>Entre no nosso grupo WhatsApp aqui:</strong>
-    <a href="https://chat.whatsapp.com/DXtHYPEpmcb7sldYZuBaVz?mode=hqrc" target="_blank">https://chat.whatsapp.com/DXtHYPEpmcb7sldYZuBaVz?mode=hqrc</a> <br>
+    <a href="https://chat.whatsapp.com/DXtHYPEpmcb7sldYZuBaVz?mode=hqrc"
+        target="_blank">https://chat.whatsapp.com/DXtHYPEpmcb7sldYZuBaVz?mode=hqrc</a> <br>
 
     <i class="bi bi-envelope"></i> <strong>E-mail geral do OBD:</strong> <a
         href="mailto:organizacaobrasileiradedardos@gmail.com">organizacaobrasileiradedardos@gmail.com</a>
@@ -23,29 +24,93 @@
 <p></p>
 <div class="row">
     <div class="col-1"></div>
-    <div class="col-4">
-        <div class="card border-dark mb-3" style="max-width: 18rem;">
-            <span class="badge bg-primary ">
-                <div class="card-header"><strong>OBD Member Card ***** {% now "Y" %}</strong></div>
-            </span>
-            <div class="card-body text-dark">
-                <h6 class="card-title"><strong>{{ user.first_name }} {{ user.last_name }} | {{
-                        user.profile.country}}</strong></h6>
-                <p class="card-text" align="center">
-                    OBD ID - {{ user.profile.pin }} <br>
-                    Desde - {{ user.profile.created_at|date:"d/m/y" }}<br>
-                    <span class="badge bg-dark">***** {{ user.username }} *****<br></span>
-                </p>
+    <div class="col-5">
+        <div class="card border-dark mb-3">
+            <div class="card-header bg-primary text-white">
+                <strong>OBD Member Card ***** {% now "Y" %}</strong>
+            </div>
+
+            <div class="card-body text-white">
+                <div class="row">
+                    <!-- Column 1: Photos -->
+                    <div class="col-md-4 text-center d-flex flex-column align-items-center justify-content-center">
+                        <img src="{{ user.profile.photo.url }}"
+                            class="img-fluid rounded-circle mb-3 border border-2 border-dark" alt="Profile"
+                            style="width: 100px; height: 100px; object-fit: cover;">
+
+                        {% if qr_code %}
+                        <div class="mt-2">
+                            <img src="{{ qr_code }}" class="img-fluid border" alt="QR Code" style="max-width: 80px;">
+                        </div>
+                        {% endif %}
+                    </div>
+
+                    <!-- Column 2: Details -->
+                    <div class="col-md-8">
+                        <h5 class="card-title fw-bold mb-0 text-white">
+                            {{ user.first_name }} {{ user.last_name }}
+                        </h5>
+                        {% if user.profile.nickname %}
+                        <p class="text-primary fst-italic mb-2">"{{ user.profile.nickname }}"</p>
+                        {% else %}
+                        <p class="mb-2"></p>
+                        {% endif %}
+
+                        <ul class="list-unstyled small mb-2">
+                            <li class="mb-1">
+                                <i class="bi bi-geo-alt-fill text-danger"></i>
+                                {{ user.profile.state }}
+                                {% if user.profile.state and user.profile.country %}, {% endif %}
+                                {{ user.profile.country }}
+                            </li>
+
+                            {% if user.profile.darts %}
+                            <li class="mb-1">
+                                <i class="bi bi-bullseye"></i> {{ user.profile.darts }}
+                            </li>
+                            {% endif %}
+
+                            {% if user.profile.nakka %}
+                            <li class="mb-1">
+                                <strong>Nakka:</strong> {{ user.profile.nakka }}
+                            </li>
+                            {% endif %}
+                        </ul>
+
+                        <!-- Social Icons -->
+                        <div class="mb-3">
+                            {% if user.profile.facebook %}
+                            <a href="{{ user.profile.facebook }}" target="_blank" class="text-primary me-2 fs-5"><i
+                                    class="bi bi-facebook"></i></a>
+                            {% endif %}
+                            {% if user.profile.twitter %}
+                            <a href="{{ user.profile.twitter }}" target="_blank" class="text-info me-2 fs-5"><i
+                                    class="bi bi-twitter"></i></a>
+                            {% endif %}
+                            {% if user.profile.site %}
+                            <a href="{{ user.profile.site }}" target="_blank" class="text-secondary fs-5"><i
+                                    class="bi bi-globe"></i></a>
+                            {% endif %}
+                        </div>
+
+                        <hr class="my-2">
+                        <div class="d-flex justify-content-between small text-muted">
+                            <span><strong>ID:</strong> {{ user.profile.pin }}</span>
+                            <span>Desde: {{ user.profile.created_at|date:"m/Y" }}</span>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 
     <div class="col-6">
-        <div class="card border-dark mb-3" style="max-width: 18rem;">
+        {% comment %}
+        <div class="card border-dark mb-3">
             <span class="badge bg-primary ">
                 <div class="card-header"><strong>OBD Member Card ***** {% now "Y" %}</strong></div>
             </span>
-            <div class="card-body text-dark">
+            <div class="card-body text-white">
                 <h6 class="card-title"><strong>{{ user.first_name }} {{ user.last_name }} |
                         {% if perms.profiles.has_admin_role %}
                         <span class="badge bg-success">Admin<br></span>
@@ -60,6 +125,7 @@
                 </p>
             </div>
         </div>
+        {% endcomment %}
     </div>
     <p><br></p>
 

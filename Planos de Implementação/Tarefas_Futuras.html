@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tarefas Futuras do Projeto OBD</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            line-height: 1.6;
+            padding: 20px;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            color: #2c3e50;
+            border-bottom: 2px solid #eee;
+            padding-bottom: 10px;
+        }
+
+        h2 {
+            color: #34495e;
+            margin-top: 30px;
+        }
+
+        ul {
+            list-style-type: none;
+            padding-left: 0;
+        }
+
+        li {
+            margin-bottom: 10px;
+            padding-left: 25px;
+            position: relative;
+        }
+
+        li:before {
+            content: "☐";
+            position: absolute;
+            left: 0;
+            color: #7f8c8d;
+        }
+
+        strong {
+            color: #2980b9;
+        }
+    </style>
+</head>
+
+<body>
+
+    <h1>Tarefas Futuras do Projeto OBD</h1>
+
+    <p>Esta lista contém sugestões de melhorias e novas funcionalidades para o projeto, baseada no estado atual do
+        desenvolvimento.</p>
+
+    <h2>1. Interface e Experiência do Usuário (Frontend)</h2>
+    <ul>
+        <li><strong>Polimento Mobile</strong>: Verificar e ajustar a responsividade de todas as páginas do dashboard em
+            dispositivos móveis.</li>
+        <li><strong>Correção de Lints</strong>: Resolver os avisos de sintaxe HTML/JS reportados pelo editor (ex: falta
+            de ponto e vírgula, tags mal formatadas).</li>
+        <li><strong>Feedback Visual</strong>: Implementar mensagens de sucesso/erro (toasts) para ações do usuário (ex:
+            ao salvar perfil).</li>
+    </ul>
+
+    <h2>2. Funcionalidades Pendentes</h2>
+    <ul>
+        <li><strong>Página de Ligas</strong>: Implementar a lógica e o layout da página "Ligas OBD"
+            (<code>/boa/leagues/</code>), que atualmente exibe "Em construção".</li>
+        <li><strong>Gestão de Documentos</strong>: Verificar se a seção de documentos precisa de upload/download
+            dinâmico.</li>
+        <li><strong>Média por Ano no Card</strong>: Implementar o cálculo e exibição da média (AVERAGE) do jogador
+            filtrada por ano no Card do Membro.</li>
+    </ul>
+
+    <h2>3. Qualidade de Código e Backend</h2>
+    <ul>
+        <li><strong>Testes Automatizados</strong>: Criar testes unitários para funcionalidades críticas (cálculo de
+            estatísticas, geração de QR Code).</li>
+        <li><strong>Refatoração</strong>: Otimizar views complexas em <code>views.py</code> para melhorar a manutenção.
+        </li>
+        <li><strong>Limpeza</strong>: Remover scripts de correção temporários (ex: <code>fix_templates.py</code>) se não
+            forem mais necessários.</li>
+    </ul>
+
+    <h2>4. Performance e SEO</h2>
+    <ul>
+        <li><strong>Otimização de Imagens</strong>: Verificar o tamanho das imagens carregadas (logos, banners) para
+            garantir carregamento rápido.</li>
+        <li><strong>SEO</strong>: Adicionar meta tags adequadas nas páginas públicas para melhor indexação nos
+            buscadores.</li>
+    </ul>
+
+</body>
+
+</html>
