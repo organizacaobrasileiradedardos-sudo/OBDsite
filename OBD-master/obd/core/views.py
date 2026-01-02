@@ -37,7 +37,19 @@ def index(request):
     )
 
     # NEW: Tournament Statistics Logic (Campeonato Brasileiro 2025)
-    latest_tournament = TournamentResult.objects.order_by('-date').first()
+    all_tournaments = TournamentResult.objects.order_by('-date')
+    
+    # Get selected tournament ID from request (if any)
+    selected_tournament_id = request.GET.get('tournament_id')
+    
+    if selected_tournament_id:
+        try:
+            latest_tournament = TournamentResult.objects.get(id=selected_tournament_id)
+        except TournamentResult.DoesNotExist:
+            latest_tournament = all_tournaments.first()
+    else:
+        latest_tournament = all_tournaments.first()
+        
     tournament_stats = {}
     
     if latest_tournament:
@@ -137,6 +149,8 @@ def index(request):
                 'documents': recent_documents,
                 'tournament_stats': tournament_stats,
                 'tournament_standings': tournament_standings, # Top 10 standings
+                'all_tournaments': all_tournaments,
+                'selected_tournament_id': int(selected_tournament_id) if selected_tournament_id else (latest_tournament.id if latest_tournament else None),
                 }
 
     return render(request, 'index.html', response)

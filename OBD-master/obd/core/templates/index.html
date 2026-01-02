@@ -259,6 +259,20 @@
 
             <!-- OBD Stats -->
             <div class="mb-5" id="obd-stats">
+                <div class="d-flex justify-content-center mb-3">
+                    <form method="GET" action="{% url 'index' %}" class="d-inline-group w-100"
+                        style="max-width: 300px;">
+                        <select name="tournament_id" class="form-select bg-dark text-white border-secondary"
+                            onchange="sessionStorage.setItem('scrollPosition', window.scrollY); this.form.submit()"
+                            style="background-image: url('data:image/svg+xml,%3csvg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 16 16\'%3e%3cpath fill=\'none\' stroke=\'%23ffffff\' stroke-linecap=\'round\' stroke-linejoin=\'round\' stroke-width=\'2\' d=\'M2 5l6 6 6-6\'/%3e%3c/svg%3e');">
+                            {% for t in all_tournaments %}
+                            <option value="{{ t.id }}" {% if t.id == selected_tournament_id %}selected{% endif %}>
+                                {{ t.name }} ({{ t.date|date:"d/m/Y" }})
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </form>
+                </div>
                 <h3 class="text-center mb-4 fw-bold">
                     <i class="bi bi-graph-up text-accent"></i> Estatísticas OBD
                     {% if tournament_stats %}
@@ -444,9 +458,10 @@
 
             <!-- Tournament Standings -->
             {% if tournament_standings %}
-            <div class="mb-5">
-                <h3 class="text-center mb-4 fw-bold"><i class="bi bi-trophy text-accent"></i> Classificação do
-                    Campeonato</h3>
+            <div class="mb-5" id="tournament-standings">
+                <div class="d-flex justify-content-center align-items-center mb-4 flex-wrap gap-3">
+                    <h3 class="mb-0 fw-bold"><i class="bi bi-trophy text-accent"></i> Classificação do Campeonato</h3>
+                </div>
                 <div class="table-responsive">
                     <table
                         class="table table-dark table-striped table-hover text-center align-middle rounded overflow-hidden">
@@ -643,6 +658,13 @@
 <script>
     // Initialize tooltips for floating navigation
     document.addEventListener('DOMContentLoaded', function () {
+        // Restore scroll position if set
+        const scrollPosition = sessionStorage.getItem('scrollPosition');
+        if (scrollPosition) {
+            window.scrollTo(0, parseInt(scrollPosition));
+            sessionStorage.removeItem('scrollPosition');
+        }
+
         var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
         var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
             return new bootstrap.Tooltip(tooltipTriggerEl);

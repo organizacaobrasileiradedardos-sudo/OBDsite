@@ -54,11 +54,19 @@ def get_or_create_league(name: str, start_date: datetime.date) -> tuple[League, 
             "status": True,
         },
     )
-    # Ensure a principal division exists (name "Principal")
+    # Ensure a principal division exists (name "Principal - League Name")
+    # We must properly handle the unique constraints on 'name' and 'slug'
+    from django.utils.text import slugify
+    div_name = f"Principal - {league.name}"
+    div_slug = slugify(div_name)
+    
     division, _ = Division.objects.get_or_create(
         league=league,
-        name="Principal",
-        defaults={"formation": 1},
+        name=div_name,
+        defaults={
+            "formation": 1,
+            "slug": div_slug
+        },
     )
     return league, division
 

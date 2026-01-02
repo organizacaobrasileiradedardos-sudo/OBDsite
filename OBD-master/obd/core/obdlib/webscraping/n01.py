@@ -130,13 +130,73 @@ class N01TournamentScraper:
         champion_user = None  # rank 1
         runner_up_user = None # rank 2
         third_place_user = None # rank 3 (or first encountered rank 3)
-        count = 0
+        
+        # Buffer for stats to process ranks if missing
+        processed_stats = []
+        has_valid_ranks = False
+
         for pid, stat in stats_data.items():
             if pid not in player_map:
                 continue
             name = player_map[pid]
-            # Determine rank
+            
+            # Determine rank explicitly from data
             rank_val = stat.get('rank', 0)
+            if rank_val > 0:
+                has_valid_ranks = True
+            
+            # Calculate averages and metrics for sorting/saving
+            avg3 = 0.0
+            if stat.get('darts', 0) > 0:
+                avg3 = (stat.get('score', 0) / stat.get('darts', 0)) * 3
+            
+            avg1 = avg3 / 3
+            
+            avg9 = 0.0
+            if stat.get('f9Darts', 0) > 0:
+                avg9 = (stat.get('f9Score', 0) / stat.get('f9Darts', 0)) * 3
+
+            matches_played = stat.get('match', 0)
+            matches_won = stat.get('winMatch', 0)
+            legs_played = stat.get('leg', 0)
+            legs_won = stat.get('winLeg', 0)
+            legs_diff = legs_won - (legs_played - legs_won)
+
+            processed_stats.append({
+                'pid': pid,
+                'stat': stat,
+                'name': name,
+                'rank': rank_val,
+                'avg3': avg3,
+                'avg1': avg1,
+                'avg9': avg9,
+                'matches_played': matches_played,
+                'matches_won': matches_won,
+                'legs_played': legs_played,
+                'legs_won': legs_won,
+                'legs_diff': legs_diff
+            })
+
+        # Fallback Rank Calculation if needed
+        if not has_valid_ranks and processed_stats:
+            # Sort by: Matches Won (desc), Legs Won (desc), Leg Diff (desc), Avg3 (desc)
+            processed_stats.sort(key=lambda x: (
+                x['matches_won'], 
+                x['legs_won'], 
+                x['legs_diff'], 
+                x['avg3']
+            ), reverse=True)
+            
+            # Assign ranks based on sorted order
+            for i, p_data in enumerate(processed_stats):
+                p_data['rank'] = i + 1
+
+        # Save to DB
+        count = 0
+        for p_data in processed_stats:
+            rank_val = p_data['rank']
+            name = p_data['name']
+            
             if rank_val > 0 and rank_val <= 3:
                 # Simple PIN derived from name (lowercase, no spaces)
                 pin = name.replace(' ', '').lower()
@@ -147,64 +207,40 @@ class N01TournamentScraper:
                 elif rank_val == 2:
                     runner_up_user = user_obj
                 elif rank_val == 3:
-                    # If we haven't found a 3rd place yet, take this one.
-                    # Note: In some tournaments there are two 3rd places.
-                    # For now, we just take the first one encountered or overwrite.
-                    # Ideally we'd fill p3 and p4, but let's stick to p3 for now as requested.
                     if not third_place_user:
                         third_place_user = user_obj
-            
-            # Calculate averages
-            # 3 Dart Avg = (score / darts) * 3
-            avg3 = 0.0
-            if stat.get('darts', 0) > 0:
-                avg3 = (stat.get('score', 0) / stat.get('darts', 0)) * 3
-            
-            # 1 Dart Avg
-            avg1 = avg3 / 3
-            
-            # First 9 Avg
-            avg9 = 0.0
-            if stat.get('f9Darts', 0) > 0:
-                avg9 = (stat.get('f9Score', 0) / stat.get('f9Darts', 0)) * 3
 
-            # Win Rates
-            matches_played = stat.get('match', 0)
-            matches_won = stat.get('winMatch', 0)
-            wr_match = f"{(matches_won/matches_played)*100:.1f}%" if matches_played > 0 else "0.0%"
-            
-            legs_played = stat.get('leg', 0)
-            legs_won = stat.get('winLeg', 0)
-            wr_leg = f"{(legs_won/legs_played)*100:.1f}%" if legs_played > 0 else "0.0%"
+            wr_match = f"{(p_data['matches_won']/p_data['matches_played'])*100:.1f}%" if p_data['matches_played'] > 0 else "0.0%"
+            wr_leg = f"{(p_data['legs_won']/p_data['legs_played'])*100:.1f}%" if p_data['legs_played'] > 0 else "0.0%"
 
             PlayerTournamentStat.objects.create(
                 tournament=tournament,
                 player_name=name,
-                rank=rank_val if rank_val > 0 else 999, # 0 usually means unranked or not finished
-                matches_played=matches_played,
-                matches_won=matches_won,
-                legs_played=legs_played,
-                legs_won=legs_won,
-                legs_diff=legs_won - (legs_played - legs_won), # Approximate diff
-                count_100_plus=stat.get('ton00', 0),
-                count_140_plus=stat.get('ton40', 0),
-                count_170_plus=stat.get('ton70', 0),
-                count_180=stat.get('ton80', 0),
-                high_finish=stat.get('highOut', 0),
-                count_100_plus_finish=stat.get('highOutCount', 0),
-                best_leg=stat.get('best', 0),
-                worst_leg=stat.get('worst', 0),
+                rank=rank_val if rank_val > 0 else 999,
+                matches_played=p_data['matches_played'],
+                matches_won=p_data['matches_won'],
+                legs_played=p_data['legs_played'],
+                legs_won=p_data['legs_won'],
+                legs_diff=p_data['legs_diff'],
+                count_100_plus=p_data['stat'].get('ton00', 0),
+                count_140_plus=p_data['stat'].get('ton40', 0),
+                count_170_plus=p_data['stat'].get('ton70', 0),
+                count_180=p_data['stat'].get('ton80', 0),
+                high_finish=p_data['stat'].get('highOut', 0),
+                count_100_plus_finish=p_data['stat'].get('highOutCount', 0),
+                best_leg=p_data['stat'].get('best', 0),
+                worst_leg=p_data['stat'].get('worst', 0),
                 win_rate_matches=wr_match,
                 win_rate_legs=wr_leg,
-                average_3_dart=round(avg3, 2),
-                average_1_dart=round(avg1, 2),
-                first_9_average=round(avg9, 2)
+                average_3_dart=round(p_data['avg3'], 2),
+                average_1_dart=round(p_data['avg1'], 2),
+                first_9_average=round(p_data['avg9'], 2)
             )
             count += 1
 
         # Register champion if we captured rank 1
         if champion_user:
-            league, division = get_or_create_league('Campeonato Brasileiro OBD 2025', timezone.now().date())
+            league, division = get_or_create_league(tournament_name, timezone.now().date())
             register_champion(league, division, champion_user, p2_user=runner_up_user, p3_user=third_place_user)
         return True, f"Successfully captured {count} player stats for '{tournament_name}'"
 
