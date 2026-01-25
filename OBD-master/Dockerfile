@@ -18,6 +18,7 @@ COPY . .
 WORKDIR /app/OBD-master
 
 # instala deps
+RUN ls -la
 RUN pip install --no-cache-dir -r requirements.txt
 
 # opcional: collectstatic (se você estiver com whitenoise ou servir static)
