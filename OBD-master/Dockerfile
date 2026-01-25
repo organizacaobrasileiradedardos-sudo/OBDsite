@@ -14,8 +14,15 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 # copia o projeto
 COPY . .
 
+
 # instala dependências Python
 RUN pip install --no-cache-dir -r requirements.txt
+
+# entra no diretório do django
+# WORKDIR /app/OBD-master
+
+# instala deps
+RUN pwd && ls -la
 
 # start da aplicação
 CMD ["sh", "-c", "gunicorn obd.wsgi:application --bind 0.0.0.0:${PORT} --log-file -"]
