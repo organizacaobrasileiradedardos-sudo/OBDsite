@@ -29,7 +29,7 @@ SECRET_KEY = config('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = config('DEBUG', default=False, cast=bool)
-ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='', cast=Csv())
+ALLOWED_HOSTS = ["obdsite-production.up.railway.app","localhost","127.0.0.1",]
 DEFAULT_FROM_EMAIL = config('DEFAULT_FROM_EMAIL')
 LOGIN_URL = '/dashboard/player/login'
 
