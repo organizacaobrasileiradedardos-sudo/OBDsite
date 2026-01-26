@@ -15,9 +15,10 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 COPY . .
 
 # entra no diretório do django
-WORKDIR /app/OBD-master
+# WORKDIR /app/OBD-master
 
 # instala deps
+RUN pwd && ls -la
 RUN pip install --no-cache-dir -r requirements.txt
 
 # opcional: collectstatic (se você estiver com whitenoise ou servir static)
