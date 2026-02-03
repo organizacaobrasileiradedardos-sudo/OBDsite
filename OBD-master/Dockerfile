@@ -25,4 +25,4 @@ RUN pip install --no-cache-dir -r requirements.txt
 RUN pwd && ls -la
 
 # start da aplicação
-CMD ["sh", "-c", "gunicorn obd.wsgi:application --bind 0.0.0.0:${PORT} --log-file -"]
+CMD ["sh", "-c", "python manage.py migrate && gunicorn obd.wsgi:application --bind 0.0.0.0:${PORT}"]
