@@ -14,5 +14,7 @@ COPY . .
 
 RUN pip install --no-cache-dir -r requirements.txt
 
-CMD sh -c "python manage.py migrate && gunicorn obd.wsgi:application --bind 0.0.0.0:$PORT --workers 2 --threads 4"
-
+CMD gunicorn obd.wsgi:application \
+    --bind 0.0.0.0:${PORT:-8080} \
+    --workers 2 \
+    --threads 4
