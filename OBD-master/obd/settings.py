@@ -12,7 +12,7 @@ https://docs.djangoproject.com/en/3.1/ref/settings/
 import os
 from pathlib import Path
 from decouple import config, Csv
-from dj_database_url import parse as dburl
+from dj_database_url
 import cloudinary
 import cloudinary.uploader
 import cloudinary.api
@@ -166,7 +166,7 @@ EMAIL_USE_SSL = config('EMAIL_USE_SSL', cast=bool)
 
 cloudinary.config(
     cloud_name=config('CLOUDINARY_NAME'),
-    api_key=config('CLOUDINARY_API_KEY'),
+    api_key=config('CLOUDINARY_API'),
     api_secret=config('CLOUDINARY_API_SECRET'),
     secure=config('CLOUDINARY_SECURE')
 )
