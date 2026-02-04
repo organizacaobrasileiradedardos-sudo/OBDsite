@@ -1,2 +1,2 @@
-web: gunicorn obd.wsgi --bind 0.0.0.0:$PORT
+web: gunicorn obd.wsgi:application --bind 0.0.0.0:$PORT --workers 3 --log-level debug --timeout 120
 
