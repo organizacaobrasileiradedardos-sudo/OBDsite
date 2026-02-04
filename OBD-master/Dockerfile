@@ -10,13 +10,15 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     libpq-dev \
     && rm -rf /var/lib/apt/lists/*
 
+# copia tudo
 COPY . .
 
-# instala dependências (arquivo está na raiz)
-RUN pip install --no-cache-dir -r requirements.txt
-
-# agora entra no Django
+# entra onde o Django realmente está
 WORKDIR /app/OBD-master
 
+# instala dependências
+RUN pip install --no-cache-dir -r requirements.txt
+
+# start
 CMD sh -c "python manage.py migrate && gunicorn obd.wsgi:application --bind 0.0.0.0:$PORT --workers 2 --threads 4"
 
