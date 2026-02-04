@@ -12,10 +12,11 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 
 COPY . .
 
-# 🔥 ESTE É O PONTO-CHAVE
-WORKDIR /app/OBD-master
-
+# instala dependências (arquivo está na raiz)
 RUN pip install --no-cache-dir -r requirements.txt
+
+# agora entra no Django
+WORKDIR /app/OBD-master
 
 CMD sh -c "python manage.py migrate && gunicorn obd.wsgi:application --bind 0.0.0.0:$PORT --workers 2 --threads 4"
 
