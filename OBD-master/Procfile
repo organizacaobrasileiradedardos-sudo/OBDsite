@@ -1,1 +1,1 @@
-web: gunicorn obd.wsgi:application --bind 0.0.0.0:$PORT
+web: python manage.py collectstatic --noinput && python manage.py migrate && gunicorn seu_projeto.wsgi --bind 0.0.0.0:$PORT
