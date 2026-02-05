@@ -12,7 +12,7 @@ https://docs.djangoproject.com/en/3.1/ref/settings/
 import os
 from pathlib import Path
 from decouple import config, Csv
-from dj_database_url
+import dj_database_url
 import cloudinary
 import cloudinary.uploader
 import cloudinary.api
