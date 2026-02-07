@@ -102,10 +102,10 @@ WSGI_APPLICATION = 'obd.wsgi.application'
 default_dburl = 'sqlite:///' + os.path.join(BASE_DIR, 'db.sqlite3')
 
 DATABASES = {
-    "default": dj_database_url.config(
-        default=default_dburl,
+    'default': dj_database_url.config(
+        default=config('DATABASE_URL', default=''),
         conn_max_age=600,
-        conn_health_checks=True,
+        ssl_require=True
     )
 }
 
