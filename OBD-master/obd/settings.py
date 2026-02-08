@@ -9,8 +9,8 @@ https://docs.djangoproject.com/en/3.1/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/3.1/ref/settings/
 """
-import dj_database_url
 import os
+import dj_database_url
 from pathlib import Path
 from decouple import config, Csv
 import cloudinary
