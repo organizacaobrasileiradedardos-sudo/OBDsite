@@ -99,11 +99,13 @@ WSGI_APPLICATION = 'obd.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/3.1/ref/settings/#
 
+# Config do banco: usa DATABASE_URL do Railway se existir, senão fallback SQLite local
 DATABASES = {
-    "default": dj_database_url.config(
-        default=os.environ.get("DATABASE_URL"),
-        conn_max_age=600,
-        ssl_require=True,
+    'default': dj_database_url.config(
+        default='sqlite:///' + str(BASE_DIR / 'db.sqlite3'),  # Fallback local
+        conn_max_age=600,  # Mantém conexões vivas
+        conn_health_checks=True,
+        engine='django.db.backends.postgresql' if 'postgres' in os.environ.get('DATABASE_URL', '') else 'django.db.backends.sqlite3'  # ← Força ENGINE correto
     )
 }
 
