@@ -104,8 +104,7 @@ DATABASES = {
     'default': dj_database_url.config(
         default='sqlite:///' + str(BASE_DIR / 'db.sqlite3'),  # Fallback local
         conn_max_age=600,  # Mantém conexões vivas
-        conn_health_checks=True,
-        engine='django.db.backends.postgresql' if 'postgres' in os.environ.get('DATABASE_URL', '') else 'django.db.backends.sqlite3'  # ← Força ENGINE correto
+        conn_health_checks=True
     )
 }
 
