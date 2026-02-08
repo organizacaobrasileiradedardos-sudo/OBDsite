@@ -101,10 +101,10 @@ WSGI_APPLICATION = 'obd.wsgi.application'
 
 # Config do banco: usa DATABASE_URL do Railway se existir, senão fallback SQLite local
 DATABASES = {
-    'default': dj_database_url.config(
-        default='sqlite:///' + str(BASE_DIR / 'db.sqlite3'),  # Fallback local
-        conn_max_age=600,  # Mantém conexões vivas
-        conn_health_checks=True
+    "default": dj_database_url.config(
+        default=os.getenv("DATABASE_URL"),
+        conn_max_age=600,
+        ssl_require=True,
     )
 }
 
