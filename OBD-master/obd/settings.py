@@ -158,7 +158,7 @@ MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 # Email Configuration
-ADMINS = config('ALERT_ERRORS_TO')
+ADMINS = []    # config('ALERT_ERRORS_TO')
 MANAGERS = config('ALERT_ERRORS_TO')
 EMAIL_BACKEND = config('EMAIL_BACKEND')
 EMAIL_HOST = config('EMAIL_HOST')
