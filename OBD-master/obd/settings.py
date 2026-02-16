@@ -187,3 +187,9 @@ SCOUT_KEY = config('SCOUT_KEY')
 SCOUT_NAME = config('SCOUT_NAME')
 # If you'd like to utilize Error Monitoring:
 SCOUT_ERRORS_ENABLED = config('SCOUT_ERRORS')
+
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+}
+
