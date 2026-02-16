@@ -28,8 +28,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = config('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = config('DEBUG', default='False').lower() == 'true'
-import os
+DEBUG = os.getenv('DEBUG', 'False') == 'true'
 ALLOWED_HOSTS = os.getenv("ALLOWED_HOSTS", "").split(",")
 DEFAULT_FROM_EMAIL = config('DEFAULT_FROM_EMAIL')
 LOGIN_URL = '/dashboard/player/login'
@@ -75,6 +74,13 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
+
+MIDDLEWARE.insert(1, "whitenoise.middleware.WhiteNoiseMiddleware")
+
+STATIC_ROOT = BASE_DIR / "staticfiles"
+STATIC_URL = "/static/"
+
+STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 
 ROOT_URLCONF = 'obd.urls'
 
@@ -153,15 +159,15 @@ DATE_INPUT_FORMATS = ['%Y-%m-%d',
 # https://docs.djangoproject.com/en/3.1/howto/static-files/
 
 STATIC_URL = '/static/'
-STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+STATIC_ROOT = BASE_DIR / 'staticfiles'
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 # Email Configuration
-ADMINS = []    # config('ALERT_ERRORS_TO')
+ADMINS = [("Administrador", "organizacaobrasileiradedardos@gmail.com")]    # config('ALERT_ERRORS_TO')
 MANAGERS = []  # config('ALERT_ERRORS_TO')
-EMAIL_BACKEND = config('EMAIL_BACKEND')
+EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
 EMAIL_HOST = config('EMAIL_HOST')
 EMAIL_PORT = config('EMAIL_PORT', cast=int)
 EMAIL_HOST_USER = config('EMAIL_HOST_USER')
