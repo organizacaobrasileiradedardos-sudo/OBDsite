@@ -159,7 +159,7 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 # Email Configuration
 ADMINS = []    # config('ALERT_ERRORS_TO')
-MANAGERS = config('ALERT_ERRORS_TO')
+MANAGERS = []  # config('ALERT_ERRORS_TO')
 EMAIL_BACKEND = config('EMAIL_BACKEND')
 EMAIL_HOST = config('EMAIL_HOST')
 EMAIL_PORT = config('EMAIL_PORT', cast=int)
