@@ -29,7 +29,8 @@ SECRET_KEY = config('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = config('DEBUG', default='False').lower() == 'true'
-ALLOWED_HOSTS = ['*']    # ["obdsite-production.up.railway.app", ".up.railway.app", "localhost", "127.0.0.1"]
+import os
+ALLOWED_HOSTS = os.getenv("ALLOWED_HOSTS", "").split(",")
 DEFAULT_FROM_EMAIL = config('DEFAULT_FROM_EMAIL')
 LOGIN_URL = '/dashboard/player/login'
 
