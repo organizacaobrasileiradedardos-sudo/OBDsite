@@ -128,7 +128,7 @@ def index(request):
     recent_news = News.objects.filter(is_active=True).order_by('-published_date')[:5]
     recent_documents = Document.objects.filter(is_active=True).order_by('-publish_date')[:5]
 
-    response = {'matches': matches,
+    context = {'matches': matches,
                 'boa': boa,
                 'stats_out': stats_out,
                 'stats_180': stats_180,
@@ -153,7 +153,7 @@ def index(request):
                 'selected_tournament_id': int(selected_tournament_id) if selected_tournament_id else (latest_tournament.id if latest_tournament else None),
                 }
 
-    return render(request, 'index.html', response)
+    return render(request, 'index.html', context)
 
 
 
