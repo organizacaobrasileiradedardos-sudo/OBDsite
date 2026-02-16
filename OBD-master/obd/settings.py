@@ -165,8 +165,8 @@ MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 # Email Configuration
-ADMINS = [("Administrador", "organizacaobrasileiradedardos@gmail.com")]    # config('ALERT_ERRORS_TO')
-MANAGERS = []  # config('ALERT_ERRORS_TO')
+ADMINS = [("OBD", "organizacaobrasileiradedardos@gmail.com")]    # config('ALERT_ERRORS_TO')
+MANAGERS = ADMINS  # config('ALERT_ERRORS_TO')
 EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
 EMAIL_HOST = config('EMAIL_HOST')
 EMAIL_PORT = config('EMAIL_PORT', cast=int)
