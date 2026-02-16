@@ -28,7 +28,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = config('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = config('DEBUG', default=False) == 'True'
+DEBUG = config('DEBUG', default='False').lower() == 'True'
 ALLOWED_HOSTS = ['*']    # ["obdsite-production.up.railway.app", ".up.railway.app", "localhost", "127.0.0.1"]
 DEFAULT_FROM_EMAIL = config('DEFAULT_FROM_EMAIL')
 LOGIN_URL = '/dashboard/player/login'
