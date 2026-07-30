@@ -19,7 +19,7 @@ class Profile(models.Model):
     nickname = models.CharField(max_length=40, null=False, blank=True)
     photo = models.ImageField(default='/static/media/logos/Logo_OBD_3.jpeg')
     birth_date = models.DateField(blank=True, null=True)
-    pin = models.CharField(max_length=10, null=False, blank=True)
+    pin = models.CharField(max_length=50, null=False, blank=True)
     slug = models.CharField(max_length=180, null=False, blank=True)
     bio = models.TextField(max_length=250, null=False, blank=True)
     country = models.CharField(max_length=60, blank=True, default='Brasil')
