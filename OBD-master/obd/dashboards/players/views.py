@@ -9,6 +9,7 @@ from django.contrib.auth.models import User
 from django.core.mail import send_mail
 from django.template.loader import render_to_string
 from django.contrib.auth import login, authenticate, logout
+from django.urls import reverse
 from django.contrib.auth.decorators import login_required, permission_required
 from django.contrib.messages import get_messages
 from django.http import HttpResponseRedirect, HttpResponse
@@ -105,7 +106,7 @@ def loginuser(request):
             logout(request)
             user = authenticate(username=form.cleaned_data['username'].lower(), password=form.cleaned_data['password'])
             login(request, user)
-            return HttpResponseRedirect('/dashboard/player/')
+            return HttpResponseRedirect(reverse('players:dashboard'))
     else:
         boasession = ObdSession()
         token = boasession.startSession()
