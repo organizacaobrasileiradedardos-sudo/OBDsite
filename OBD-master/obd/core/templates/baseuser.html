@@ -156,9 +156,13 @@ Description: This is the BASE template of all OBD DASHOBDRD pages. It cotains th
                                 class="bi bi-list-stars"></i> Ver meu histórico</a>
                         <a href="{% url 'players:player_audit' %}" class="list-group-item list-group-item-action"><i
                                 class="bi bi-file-text"></i> Gerar relatório</a>
+                        {% if user.profile.pin and user.first_name and user.last_name %}
                         <a href="{% url 'profiles:publicprofile' pin=user.profile.pin first=user.first_name last=user.last_name %}"
-                            class="list-group-item list-group-item-action"><i class="bi bi-graph-up"></i> Perfil
-                            Público</a>
+                                class="list-group-item list-group-item-action"><i class="bi bi-graph-up"></i> Perfil
+                                Público</a>
+                        {% else %}
+                        <span class="list-group-item text-muted"><i class="bi bi-graph-up"></i> Perfil Público (complete seu cadastro)</span>
+                        {% endif %}
                         <a href="{% url 'players:logout' %}" class="btn btn-secondary"><i
                                 class="bi bi-box-arrow-left"></i> Sair do Sistema</a>
 
