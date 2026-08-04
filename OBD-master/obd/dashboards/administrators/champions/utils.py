@@ -31,7 +31,7 @@ def get_or_create_player(name: str, pin: str) -> User:
     )
     if created:
         # The post_save signal creates an empty Profile; we fill the required fields.
-        Profile.objects.filter(user=user).update(pin=pin, nickname=name)
+        Profile.objects.filter(user=user).update(pin=pin, nickname=name, is_verified=False)
     return user
 
 
