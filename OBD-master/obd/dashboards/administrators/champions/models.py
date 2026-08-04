@@ -14,10 +14,10 @@ class Champion(models.Model):
     league = models.ForeignKey(League, on_delete=models.DO_NOTHING, blank=False)
     division = models.ForeignKey(Division, on_delete=models.DO_NOTHING, blank=False)
     mode = models.IntegerField(choices=MODE, default=1)
-    p1 = models.ForeignKey(User, on_delete=models.DO_NOTHING, related_name='p1', blank=True, null=True)
-    p2 = models.ForeignKey(User, on_delete=models.DO_NOTHING, related_name='p2', blank=True, null=True)
-    p3 = models.ForeignKey(User, on_delete=models.DO_NOTHING, related_name='p3', blank=True, null=True)
-    p4 = models.ForeignKey(User, on_delete=models.DO_NOTHING, related_name='p4', blank=True, null=True)
+    p1 = models.ForeignKey(User, on_delete=models.SET_NULL, related_name='p1', blank=True, null=True)
+    p2 = models.ForeignKey(User, on_delete=models.SET_NULL, related_name='p2', blank=True, null=True)
+    p3 = models.ForeignKey(User, on_delete=models.SET_NULL, related_name='p3', blank=True, null=True)
+    p4 = models.ForeignKey(User, on_delete=models.SET_NULL, related_name='p4', blank=True, null=True)
     created_at = models.DateTimeField('Created at', auto_now_add=True)
 
     class Meta:

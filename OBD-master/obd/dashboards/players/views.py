@@ -116,7 +116,7 @@ def loginuser(request):
 
 
 def logoutuser(request):
-    if not get_messages(request):
+    if request.user.is_authenticated and not get_messages(request):
         name = str(request.user.first_name).capitalize()
         messages.success(request, f'Até mais, %s! Tenha um ótimo dia e bons treinos!' % name)
     logout(request)
