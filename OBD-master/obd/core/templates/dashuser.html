@@ -49,6 +49,9 @@
                     <div class="col-md-8">
                         <h5 class="card-title fw-bold mb-0 text-white">
                             {{ user.first_name }} {{ user.last_name }}
+                            {% if not user.profile.is_verified %}
+                            <span class="badge bg-warning text-dark">Não Verificado</span>
+                            {% endif %}
                         </h5>
                         {% if user.profile.nickname %}
                         <p class="text-primary fst-italic mb-2">"{{ user.profile.nickname }}"</p>

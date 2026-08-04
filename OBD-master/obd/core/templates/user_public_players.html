@@ -60,16 +60,22 @@ Description: This is the page where main data will remains.
         {% for player in players %}
         <div class="col">
           <div class="card h-100">
-            {% if player.profile.pin and player.first_name and player.last_name %}
-            <a href="{% url 'profiles:publicprofile' pin=player.profile.pin first=player.first_name last=player.last_name %}"
-              class="list-group-item list-group-item-action active text-white" aria-current="true">
-              {{ player.first_name }} {{ player.last_name }}
-            </a>
-            {% else %}
-            <div class="list-group-item list-group-item-action active text-white" aria-current="true">
-              {{ player.first_name }} {{ player.last_name }}
-            </div>
+          {% if player.profile.pin and player.first_name and player.last_name %}
+          <a href="{% url 'profiles:publicprofile' pin=player.profile.pin first=player.first_name last=player.last_name %}"
+            class="list-group-item list-group-item-action active text-white" aria-current="true">
+            {{ player.first_name }} {{ player.last_name }}
+            {% if not player.profile.is_verified %}
+            <span class="badge bg-warning text-dark">Não Verificado</span>
             {% endif %}
+          </a>
+          {% else %}
+          <div class="list-group-item list-group-item-action active text-white" aria-current="true">
+            {{ player.first_name }} {{ player.last_name }}
+            {% if not player.profile.is_verified %}
+            <span class="badge bg-warning text-dark">Não Verificado</span>
+            {% endif %}
+          </div>
+          {% endif %}
             <div class="rect-img-container">
               <img class="rect-img figure-img img-fluid rounded" src="{{ player.profile.photo }}" align="center"
                 title="{{ profile.nickname }}" alt="{{ profile.nickname }}">

@@ -24,7 +24,11 @@ Description: This is the page where main data will remains.
             <img src="{% static '/media/logos/1230x200-banner-fundo-escuro.jpg' %}"
                 class="card-img figure-img img-fluid rounded" alt="...">
             <p><br></p>
-            <h2 class="card-title"><strong><i class="bi bi-list-stars"></i> Perfil Público de {{ profile.user.first_name }} {{ profile.user.last_name }} @{{ profile.nickname }}</strong></h2>
+            <h2 class="card-title"><strong><i class="bi bi-list-stars"></i> Perfil Público de {{ profile.user.first_name }} {{ profile.user.last_name }} @{{ profile.nickname }}</strong>
+                {% if not profile.is_verified %}
+                <span class="badge bg-warning text-dark">Não Verificado</span>
+                {% endif %}
+            </h2>
             <p><br></p>
             <div class="card mb-3" style="max-width: 100%;">
                 <div class="row g-0">
