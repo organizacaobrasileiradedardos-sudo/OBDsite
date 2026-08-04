@@ -196,19 +196,18 @@ class N01TournamentScraper:
         for p_data in processed_stats:
             rank_val = p_data['rank']
             name = p_data['name']
-            
-            if rank_val > 0 and rank_val <= 3:
-                # Simple PIN derived from name (lowercase, no spaces)
-                pin = name.replace(' ', '').lower()
-                user_obj = get_or_create_player(name, pin)
-                
-                if rank_val == 1:
-                    champion_user = user_obj
-                elif rank_val == 2:
-                    runner_up_user = user_obj
-                elif rank_val == 3:
-                    if not third_place_user:
-                        third_place_user = user_obj
+
+            # Create/find the player account for EVERY participant, not just the podium
+            pin = name.replace(' ', '').lower()
+            user_obj = get_or_create_player(name, pin)
+
+            if rank_val == 1:
+                champion_user = user_obj
+            elif rank_val == 2:
+                runner_up_user = user_obj
+            elif rank_val == 3:
+                if not third_place_user:
+                    third_place_user = user_obj
 
             wr_match = f"{(p_data['matches_won']/p_data['matches_played'])*100:.1f}%" if p_data['matches_played'] > 0 else "0.0%"
             wr_leg = f"{(p_data['legs_won']/p_data['legs_played'])*100:.1f}%" if p_data['legs_played'] > 0 else "0.0%"
