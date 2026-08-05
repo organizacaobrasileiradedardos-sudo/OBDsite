@@ -24,4 +24,6 @@ urlpatterns = [
     path('dashboard/admin/logout', views.logoutAdm, name='logout'),
     path('dashboard/admin/scraping/', views.scraping_dashboard, name='scraping_dashboard'),
     path('dashboard/admin/scraping/run/', views.run_capture, name='run_capture'),
+    path('dashboard/admin/order-of-merit/', views.order_of_merit_dashboard, name='order_of_merit_dashboard'),
+    path('dashboard/admin/order-of-merit/import/', views.import_order_of_merit, name='import_order_of_merit'),
 ]

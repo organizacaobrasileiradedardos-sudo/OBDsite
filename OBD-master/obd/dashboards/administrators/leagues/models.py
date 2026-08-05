@@ -50,3 +50,22 @@ class League(models.Model):
         verbose_name_plural = "leagues"
         verbose_name = "league"
         ordering = ('-created_at',)
+
+class OrderOfMeritEntry(models.Model):
+    """Registra o valor em R$ que um jogador recebeu em uma etapa (League) da Liga Nacional."""
+
+    player = models.ForeignKey(User, on_delete=models.CASCADE, related_name='order_of_merit_entries')
+    league = models.ForeignKey(League, on_delete=models.CASCADE, related_name='order_of_merit_entries')
+    position_in_stage = models.IntegerField('Posição na Etapa', blank=True, null=True)
+    value = models.DecimalField('Valor (R$)', max_digits=8, decimal_places=2, default=0)
+    created_at = models.DateTimeField('Criado em', auto_now_add=True)
+    updated_at = models.DateTimeField('Atualizado em', auto_now=True)
+
+    class Meta:
+        verbose_name_plural = "order of merit entries"
+        verbose_name = "order of merit entry"
+        unique_together = ('player', 'league')
+        ordering = ('-league__start_date',)
+
+    def __str__(self):
+        return f"{self.player} - {self.league.name}: R$ {self.value}"

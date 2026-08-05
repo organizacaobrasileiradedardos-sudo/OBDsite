@@ -1,0 +1,49 @@
+{% extends 'baseadmin.html' %}
+
+{% block title %} Importação Order of Merit {% endblock %}
+
+{% block page %}Order of Merit - Importação de Premiação{% endblock %}
+{% block boauser %} Administrador {% endblock %}
+
+{% block content %}
+
+{% if messages %}
+{% for message in messages %}
+<div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+  {{ message }}
+  <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+</div>
+{% endfor %}
+{% endif %}
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="card bg-dark text-white mb-4">
+            <div class="card-header">
+                <i class="bi bi-file-earmark-spreadsheet"></i> Importar Etapa da Order of Merit
+            </div>
+            <div class="card-body">
+                <form method="post" action="{% url 'administrators:import_order_of_merit' %}" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label for="league_id" class="form-label">Etapa (Liga Nacional)</label>
+                        <select class="form-select" id="league_id" name="league_id" required>
+                            <option value="">Selecione a etapa...</option>
+                            {% for league in leagues %}
+                            <option value="{{ league.id }}">{{ league.name }} ({{ league.start_date|date:"d/m/Y" }})</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="file" class="form-label">Planilha (.xlsx)</label>
+                        <input type="file" class="form-control" id="file" name="file" accept=".xlsx" required>
+                        <div class="form-text text-muted">A planilha deve conter as colunas: Posição, Jogador e Valor (R$).</div>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Importar</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

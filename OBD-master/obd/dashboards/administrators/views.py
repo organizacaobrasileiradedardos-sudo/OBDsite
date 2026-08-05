@@ -8,7 +8,9 @@ from obd.core.obdlib.webscraping.n01 import N01TournamentScraper
 from obd.dashboards.administrators.enviroments.models import Enviroment
 from obd.dashboards.administrators.fixtures.models import Fixture
 from obd.dashboards.administrators.leagues.models import League
-
+import pandas as pd 
+from decimal import Decimal, InvalidOperation
+from obd.dashboards.administrators.leagues.models import League, OrderOfMeritEntry
 
 @login_required()
 @permission_required('profiles.has_admin_role', raise_exception=True)
@@ -76,5 +78,90 @@ def run_capture(request):
     return redirect('administrators:scraping_dashboard')
 
 
+@login_required
+@permission_required('profiles.has_admin_role', raise_exception=True)
+def order_of_merit_dashboard(request):
+    leagues = League.objects.filter(scope=2).order_by('-start_date')  # scope=2 = Nacional
+    return render(request, 'order_of_merit_dashboard.html', {'leagues': leagues})
+
+
+@login_required
+@permission_required('profiles.has_admin_role', raise_exception=True)
+def import_order_of_merit(request):
+    if request.method != 'POST':
+        return redirect('administrators:order_of_merit_dashboard')
+
+    league_id = request.POST.get('league_id')
+    excel_file = request.FILES.get('file')
+
+    if not league_id or not excel_file:
+        messages.error(request, "Selecione a etapa e o arquivo antes de importar.")
+        return redirect('administrators:order_of_merit_dashboard')
+
+    try:
+        league = League.objects.get(id=league_id)
+    except League.DoesNotExist:
+        messages.error(request, "Etapa não encontrada.")
+        return redirect('administrators:order_of_merit_dashboard')
+
+    try:
+        df = pd.read_excel(excel_file)
+    except Exception as e:
+        messages.error(request, f"Não foi possível ler o arquivo: {e}")
+        return redirect('administrators:order_of_merit_dashboard')
+
+    # Normaliza nomes de colunas (remove espaços, deixa minúsculo, tira acentos comuns)
+    df.columns = [str(c).strip().lower() for c in df.columns]
+
+    # Tenta localizar as colunas certas, aceitando pequenas variações
+    col_pos = next((c for c in df.columns if 'pos' in c), None)
+    col_player = next((c for c in df.columns if 'jogador' in c or 'nome' in c), None)
+    col_value = next((c for c in df.columns if 'valor' in c or 'premia' in c or 'r$' in c), None)
+
+    if not col_player or not col_value:
+        messages.error(request, "Não foi possível identificar as colunas 'Jogador' e 'Valor' na planilha.")
+        return redirect('administrators:order_of_merit_dashboard')
+
+    matched = 0
+    not_found = []
+
+    for _, row in df.iterrows():
+        name = str(row[col_player]).strip()
+        if not name or name.lower() == 'nan':
+            continue
+
+        raw_value = row[col_value]
+        try:
+            value = Decimal(str(raw_value).replace('R$', '').replace(',', '.').strip())
+        except (InvalidOperation, ValueError):
+            not_found.append(f"{name} (valor inválido: {raw_value})")
+            continue
+
+        position = None
+        if col_pos:
+            try:
+                position = int(row[col_pos])
+            except (ValueError, TypeError):
+                position = None
+
+        pin = name.replace(' ', '').lower()
+        user = User.objects.filter(username__iexact=pin).first()
+
+        if not user:
+            not_found.append(name)
+            continue
+
+        OrderOfMeritEntry.objects.update_or_create(
+            player=user,
+            league=league,
+            defaults={'value': value, 'position_in_stage': position}
+        )
+        matched += 1
+
+    messages.success(request, f"Importação concluída: {matched} jogadores atualizados na etapa {league.name}.")
+    if not_found:
+        messages.warning(request, f"{len(not_found)} nomes não encontrados no cadastro: {', '.join(not_found)}")
+
+    return redirect('administrators:order_of_merit_dashboard')
 
 
