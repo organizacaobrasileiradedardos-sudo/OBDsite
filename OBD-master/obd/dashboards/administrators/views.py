@@ -148,8 +148,17 @@ def import_order_of_merit(request):
         user = User.objects.filter(username__iexact=pin).first()
 
         if not user:
-            not_found.append(name)
-            continue
+            # Fallback: nome na planilha pode ser abreviado (ex: "Rodrigo KEKO" vs
+            # cadastro completo "Rodrigo Keko Johan"). Tenta achar por prefixo.
+            candidates = list(User.objects.filter(username__istartswith=pin))
+            if len(candidates) == 1:
+                user = candidates[0]
+            elif len(candidates) > 1:
+                not_found.append(f"{name} (ambíguo: várias correspondências possíveis)")
+                continue
+            else:
+                not_found.append(name)
+                continue
 
         OrderOfMeritEntry.objects.update_or_create(
             player=user,
