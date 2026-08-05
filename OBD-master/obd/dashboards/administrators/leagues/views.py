@@ -20,7 +20,7 @@ import datetime
 
 from obd.dashboards.players.stats.models import Stat
 
-from decimal import decimal
+from decimal import Decimal
 from obd.dashboards.administrators.leagues.models import OrderOfMeritEntry
 
 
