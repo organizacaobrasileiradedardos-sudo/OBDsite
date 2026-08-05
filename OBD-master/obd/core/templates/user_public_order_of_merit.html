@@ -13,25 +13,19 @@ Description: This is the page where main data will remains.
 {% endblock %}
 {% block title %}OBD Order Of Merit{% endblock %}
 {% block styles %}
-
 <style>
-    .centerimg {
-        display: table-cell;
-        text-align: center;
-        vertical-align: middle;
-    }
+    .merit-pos-1 { background: linear-gradient(90deg, rgba(255,215,0,0.15), transparent); border-left: 4px solid #d4af37; }
+    .merit-pos-2 { background: linear-gradient(90deg, rgba(192,192,192,0.15), transparent); border-left: 4px solid #b0b0b0; }
+    .merit-pos-3 { background: linear-gradient(90deg, rgba(205,127,50,0.15), transparent); border-left: 4px solid #cd7f32; }
+    .merit-total { font-weight: bold; color: #14532d; }
+    .merit-empty { color: #ced4da; }
 </style>
-
-
-
 {% endblock %}
 {% block content %}
 
 <div class="container">
     <div class="row">
-
         <div class="col-6 col-md-1"></div>
-
         <div class="col-6 col-md-10">
 
             <div class="card mb-3">
@@ -42,86 +36,72 @@ Description: This is the page where main data will remains.
                     <h1 class="text-center"
                         style="font-size: 2.7rem; font-weight: bold; letter-spacing: 2px; color: #003d7a;">OBD ORDER
                         OF MERIT</h1>
-                    <p class="card-text text-center"><small class="text-muted">Ranking geral dos jogadores do
-                            OBD.</small></p>
+                    <p class="card-text text-center"><small class="text-muted">Ranking de premiação em dinheiro da
+                            Liga Nacional OBD, acumulado por etapa.</small></p>
                 </div>
             </div>
 
-            <table class="table table-striped table-bordered caption-top">
-                <caption>Estatísticas com base nos últimos 12 meses. Critérios: pontos - vitórias - média</caption>
-                <thead>
-                    <tr>
-                        <th scope="col" style="font-size: small" align="center">#</th>
-                        <th scope="col" style="font-size: small" align="center">Jogador</th>
-                        <th scope="col" style="font-size: small" align="center"><i class="bi bi-star"></i> Pontos
-                            (Merits)</th>
-                        <th scope="col" style="font-size: small" align="center">Vitórias</th>
-                        <th scope="col" style="font-size: small" align="center">Partidas</th>
-                        <th scope="col" style="font-size: small" align="center">Média</th>
-                        <th scope="col" style="font-size: small" align="center">Melhor Leg</th>
-                        <th scope="col" style="font-size: small" align="center">Melhor Fechada</th>
-                        <th scope="col" style="font-size: small" align="center">100+</th>
-                        <th scope="col" style="font-size: small" align="center">140+</th>
-                        <th scope="col" style="font-size: small" align="center">170+</th>
-                        <th scope="col" style="font-size: small" align="center">180s</th>
-                        <th scope="col" style="font-size: small" align="center">Classe</th>
-                        <th scope="col" style="font-size: small" align="center">Membro Desde</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for player in players %}
-                    <tr>
-                        <th scope="row">{{ forloop.counter }}</th>
-                        <td>
-                            <h6 style="font-size: small" align="center">{{ player.user.first_name}}
-                                {{player.user.last_name }}</h6>
-                        </td>
-                        <td>
-                            <h6 style="font-size: small" align="center">{{ player.bcmPoints }}</h6>
-                        </td>
-                        <td>
-                            <h6 style="font-size: small" align="center">{{ player.bcmWin }}</h6>
-                        </td>
-                        <td>
-                            <h6 style="font-size: small" align="center">{{ player.bcmMatches }}</h6>
-                        </td>
-                        <td>
-                            <h6 style="font-size: small" align="center">{{ player.bcmAvg }}</h6>
-                        </td>
-                        <td>
-                            <h6 style="font-size: small" align="center">{{ player.bcmLeg }}</h6>
-                        </td>
-                        <td>
-                            <h6 style="font-size: small" align="center">{{ player.bcmOut }}</h6>
-                        </td>
-                        <td>
-                            <h6 style="font-size: small" align="center">{{ player.bcmTon }}</h6>
-                        </td>
-                        <td>
-                            <h6 style="font-size: small" align="center">{{ player.bcmTon40 }}</h6>
-                        </td>
-                        <td>
-                            <h6 style="font-size: small" align="center">{{ player.bcmTon70 }}</h6>
-                        </td>
-                        <td>
-                            <h6 style="font-size: small" align="center">{{ player.bcmTon80 }}</h6>
-                        </td>
-                        <td>
-                            <h6 style="font-size: small" align="center">{{ player.get_bcmClass_display }}</h6>
-                        </td>
-                        <td>
-                            <h6 style="font-size: small" align="center">{{ player.created_at | date:"d/M/y" }}</h6>
-                        </td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-
+            <div class="table-responsive">
+                <table class="table table-striped table-bordered caption-top align-middle">
+                    <caption>Valores em R$ recebidos por jogador em cada etapa da Liga Nacional.</caption>
+                    <thead class="table-dark">
+                        <tr>
+                            <th scope="col" class="text-center">#</th>
+                            <th scope="col">Jogador</th>
+                            {% for etapa in etapas %}
+                            <th scope="col" class="text-center">{{ etapa.name }}</th>
+                            {% endfor %}
+                            <th scope="col" class="text-center">Total</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for row in ranking %}
+                        <tr class="{% if forloop.counter == 1 %}merit-pos-1{% elif forloop.counter == 2 %}merit-pos-2{% elif forloop.counter == 3 %}merit-pos-3{% endif %}">
+                            <td class="text-center">
+                                {% if forloop.counter == 1 %}
+                                <i class="bi bi-trophy-fill" style="color: #d4af37;"></i>
+                                {% elif forloop.counter == 2 %}
+                                <i class="bi bi-trophy-fill" style="color: #b0b0b0;"></i>
+                                {% elif forloop.counter == 3 %}
+                                <i class="bi bi-trophy-fill" style="color: #cd7f32;"></i>
+                                {% endif %}
+                                {{ forloop.counter }}
+                            </td>
+                            <td>
+                                {% if row.player.profile.pin and row.player.first_name and row.player.last_name %}
+                                <a href="{% url 'profiles:publicprofile' pin=row.player.profile.pin first=row.player.first_name last=row.player.last_name %}">
+                                    {{ row.player.first_name }} {{ row.player.last_name }}
+                                </a>
+                                {% else %}
+                                {{ row.player.first_name }} {{ row.player.last_name }}
+                                {% endif %}
+                                {% if not row.player.profile.is_verified %}
+                                <span class="badge bg-warning text-dark">Não Verificado</span>
+                                {% endif %}
+                            </td>
+                            {% for value in row.values %}
+                            <td class="text-center">
+                                {% if value %}
+                                R$ {{ value|floatformat:2 }}
+                                {% else %}
+                                <span class="merit-empty">—</span>
+                                {% endif %}
+                            </td>
+                            {% endfor %}
+                            <td class="text-center merit-total">R$ {{ row.total|floatformat:2 }}</td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="{{ etapas|length|add:3 }}" class="text-center">Nenhum dado de premiação importado até o momento.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
 
         </div>
     </div>
     <div class="col-6 col-md-1"></div>
-</div>
 </div>
 <p><br></p>
 
