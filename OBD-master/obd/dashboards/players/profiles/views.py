@@ -52,13 +52,18 @@ def updateconfig(request):
     profile.twitter = form.cleaned_data['social']
 
 
-    profile.nakka = form.cleaned_data['nakka']
+profile.nakka = form.cleaned_data['nakka']
+
+    # Marca como verificado automaticamente: se o jogador chegou até aqui e
+    # salvou o próprio perfil, é prova de que é uma pessoa real controlando a conta.
+    if not profile.is_verified:
+        profile.is_verified = True
+
     profile.save()
 
     # Success feedback
     messages.success(request, 'Informações atualizadas com sucesso, ')
     return HttpResponseRedirect(reverse('profiles:config'))
-
 
 def showprofile(request):
     return render(request, 'profile_view.html',
