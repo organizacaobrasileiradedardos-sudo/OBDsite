@@ -12,9 +12,13 @@
                 <div class="card-header bg-warning text-dark">
                     <i class="bi bi-patch-exclamation"></i> Reivindicar Cadastro
                 </div>
-                <div class="card-body text-white">
-                    <p>Você está reivindicando o cadastro de <strong>{{ profile.user.first_name }} {{ profile.user.last_name }}</strong>.</p>
-                    <p>Defina um e-mail e senha para poder acessar sua conta a partir de agora.</p>
+                    <div class="card-body text-white">
+                        <p>Você está reivindicando o cadastro de <strong>{{ profile.user.first_name }} {{ profile.user.last_name }}</strong>.</p>
+                        <p>Defina um e-mail e senha para poder acessar sua conta a partir de agora.</p>
+
+                    <div class="alert alert-warning text-dark" role="alert">
+                        <i class="bi bi-exclamation-triangle-fill"></i> Após a reivindicação, a OBD poderá avaliar a veracidade dos dados informados em relação ao cadastro reivindicado. Informações falsas ou reivindicações indevidas podem levar à suspensão do acesso.
+                    </div>
 
                     {% if messages %}
                     {% for message in messages %}
