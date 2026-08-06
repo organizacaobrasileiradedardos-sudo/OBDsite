@@ -23,9 +23,6 @@ class ProfileForm(forms.Form):
     nakka = forms.CharField(label='Nakka', required=True)
 
 
-
-
-
     # Checking if ID already is use on NAKKA
     def clean_nakka(self):
         nakka = self.cleaned_data['nakka']
@@ -43,3 +40,21 @@ class ProfileForm(forms.Form):
                     raise forms.ValidationError(u'ID "%s" usada por outro jogador no Nakka.' % nakka)
         else:
             return nakka
+
+class ClaimAccountForm(forms.Form):
+    email = forms.EmailField(label='Seu E-mail', required=True)
+    password = forms.CharField(label='Nova Senha', widget=forms.PasswordInput, required=True, min_length=6)
+    password2 = forms.CharField(label='Confirme a Senha', widget=forms.PasswordInput, required=True)
+
+    def clean_email(self):
+        email = self.cleaned_data['email']
+        if User.objects.filter(email__iexact=email).exists():
+            raise forms.ValidationError('Este e-mail já está em uso por outra conta.')
+        return email
+
+    def clean_password2(self):
+        p1 = self.cleaned_data.get('password')
+        p2 = self.cleaned_data.get('password2')
+        if p1 and p2 and p1 != p2:
+            raise forms.ValidationError('As senhas não conferem.')
+        return p2

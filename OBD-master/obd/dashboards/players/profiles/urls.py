@@ -21,4 +21,5 @@ app_name = 'profiles'
 urlpatterns = [
     path('dashboard/player/profile/view/', views.config, name='config'),
     path('profile/public/<str:pin>/show/<str:first>-<str:last>/', views.publicprofile, name='publicprofile'),
+    path('profile/claim/<str:pin>/', views.claim_account, name='claim_account'),
 ]

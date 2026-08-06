@@ -8,6 +8,8 @@ from obd.dashboards.administrators.results.models import Result
 from obd.dashboards.players.profiles.forms import ProfileForm
 from obd.dashboards.players.profiles.models import Profile
 from obd.dashboards.players.stats.models import Stat
+from django.contrib.auth import login as auth_login
+from obd.dashboards.players.profiles.forms import ClaimAccountForm
 import cloudinary
 import cloudinary.uploader
 import cloudinary.api
@@ -104,3 +106,35 @@ def publicprofile(request, pin, first, last):
                'graph': totals}
 
     return render(request, 'user_public_profile.html', context)
+
+def claim_account(request, pin):
+    try:
+        profile = Profile.objects.get(pin=pin)
+    except Profile.DoesNotExist:
+        messages.error(request, 'Cadastro não encontrado.')
+        return HttpResponseRedirect('/')
+
+    if profile.is_verified:
+        messages.info(request, 'Este cadastro já foi verificado. Se for você, faça login normalmente ou use "Esqueci minha senha".')
+        return HttpResponseRedirect(reverse('players:login'))
+
+    if request.method == 'POST':
+        form = ClaimAccountForm(request.POST)
+        if form.is_valid():
+            user = profile.user
+            user.email = form.cleaned_data['email']
+            user.set_password(form.cleaned_data['password'])
+            user.save()
+
+            profile.is_verified = True
+            profile.save()
+
+            user.backend = 'django.contrib.auth.backends.ModelBackend'
+            auth_login(request, user)
+
+            messages.success(request, f'Cadastro reivindicado com sucesso, {user.first_name}! Complete seu perfil abaixo.')
+            return HttpResponseRedirect(reverse('profiles:config'))
+    else:
+        form = ClaimAccountForm()
+
+    return render(request, 'claim_account.html', {'form': form, 'profile': profile})    
