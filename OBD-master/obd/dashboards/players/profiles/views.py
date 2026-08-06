@@ -50,9 +50,7 @@ def updateconfig(request):
     profile.facebook = form.cleaned_data['facebook']
     profile.site = form.cleaned_data['site']
     profile.twitter = form.cleaned_data['social']
-
-
-profile.nakka = form.cleaned_data['nakka']
+    profile.nakka = form.cleaned_data['nakka']
 
     # Marca como verificado automaticamente: se o jogador chegou até aqui e
     # salvou o próprio perfil, é prova de que é uma pessoa real controlando a conta.
