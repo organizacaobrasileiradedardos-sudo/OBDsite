@@ -175,7 +175,7 @@
                                     </span>
                                     {% endif %}
                                     <span class="badge badge-dartboard badge-red rounded-pill">
-                                        {{ line.bcmAvg | floatformat:"2" }}
+                                        {{ line.value | floatformat:"2" }}
                                     </span>
                                 </li>
                                 {% endfor %}
@@ -204,7 +204,7 @@
                                     </span>
                                     {% endif %}
                                     <span class="badge badge-dartboard badge-green rounded-pill">
-                                        {{ line.bcmOut }}
+                                        {{ line.value }}
                                     </span>
                                 </li>
                                 {% endfor %}
@@ -235,7 +235,7 @@
                                     </span>
                                     {% endif %}
                                     <span class="badge badge-dartboard badge-gold rounded-pill">
-                                        {{ line.bcmTon80 }}
+                                        {{ line.value }}
                                     </span>
                                 </li>
                                 {% endfor %}

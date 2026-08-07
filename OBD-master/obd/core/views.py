@@ -93,11 +93,22 @@ def index(request):
     else:
         tournament_standings = []
 
-    stats = Stat.objects.all()
+    t_stats_qs = PlayerTournamentStat.objects.filter(player__isnull=False)
 
-    stats_out = stats.order_by('-bcmOut')[:5]
-    stats_180 = stats.order_by('-bcmTon80')[:5]
-    stats_avg = stats.order_by('-bcmAvg')[:5]
+    def _leaderboard(field, agg_func, limit=5):
+        rows = t_stats_qs.values('player').annotate(value=agg_func(field)).order_by('-value')[:limit]
+        result = []
+        for row in rows:
+            try:
+                user = User.objects.select_related('profile').get(id=row['player'])
+            except User.DoesNotExist:
+                continue
+            result.append({'user': user, 'value': row['value']})
+        return result
+
+    stats_avg = _leaderboard('average_3_dart', Max)
+    stats_out = _leaderboard('high_finish', Max)
+    stats_180 = _leaderboard('count_180', Sum)
 
     matches = Fixture.objects.filter(status=1).order_by('-on_date')[:6]
 
