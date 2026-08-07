@@ -26,7 +26,8 @@ import pandas as pd
 
 @login_required()
 def dashboard(request):
-    stat = Stat.objects.get(user=request.user)
+    fullname = request.user.first_name + '-' + request.user.last_name
+
     # === Estatísticas de Torneios (PlayerTournamentStat) ===
     from django.db.models import Sum, Max, Min, Count, F
     from obd.core.models import PlayerTournamentStat
@@ -75,27 +76,6 @@ def dashboard(request):
             'best_leg': best_leg_qs['best_leg'],
             'recent_form': recent_form,
         }
-    total = stat.divAwinner+stat.divBwinner+stat.divCwinner+stat.divDwinner+stat.divOtherswinner
-    fullname = request.user.first_name+'-'+request.user.last_name
-
-    labels = []
-    data = []
-    title = ''
-    averages = Result.objects.filter(validation=1, player=request.user, average__gt=0).order_by('-on_date')[:10]
-    totals = averages.count()
-    if totals > 0:
-        for label in range(totals):
-            label = label + 1
-            labels.append(f'Jogo {label}')
-
-        for average in averages:
-            data.append(float(average.average))
-
-        data = list(reversed(data))
-        min_data = min(data)
-        max_data = max(data)
-        avg = request.user.stat.bcmAvg
-        title = f'Mín: {min_data}, Média: {avg}, Máx: {max_data}'
 
     # QR Code Generation
     qr_code_base64 = None
@@ -135,14 +115,9 @@ def dashboard(request):
             print(f"Error generating QR code: {e}")
             qr_code_base64 = None
 
-        context = {'total': total,
-                   'fullname': fullname,
-                   'labels': labels,
-                   'data': data,
-                   'title': title,
-                   'graph': totals,
-                   'qr_code': qr_code_base64,
-                   'tournament_summary': tournament_summary}
+    context = {'fullname': fullname,
+               'qr_code': qr_code_base64,
+               'tournament_summary': tournament_summary}
 
     return render(request, 'dashuser.html', context)
 

@@ -284,99 +284,11 @@
 
     <p><br></p>
 
-    <h5><strong><i class="bi bi-list-stars"></i> Estatísticas de {{ user.first_name }} {{ user.last_name }}</strong>
-    </h5>
-
-
-    <table class="table">
-        <thead>
-            <tr>
-                <th scope="col" style="text-align: center; vertical-align: middle;">#ID</th>
-                <th scope="col" style="text-align: center; vertical-align: middle;">Classe</th>
-                <th scope="col" style="text-align: center; vertical-align: middle;">OBD Score</th>
-                <th scope="col" style="text-align: center; vertical-align: middle;">Best Leg</th>
-                <th scope="col" style="text-align: center; vertical-align: middle;">Melhor Fechada</th>
-                <th scope="col" style="text-align: center; vertical-align: middle;">Média</th>
-                <th scope="col" style="text-align: center; vertical-align: middle;">Títulos</th>
-                <th scope="col" style="text-align: center; vertical-align: middle;">Jogos</th>
-                <th scope="col" style="text-align: center; vertical-align: middle;">Triunfos</th>
-                <th scope="col" style="text-align: center; vertical-align: middle;">100+</th>
-                <th scope="col" style="text-align: center; vertical-align: middle;">140+</th>
-                <th scope="col" style="text-align: center; vertical-align: middle;">170+</th>
-                <th scope="col" style="text-align: center; vertical-align: middle;">180+</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr>
-                <td scope="row" style="text-align: center; vertical-align: middle;">{{ user.id }}</td>
-                <td style="text-align: center; vertical-align: middle;">{{ user.stat.get_bcmClass_display }}</td>
-                <td style="text-align: center; vertical-align: middle;">{{ user.stat.bcmPoints }}</td>
-                <td style="text-align: center; vertical-align: middle;">{{ user.stat.bcmLeg }}</td>
-                <td style="text-align: center; vertical-align: middle;">{{ user.stat.bcmOut }}</td>
-                <td style="text-align: center; vertical-align: middle;">{{ user.stat.bcmAvg | floatformat:"2" }}</td>
-                <td style="text-align: center; vertical-align: middle;">{{ total }}</td>
-                <td style="text-align: center; vertical-align: middle;">{{ user.stat.leagueParticipation }}</td>
-                <td style="text-align: center; vertical-align: middle;">{{ user.stat.bcmWin }}</td>
-                <td style="text-align: center; vertical-align: middle;">{{ user.stat.bcmTon }}</td>
-                <td style="text-align: center; vertical-align: middle;">{{ user.stat.bcmTon40 }}</td>
-                <td style="text-align: center; vertical-align: middle;">{{ user.stat.bcmTon70 }}</td>
-                <td style="text-align: center; vertical-align: middle;">{{ user.stat.bcmTon80 }}</td>
-
-            </tr>
-        </tbody>
-    </table>
-    <p><br></p>
-    <h5><strong><i class="bi bi-graph-up"></i> Histórico das médias (10 jogos) | {{ title }}</strong></h5>
-    <p><br></p>
-    {% if graph %}
-    <div>
-        <canvas id="myChart"></canvas>
-        <p><br></p>
-    </div>
-    {% else %}
-    <p>Sem jogos registrados no momento.</p>
-    {% endif %}
-
 </div>
 
 
 
 {% endblock %}
 {% block jslib %}
-
-
-{% if graph %}
-<script src="https://cdn.jsdelivr.net/npm/chart.js@3.5.1/dist/chart.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
-<script>
-    var ctx = document.getElementById('myChart');
-    var myChart = new Chart(ctx, {
-        type: 'line',
-        data: {
-            labels: {{ labels | safe }},
-    datasets: [{
-        label: 'Médias (AVG)',
-        data: {{ data | safe }},
-        fill: true,
-        backgroundColor: [
-        'rgba(99,143,255,0.2)',
-    ],
-        borderColor: [
-        'rgb(14,41,103)',
-    ],
-        borderWidth: 3
-            }]
-        },
-    options: {
-        scales: {
-            y: {
-                beginAtZero: false
-            }
-        }
-    }
-    });
-</script>
-{% endif %}
 
 {% endblock %}
