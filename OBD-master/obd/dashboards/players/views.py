@@ -27,6 +27,54 @@ import pandas as pd
 @login_required()
 def dashboard(request):
     stat = Stat.objects.get(user=request.user)
+    # === Estatísticas de Torneios (PlayerTournamentStat) ===
+    from django.db.models import Sum, Max, Min, Count, F
+    from obd.core.models import PlayerTournamentStat
+
+    t_stats = PlayerTournamentStat.objects.filter(player=request.user)
+    tournament_summary = None
+
+    if t_stats.exists():
+        agg = t_stats.aggregate(
+            tournaments=Count('id'),
+            matches_played=Sum('matches_played'),
+            matches_won=Sum('matches_won'),
+            legs_played=Sum('legs_played'),
+            legs_won=Sum('legs_won'),
+            legs_diff=Sum('legs_diff'),
+            total_180=Sum('count_180'),
+            total_140=Sum('count_140_plus'),
+            total_100=Sum('count_100_plus'),
+            total_100_finish=Sum('count_100_plus_finish'),
+            best_avg=Max('average_3_dart'),
+            highest_out=Max('high_finish'),
+            most_180_single=Max('count_180'),
+            best_rank=Min('rank'),
+        )
+
+        best_leg_qs = t_stats.filter(best_leg__gt=0).aggregate(best_leg=Min('best_leg'))
+
+        win_rate = 0
+        if agg['matches_played']:
+            win_rate = round((agg['matches_won'] / agg['matches_played']) * 100, 1)
+
+        career_avg = 0
+        if agg['legs_played']:
+            weighted = t_stats.aggregate(w=Sum(F('average_3_dart') * F('legs_played')))['w'] or 0
+            career_avg = round(weighted / agg['legs_played'], 2)
+
+        titles = t_stats.filter(rank=1).count()
+
+        recent_form = t_stats.select_related('tournament').order_by('-tournament__date')[:3]
+
+        tournament_summary = {
+            **agg,
+            'win_rate': win_rate,
+            'career_avg': career_avg,
+            'titles': titles,
+            'best_leg': best_leg_qs['best_leg'],
+            'recent_form': recent_form,
+        }
     total = stat.divAwinner+stat.divBwinner+stat.divCwinner+stat.divDwinner+stat.divOtherswinner
     fullname = request.user.first_name+'-'+request.user.last_name
 
@@ -87,13 +135,14 @@ def dashboard(request):
             print(f"Error generating QR code: {e}")
             qr_code_base64 = None
 
-    context = {'total': total,
-               'fullname': fullname,
-               'labels': labels,
-               'data': data,
-               'title': title,
-               'graph': totals,
-               'qr_code': qr_code_base64}
+        context = {'total': total,
+                   'fullname': fullname,
+                   'labels': labels,
+                   'data': data,
+                   'title': title,
+                   'graph': totals,
+                   'qr_code': qr_code_base64,
+                   'tournament_summary': tournament_summary}
 
     return render(request, 'dashuser.html', context)
 
