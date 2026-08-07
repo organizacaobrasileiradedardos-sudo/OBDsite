@@ -215,6 +215,7 @@ class N01TournamentScraper:
             PlayerTournamentStat.objects.create(
                 tournament=tournament,
                 player_name=name,
+                player=user_obj,
                 rank=rank_val if rank_val > 0 else 999,
                 matches_played=p_data['matches_played'],
                 matches_won=p_data['matches_won'],

@@ -1,5 +1,8 @@
 from django.db import models
 from django.utils import timezone
+from django.contrib.auth.models import User
+from django.db import models
+from django.utils import timezone
 
 
 class Event(models.Model):
@@ -107,6 +110,7 @@ class PlayerTournamentStat(models.Model):
     """Model for storing player stats in a tournament"""
     tournament = models.ForeignKey(TournamentResult, on_delete=models.CASCADE, related_name='stats')
     player_name = models.CharField('Nome do Jogador', max_length=100)
+    player = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='tournament_stats')
     rank = models.IntegerField('Classificação')
     
     # Match Stats
