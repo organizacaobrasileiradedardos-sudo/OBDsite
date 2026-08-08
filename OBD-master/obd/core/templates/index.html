@@ -163,11 +163,16 @@
                                 {% for line in stats_avg %}
                                 <li class="list-group-item d-flex justify-content-between align-items-center">
                                     {% if line.user.profile.pin and line.user.first_name and line.user.last_name %}
-                                    <a
-                                        href="{% url 'profiles:publicprofile' pin=line.user.profile.pin first=line.user.first_name last=line.user.last_name %}">
+                                    <a href="{% url 'profiles:publicprofile' pin=line.user.profile.pin first=line.user.first_name last=line.user.last_name %}">
                                         <span class="fw-bold text-muted me-2">{{ forloop.counter }}º</span>
                                         {{ line.user.first_name }} {{ line.user.last_name }}
                                     </a>
+                                    {% elif line.user.profile.pin and not line.user.profile.is_verified %}
+                                    <span>
+                                        <span class="fw-bold text-muted me-2">{{ forloop.counter }}º</span>
+                                        {{ line.user.first_name }} {{ line.user.last_name }}
+                                        <a href="{% url 'profiles:claim_account' pin=line.user.profile.pin %}" class="small">(é você? reivindique)</a>
+                                    </span>
                                     {% else %}
                                     <span>
                                         <span class="fw-bold text-muted me-2">{{ forloop.counter }}º</span>
