@@ -174,7 +174,7 @@
                                         {{ line.user.first_name }} {{ line.user.last_name }}
                                     </span>
                                     {% endif %}
-                                    <span class="badge badge-dartboard badge-gold rounded-pill" style="font-size: 1rem;">
+                                    <span class="badge badge-dartboard badge-red rounded-pill">
                                         {{ line.value | floatformat:"2" }}
                                     </span>
                                 </li>
@@ -234,7 +234,7 @@
                                         {{ line.user.first_name }} {{ line.user.last_name }}
                                     </span>
                                     {% endif %}
-                                   <span class="badge badge-dartboard badge-gold rounded-pill" style="font-size: 1rem;">
+                                    <span class="badge badge-dartboard badge-gold rounded-pill" style="font-size: 1rem;">
                                         {{ line.value }}
                                     </span>
                                 </li>
@@ -274,7 +274,7 @@
                             <ul class="list-group list-group-flush">
                                 <li class="list-group-item d-flex justify-content-between align-items-center">
                                     Média Geral
-                                    <span class="badge bg-primary rounded-pill">
+                                    <span class="badge bg-primary rounded-pill" style="font-size: 1rem;">
                                         {% if tournament_stats %}
                                         {{ tournament_stats.average|floatformat:"2" }}
                                         {% else %}
@@ -288,7 +288,7 @@
                                 </li>
                                 <li class="list-group-item d-flex justify-content-between align-items-center">
                                     Partidas
-                                    <span class="badge bg-primary rounded-pill">
+                                    <span class="badge bg-primary rounded-pill" style="font-size: 1rem;">
                                         {% if tournament_stats %}
                                         {{ tournament_stats.matches }}
                                         {% else %}
@@ -298,7 +298,7 @@
                                 </li>
                                 <li class="list-group-item d-flex justify-content-between align-items-center">
                                     Legs
-                                    <span class="badge bg-primary rounded-pill">
+                                    <span class="badge bg-primary rounded-pill" style="font-size: 1rem;">
                                         {% if tournament_stats %}
                                         {{ tournament_stats.legs }}
                                         {% else %}
@@ -308,7 +308,7 @@
                                 </li>
                                 <li class="list-group-item d-flex justify-content-between align-items-center">
                                     Jogadores
-                                    <span class="badge bg-primary rounded-pill">
+                                    <span class="badge bg-primary rounded-pill" style="font-size: 1rem;">
                                         {% if tournament_stats %}
                                         {{ tournament_stats.players }}
                                         {% else %}
@@ -325,7 +325,7 @@
                             <ul class="list-group list-group-flush">
                                 <li class="list-group-item d-flex justify-content-between align-items-center">
                                     100+
-                                    <span class="badge bg-primary rounded-pill">
+                                    <span class="badge bg-primary rounded-pill" style="font-size: 1rem;">
                                         {% if tournament_stats %}
                                         {{ tournament_stats.ton }}
                                         {% else %}
@@ -335,7 +335,7 @@
                                 </li>
                                 <li class="list-group-item d-flex justify-content-between align-items-center">
                                     140+
-                                    <span class="badge bg-primary rounded-pill">
+                                    <span class="badge bg-primary rounded-pill" style="font-size: 1rem;">
                                         {% if tournament_stats %}
                                         {{ tournament_stats.ton40 }}
                                         {% else %}
@@ -345,7 +345,7 @@
                                 </li>
                                 <li class="list-group-item d-flex justify-content-between align-items-center">
                                     170+
-                                    <span class="badge bg-primary rounded-pill">
+                                    <span class="badge bg-primary rounded-pill" style="font-size: 1rem;"> 
                                         {% if tournament_stats %}
                                         {{ tournament_stats.ton70 }}
                                         {% else %}
@@ -355,7 +355,7 @@
                                 </li>
                                 <li class="list-group-item d-flex justify-content-between align-items-center">
                                     180s
-                                    <span class="badge bg-danger rounded-pill">
+                                    <span class="badge bg-danger rounded-pill" style="font-size: 1rem;">
                                         {% if tournament_stats %}
                                         {{ tournament_stats.ton80 }}
                                         {% else %}
@@ -373,15 +373,15 @@
                             <ul class="list-group list-group-flush">
                                 <li class="list-group-item d-flex justify-content-between align-items-center">
                                     Maior Fechamento
-                                    <span class="badge bg-primary rounded-pill">{{ ts.highest_out }}</span>
+                                    <span class="badge bg-primary rounded-pill" style="font-size: 1rem;">{{ ts.highest_out }}</span>
                                 </li>
                                 <li class="list-group-item d-flex justify-content-between align-items-center">
                                     Melhor Leg (Dardos)
-                                    <span class="badge bg-primary rounded-pill">{{ ts.best_leg }}</span>
+                                    <span class="badge bg-primary rounded-pill" style="font-size: 1rem;">{{ ts.best_leg }}</span>
                                 </li>
                                 <li class="list-group-item d-flex justify-content-between align-items-center">
                                     Melhor Média
-                                    <span class="badge bg-primary rounded-pill">{{ ts.best_avg|floatformat:"2" }}</span>
+                                    <span class="badge bg-primary rounded-pill" style="font-size: 1rem;">{{ ts.best_avg|floatformat:"2" }}</span>
                                 </li>
                             </ul>
                             {% else %}
@@ -389,10 +389,10 @@
                             <ul class="list-group list-group-flush">
 
                                 <li class="list-group-item d-flex justify-content-between align-items-center">Nakka
-                                    <span class="badge bg-primary rounded-pill">{{ server.nakka }}</span>
+                                    <span class="badge bg-primary rounded-pill" style="font-size: 1rem;">{{ server.nakka }}</span>
                                 </li>
                                 <li class="list-group-item d-flex justify-content-between align-items-center">Manual
-                                    <span class="badge bg-primary rounded-pill">{{ server.manual }}</span>
+                                    <span class="badge bg-primary rounded-pill" style="font-size: 1rem;">{{ server.manual }}</span>
                                 </li>
                             </ul>
                             {% endif %}
