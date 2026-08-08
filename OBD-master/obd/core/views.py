@@ -36,6 +36,29 @@ def index(request):
         average=avg,
     )
 
+    # === Campeões atuais por Divisão (A, B, C, D) - sempre a etapa mais recente de cada divisão ===
+    division_champions = []
+    for div_letter in ['A', 'B', 'C', 'D']:
+        latest_div_tournament = TournamentResult.objects.filter(
+            name__icontains=f'DIVISÃO {div_letter}'
+        ).order_by('-date').first()
+
+        if not latest_div_tournament:
+            continue
+
+        champion_stat = latest_div_tournament.stats.filter(rank=1).first()
+        if not champion_stat:
+            continue
+
+        division_champions.append({
+            'division': div_letter,
+            'tournament_name': latest_div_tournament.name,
+            'champion_name': champion_stat.player_name,
+            'champion_avg': champion_stat.average_3_dart,
+            'champion_matches_won': champion_stat.matches_won,
+            'champion_legs_won': champion_stat.legs_won,
+        })
+
     # NEW: Tournament Statistics Logic (Campeonato Brasileiro 2025)
     all_tournaments = TournamentResult.objects.order_by('-date')
     
@@ -161,6 +184,7 @@ def index(request):
                 'tournament_stats': tournament_stats,
                 'tournament_standings': tournament_standings, # Top 10 standings
                 'all_tournaments': all_tournaments,
+                'division_champions': division_champions,
                 'selected_tournament_id': int(selected_tournament_id) if selected_tournament_id else (latest_tournament.id if latest_tournament else None),
                 }
 

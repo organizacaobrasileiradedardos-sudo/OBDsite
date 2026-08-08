@@ -418,6 +418,47 @@
                 </div>
             </div>
 
+            <!-- Champions by Division -->
+            {% if division_champions %}
+            <div class="mb-5">
+                <h3 class="text-center mb-4 fw-bold"><i class="bi bi-trophy-fill text-dartboard-gold"></i> Campeões Atuais por Divisão</h3>
+                <div class="row g-4">
+                    {% for champ in division_champions %}
+                    <div class="col-md-3">
+                        <div class="card card-dartboard border-warning h-100">
+                            <div class="card-header card-header-dartboard gold text-center py-2">
+                                <h6 class="mb-0"><i class="bi bi-trophy-fill text-warning"></i> Divisão {{ champ.division }}</h6>
+                            </div>
+                            <div class="card-body text-center py-4">
+                                <h4 class="fw-bold text-dartboard-gold mb-3">{{ champ.champion_name|upper }}</h4>
+                                <div class="row">
+                                    <div class="col-4">
+                                        <i class="bi bi-graph-up text-dartboard-red"></i>
+                                        <div class="small text-muted">Média</div>
+                                        <div class="fw-bold">{{ champ.champion_avg|floatformat:"2" }}</div>
+                                    </div>
+                                    <div class="col-4">
+                                        <i class="bi bi-trophy text-dartboard-green"></i>
+                                        <div class="small text-muted">Vitórias</div>
+                                        <div class="fw-bold">{{ champ.champion_matches_won }}</div>
+                                    </div>
+                                    <div class="col-4">
+                                        <i class="bi bi-check-circle text-dartboard-gold"></i>
+                                        <div class="small text-muted">Legs</div>
+                                        <div class="fw-bold">{{ champ.champion_legs_won }}</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="card-footer text-center text-muted small">
+                                {{ champ.tournament_name }}
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+
             <!-- Tournament Champion Highlight -->
             {% if tournament_stats.champion_name %}
             {% with ts=tournament_stats %}
