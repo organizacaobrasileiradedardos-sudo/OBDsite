@@ -150,7 +150,7 @@
             <div class="mb-5">
                 <h3 class="text-center mb-4 fw-bold"><i class="bi bi-person-lines-fill text-dartboard-red"></i>
                     Estatísticas
-                    dos Jogadores</h3>
+                    OBD</h3>
                 <div class="row g-4">
                     <!-- Best Averages -->
                     <div class="col-md-4">
@@ -245,7 +245,7 @@
                 </div>
             </div>
 
-            <!-- OBD Stats -->
+            <!-- Stats ETAPAS-->
             <div class="mb-5" id="obd-stats">
                 <div class="d-flex justify-content-center mb-3">
                     <form method="GET" action="{% url 'index' %}" class="d-inline-group w-100"
@@ -262,8 +262,9 @@
                     </form>
                 </div>
                 <h3 class="text-center mb-4 fw-bold">
-                    <i class="bi bi-graph-up text-accent"></i> Estatísticas OBD
+                    <i class="bi bi-graph-up text-accent"></i> Estatísticas do Torneio/Campeonato
                     {% if tournament_stats %}
+                    <br>
                     <small class="text-muted fs-6">({{ tournament_stats.name }})</small>
                     {% endif %}
                 </h3>
