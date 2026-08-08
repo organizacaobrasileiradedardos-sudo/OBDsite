@@ -11,6 +11,7 @@ from obd.dashboards.administrators.leagues.models import League
 import pandas as pd 
 from decimal import Decimal, InvalidOperation
 from obd.dashboards.administrators.leagues.models import League, OrderOfMeritEntry
+from obd.dashboards.administrators.leagues.models import NationalRankingEntry
 
 @login_required()
 @permission_required('profiles.has_admin_role', raise_exception=True)
@@ -174,3 +175,100 @@ def import_order_of_merit(request):
     return redirect('administrators:order_of_merit_dashboard')
 
 
+@login_required
+@permission_required('profiles.has_admin_role', raise_exception=True)
+def national_ranking_dashboard(request):
+    leagues = League.objects.all().order_by('-start_date')
+    return render(request, 'national_ranking_dashboard.html', {'leagues': leagues})
+
+
+@login_required
+@permission_required('profiles.has_admin_role', raise_exception=True)
+def import_national_ranking(request):
+    if request.method != 'POST':
+        return redirect('administrators:national_ranking_dashboard')
+
+    league_id = request.POST.get('league_id')
+    excel_file = request.FILES.get('file')
+
+    if not league_id or not excel_file:
+        messages.error(request, "Selecione o torneio e o arquivo antes de importar.")
+        return redirect('administrators:national_ranking_dashboard')
+
+    try:
+        league = League.objects.get(id=league_id)
+    except League.DoesNotExist:
+        messages.error(request, "Torneio não encontrado.")
+        return redirect('administrators:national_ranking_dashboard')
+
+    try:
+        df = pd.read_excel(excel_file)
+    except Exception as e:
+        messages.error(request, f"Não foi possível ler o arquivo: {e}")
+        return redirect('administrators:national_ranking_dashboard')
+
+    df.columns = [str(c).strip().lower() for c in df.columns]
+
+    col_pos = next((c for c in df.columns if 'pos' in c or 'coloca' in c), None)
+    col_player = next((c for c in df.columns if 'jogador' in c or 'nome' in c), None)
+    col_points = next((c for c in df.columns if 'ponto' in c or 'valor' in c), None)
+
+    if not col_player or not col_points:
+        messages.error(request, "Não foi possível identificar as colunas 'Jogador' e 'Pontos' na planilha.")
+        return redirect('administrators:national_ranking_dashboard')
+
+    matched = 0
+    not_found = []
+
+    for _, row in df.iterrows():
+        name = str(row[col_player]).strip()
+        if not name or name.lower() == 'nan':
+            continue
+
+        raw_points = row[col_points]
+        try:
+            points = Decimal(str(raw_points).replace(',', '.').strip())
+        except (InvalidOperation, ValueError):
+            not_found.append(f"{name} (valor inválido: {raw_points})")
+            continue
+
+        position = None
+        if col_pos:
+            try:
+                position = int(row[col_pos])
+            except (ValueError, TypeError):
+                position = None
+
+        pin = name.replace(' ', '').lower()
+        user = User.objects.filter(username__iexact=pin).first()
+
+        if not user:
+            candidates = list(User.objects.filter(username__istartswith=pin))
+            if not candidates:
+                pin_no_accent = _strip_accents(pin)
+                candidates = [
+                    u for u in User.objects.only('id', 'username')
+                    if _strip_accents(u.username.lower()).startswith(pin_no_accent)
+                ]
+            if len(candidates) == 1:
+                user = candidates[0]
+            elif len(candidates) > 1:
+                not_found.append(f"{name} (ambíguo: várias correspondências possíveis)")
+                continue
+
+        if not user:
+            not_found.append(name)
+            continue
+
+        NationalRankingEntry.objects.update_or_create(
+            player=user,
+            league=league,
+            defaults={'points': points, 'position_in_stage': position}
+        )
+        matched += 1
+
+    messages.success(request, f"Importação concluída: {matched} jogadores atualizados no torneio {league.name}.")
+    if not_found:
+        messages.warning(request, f"{len(not_found)} nomes não encontrados no cadastro: {', '.join(not_found)}")
+
+    return redirect('administrators:national_ranking_dashboard')
