@@ -70,7 +70,7 @@ class OrderOfMeritEntry(models.Model):
     def __str__(self):
         return f"{self.player} - {self.league.name}: R$ {self.value}"
 
- class NationalRankingEntry(models.Model):
+class NationalRankingEntry(models.Model):
     """Registra os pontos que um jogador recebeu em uma etapa (League) do Ranking Nacional OBD."""
 
     player = models.ForeignKey(User, on_delete=models.CASCADE, related_name='national_ranking_entries')
