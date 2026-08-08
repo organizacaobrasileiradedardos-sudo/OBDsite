@@ -459,47 +459,6 @@
             </div>
             {% endif %}
 
-            <!-- Tournament Champion Highlight -->
-            {% if tournament_stats.champion_name %}
-            {% with ts=tournament_stats %}
-            <div class="mb-5">
-                <div class="card card-dartboard border-warning shadow-lg">
-                    <div class="card-header card-header-dartboard gold text-center py-3">
-                         <h4 class="mb-0"><i class="bi bi-trophy-fill text-warning"></i> Campeão do {{ ts.name }}</h4>
-                    </div>
-                    <div class="card-body text-center py-5 bg-gradient">
-                        <h1 class="display-3 fw-bold text-dartboard-gold mb-4">
-                            {{ ts.champion_name|upper }}
-                        </h1>
-                        <div class="row justify-content-center">
-                            <div class="col-md-3">
-                                <div class="p-3">
-                                    <i class="bi bi-graph-up fs-2 text-dartboard-red"></i>
-                                    <h5 class="mt-2 mb-1 text-muted">Média</h5>
-                                    <h3 class="fw-bold">{{ ts.champion_avg|floatformat:"2" }}</h3>
-                                </div>
-                            </div>
-                            <div class="col-md-3">
-                                <div class="p-3">
-                                    <i class="bi bi-trophy fs-2 text-dartboard-green"></i>
-                                    <h5 class="mt-2 mb-1 text-muted">Partidas Vencidas</h5>
-                                    <h3 class="fw-bold">{{ ts.champion_matches_won }}</h3>
-                                </div>
-                            </div>
-                            <div class="col-md-3">
-                                <div class="p-3">
-                                    <i class="bi bi-check-circle fs-2 text-dartboard-gold"></i>
-                                    <h5 class="mt-2 mb-1 text-muted">Legs Vencidos</h5>
-                                    <h3 class="fw-bold">{{ ts.champion_legs_won }}</h3>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            {% endwith %}
-            {% endif %}
-
             <!-- Tournament Standings -->
             {% if tournament_standings %}
             <div class="mb-5" id="tournament-standings">
