@@ -19,4 +19,5 @@ urlpatterns = [
     path('dashboard/admin/match/<int:match>/walkover/<int:win>/<int:los>/application', views.walkover, name='walkover'),
     path('dashboard/admin/match/<int:match>/draw/application', views.draw, name='draw'),
     path('dashboard/admin/league/management', views.manageleagues, name='management'),
+    path('dashboard/public/obd/national/ranking/view', views.national_ranking, name='national_ranking'),
 ]

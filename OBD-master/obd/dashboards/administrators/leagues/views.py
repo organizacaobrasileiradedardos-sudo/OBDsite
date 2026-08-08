@@ -22,7 +22,7 @@ from obd.dashboards.players.stats.models import Stat
 
 from decimal import Decimal
 from obd.dashboards.administrators.leagues.models import OrderOfMeritEntry
-
+from obd.dashboards.administrators.leagues.models import NationalRankingEntry
 
 @login_required()
 @permission_required('profiles.has_admin_role', raise_exception=True)
@@ -641,6 +641,42 @@ def orderofmerit(request):
     }
     return render(request, 'user_public_order_of_merit.html', context)
 
+
+def national_ranking(request):
+    etapas = League.objects.filter(
+        national_ranking_entries__isnull=False
+    ).distinct().order_by('start_date')
+
+    entries = NationalRankingEntry.objects.select_related('player', 'player__profile', 'league')
+
+    player_data = {}
+    for entry in entries:
+        pid = entry.player_id
+        if pid not in player_data:
+            player_data[pid] = {
+                'player': entry.player,
+                'values_by_league': {},
+                'total': Decimal('0'),
+            }
+        player_data[pid]['values_by_league'][entry.league_id] = entry.points
+        player_data[pid]['total'] += entry.points
+
+    ranking = []
+    for data in player_data.values():
+        values = [data['values_by_league'].get(etapa.id) for etapa in etapas]
+        ranking.append({
+            'player': data['player'],
+            'values': values,
+            'total': data['total'],
+        })
+
+    ranking.sort(key=lambda x: x['total'], reverse=True)
+
+    context = {
+        'etapas': etapas,
+        'ranking': ranking,
+    }
+    return render(request, 'user_public_national_ranking.html', context)
 
 @login_required()
 @permission_required('profiles.has_admin_role', raise_exception=True)
