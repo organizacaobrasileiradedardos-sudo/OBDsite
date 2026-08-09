@@ -179,7 +179,7 @@ def import_order_of_merit(request):
 @login_required
 @permission_required('profiles.has_admin_role', raise_exception=True)
 def national_ranking_dashboard(request):
-    return render(request, 'national_ranking_dashboard.html', {'leagues': leagues})
+    return render(request, 'national_ranking_dashboard.html')
 
 
 @login_required
