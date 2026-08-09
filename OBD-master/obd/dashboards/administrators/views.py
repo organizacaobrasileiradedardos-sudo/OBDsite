@@ -9,6 +9,7 @@ from obd.dashboards.administrators.enviroments.models import Enviroment
 from obd.dashboards.administrators.fixtures.models import Fixture
 from obd.dashboards.administrators.leagues.models import League
 import pandas as pd 
+import datetime
 from decimal import Decimal, InvalidOperation
 from obd.dashboards.administrators.leagues.models import League, OrderOfMeritEntry
 from obd.dashboards.administrators.leagues.models import NationalRankingEntry
@@ -178,7 +179,6 @@ def import_order_of_merit(request):
 @login_required
 @permission_required('profiles.has_admin_role', raise_exception=True)
 def national_ranking_dashboard(request):
-    leagues = League.objects.all().order_by('-start_date')
     return render(request, 'national_ranking_dashboard.html', {'leagues': leagues})
 
 
@@ -188,33 +188,71 @@ def import_national_ranking(request):
     if request.method != 'POST':
         return redirect('administrators:national_ranking_dashboard')
 
-    league_id = request.POST.get('league_id')
     excel_file = request.FILES.get('file')
 
-    if not league_id or not excel_file:
-        messages.error(request, "Selecione o torneio e o arquivo antes de importar.")
+    if not excel_file:
+        messages.error(request, "Selecione o arquivo antes de importar.")
         return redirect('administrators:national_ranking_dashboard')
 
     try:
-        league = League.objects.get(id=league_id)
-    except League.DoesNotExist:
-        messages.error(request, "Torneio não encontrado.")
-        return redirect('administrators:national_ranking_dashboard')
-
-    try:
-        df = pd.read_excel(excel_file)
+        df_raw = pd.read_excel(excel_file, header=None)
     except Exception as e:
         messages.error(request, f"Não foi possível ler o arquivo: {e}")
+        return redirect('administrators:national_ranking_dashboard')
+
+    # Linha 1 (índice 0): Torneio | Nome
+    # Linha 2 (índice 1): Data | Data
+    # Linha 4 (índice 3): Colocação | Jogador | Pontos
+    try:
+        tournament_name = str(df_raw.iloc[0, 1]).strip()
+        raw_date = df_raw.iloc[1, 1]
+    except (IndexError, KeyError):
+        messages.error(request, "Formato inválido: verifique as linhas de Torneio e Data no início do arquivo.")
+        return redirect('administrators:national_ranking_dashboard')
+
+    if not tournament_name or tournament_name.lower() == 'nan':
+        messages.error(request, "Nome do torneio não encontrado na linha 1.")
+        return redirect('administrators:national_ranking_dashboard')
+
+    if isinstance(raw_date, (datetime.datetime, datetime.date)):
+        tournament_date = raw_date.date() if isinstance(raw_date, datetime.datetime) else raw_date
+    else:
+        try:
+            tournament_date = datetime.datetime.strptime(str(raw_date).strip(), '%d/%m/%Y').date()
+        except ValueError:
+            messages.error(request, f"Data inválida na linha 2: '{raw_date}'. Use o formato DD/MM/AAAA.")
+            return redirect('administrators:national_ranking_dashboard')
+
+    # Get or create the League (torneio)
+    slug = tournament_name.lower().replace(' ', '-')
+    league, created = League.objects.get_or_create(
+        name=tournament_name,
+        defaults={
+            'slug': slug,
+            'start_date': tournament_date,
+            'end_date': tournament_date,
+            'runoff': 1,
+            'phase': 4,
+            'scope': 0,
+            'status': True,
+        }
+    )
+
+    # Linha 4 (índice 3) em diante = tabela de jogadores
+    try:
+        df = pd.read_excel(excel_file, skiprows=3)
+    except Exception as e:
+        messages.error(request, f"Não foi possível ler a tabela de jogadores: {e}")
         return redirect('administrators:national_ranking_dashboard')
 
     df.columns = [str(c).strip().lower() for c in df.columns]
 
     col_pos = next((c for c in df.columns if 'pos' in c or 'coloca' in c), None)
     col_player = next((c for c in df.columns if 'jogador' in c or 'nome' in c), None)
-    col_points = next((c for c in df.columns if 'ponto' in c or 'valor' in c), None)
+    col_points = next((c for c in df.columns if 'ponto' in c), None)
 
     if not col_player or not col_points:
-        messages.error(request, "Não foi possível identificar as colunas 'Jogador' e 'Pontos' na planilha.")
+        messages.error(request, "Não foi possível identificar as colunas 'Jogador' e 'Pontos' na tabela.")
         return redirect('administrators:national_ranking_dashboard')
 
     matched = 0
@@ -267,7 +305,8 @@ def import_national_ranking(request):
         )
         matched += 1
 
-    messages.success(request, f"Importação concluída: {matched} jogadores atualizados no torneio {league.name}.")
+    action = "criado" if created else "encontrado"
+    messages.success(request, f"Torneio '{tournament_name}' {action}. Importação concluída: {matched} jogadores atualizados.")
     if not_found:
         messages.warning(request, f"{len(not_found)} nomes não encontrados no cadastro: {', '.join(not_found)}")
 

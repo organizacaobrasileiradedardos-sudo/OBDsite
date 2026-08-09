@@ -26,18 +26,12 @@
                 <form method="post" action="{% url 'administrators:import_national_ranking' %}" enctype="multipart/form-data">
                     {% csrf_token %}
                     <div class="mb-3">
-                        <label for="league_id" class="form-label">Torneio</label>
-                        <select class="form-select" id="league_id" name="league_id" required>
-                            <option value="">Selecione o torneio...</option>
-                            {% for league in leagues %}
-                            <option value="{{ league.id }}">{{ league.name }} ({{ league.start_date|date:"d/m/Y" }})</option>
-                            {% endfor %}
-                        </select>
-                    </div>
-                    <div class="mb-3">
                         <label for="file" class="form-label">Planilha (.xlsx)</label>
                         <input type="file" class="form-control" id="file" name="file" accept=".xlsx" required>
-                        <div class="form-text text-muted">A planilha deve conter as colunas: Colocação, Jogador e Pontos.</div>
+                        <div class="form-text text-muted">
+                            A planilha deve ter: Linha 1 = "Torneio" e nome; Linha 2 = "Data" e data (DD/MM/AAAA);
+                            Linha 4 em diante = tabela com Colocação, Jogador e Pontos.
+                        </div>
                     </div>
                     <button type="submit" class="btn btn-primary">Importar</button>
                 </form>
