@@ -10,6 +10,7 @@ from obd.dashboards.administrators.fixtures.models import Fixture
 from obd.dashboards.administrators.leagues.models import League
 import pandas as pd 
 import datetime
+import unicodedata
 from decimal import Decimal, InvalidOperation
 from obd.dashboards.administrators.leagues.models import League, OrderOfMeritEntry
 from obd.dashboards.administrators.leagues.models import NationalRankingEntry
@@ -86,6 +87,12 @@ def order_of_merit_dashboard(request):
     leagues = League.objects.filter(scope=2).order_by('-start_date')  # scope=2 = Nacional
     return render(request, 'order_of_merit_dashboard.html', {'leagues': leagues})
 
+
+def _strip_accents(text):
+    return ''.join(
+        c for c in unicodedata.normalize('NFKD', text)
+        if not unicodedata.combining(c)
+    )
 
 @login_required
 @permission_required('profiles.has_admin_role', raise_exception=True)
