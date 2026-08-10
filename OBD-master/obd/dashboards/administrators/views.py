@@ -266,6 +266,7 @@ def import_national_ranking(request):
 
     matched = 0
     not_found = []
+    created_provisional = []
 
     for _, row in df.iterrows():
         name = str(row[col_player]).strip()
