@@ -11,6 +11,7 @@ import pandas as pd
 import datetime
 import unicodedata
 from decimal import Decimal, InvalidOperation
+from obd.dashboards.players.profiles.models import Profile
 from obd.dashboards.administrators.leagues.models import League, OrderOfMeritEntry
 from obd.dashboards.administrators.leagues.models import NationalRankingEntry
 from obd.dashboards.administrators.champions.utils import get_or_create_player
@@ -323,3 +324,115 @@ def import_national_ranking(request):
         messages.warning(request, f"{len(not_found)} nomes com problema: {', '.join(not_found)}")
 
     return redirect('administrators:national_ranking_dashboard')
+
+
+def _player_summary(user):
+    return {
+        'user': user,
+        'tournament_stats': PlayerTournamentStat.objects.filter(player=user).count(),
+        'order_of_merit': OrderOfMeritEntry.objects.filter(player=user).count(),
+        'national_ranking': NationalRankingEntry.objects.filter(player=user).count(),
+        'champion_titles': (
+            Champion.objects.filter(p1=user).count()
+            + Champion.objects.filter(p2=user).count()
+            + Champion.objects.filter(p3=user).count()
+            + Champion.objects.filter(p4=user).count()
+        ),
+    }
+
+
+@login_required
+@permission_required('profiles.has_admin_role', raise_exception=True)
+def merge_players_dashboard(request):
+    from obd.core.models import PlayerTournamentStat
+
+    source_username = request.POST.get('source_username') or request.GET.get('source_username')
+    target_username = request.POST.get('target_username') or request.GET.get('target_username')
+
+    context = {'source_username': source_username or '', 'target_username': target_username or ''}
+
+    if source_username and target_username:
+        try:
+            source_user = User.objects.get(username__iexact=source_username.strip())
+        except User.DoesNotExist:
+            messages.error(request, f"Usuário '{source_username}' (a mesclar) não encontrado.")
+            return render(request, 'merge_players_dashboard.html', context)
+
+        try:
+            target_user = User.objects.get(username__iexact=target_username.strip())
+        except User.DoesNotExist:
+            messages.error(request, f"Usuário '{target_username}' (a manter) não encontrado.")
+            return render(request, 'merge_players_dashboard.html', context)
+
+        if source_user.id == target_user.id:
+            messages.error(request, "Os dois usuários são o mesmo. Escolha usuários diferentes.")
+            return render(request, 'merge_players_dashboard.html', context)
+
+        context['source_summary'] = _player_summary(source_user)
+        context['target_summary'] = _player_summary(target_user)
+        context['show_confirm'] = True
+
+    return render(request, 'merge_players_dashboard.html', context)
+
+
+@login_required
+@permission_required('profiles.has_admin_role', raise_exception=True)
+def merge_players_execute(request):
+    from obd.core.models import PlayerTournamentStat
+
+    if request.method != 'POST':
+        return redirect('administrators:merge_players_dashboard')
+
+    source_username = request.POST.get('source_username')
+    target_username = request.POST.get('target_username')
+
+    try:
+        source_user = User.objects.get(username__iexact=source_username)
+        target_user = User.objects.get(username__iexact=target_username)
+    except User.DoesNotExist:
+        messages.error(request, "Usuário não encontrado. Nada foi alterado.")
+        return redirect('administrators:merge_players_dashboard')
+
+    if source_user.id == target_user.id:
+        messages.error(request, "Os dois usuários são o mesmo. Nada foi alterado.")
+        return redirect('administrators:merge_players_dashboard')
+
+    moved = 0
+    skipped = 0
+
+    # PlayerTournamentStat - sem unique_together, sempre migra
+    moved += PlayerTournamentStat.objects.filter(player=source_user).update(player=target_user)
+
+    # OrderOfMeritEntry - unique_together (player, league): se já existir para o target, descarta o do source
+    for entry in OrderOfMeritEntry.objects.filter(player=source_user):
+        if OrderOfMeritEntry.objects.filter(player=target_user, league=entry.league).exists():
+            entry.delete()
+            skipped += 1
+        else:
+            entry.player = target_user
+            entry.save()
+            moved += 1
+
+    # NationalRankingEntry - mesma lógica
+    for entry in NationalRankingEntry.objects.filter(player=source_user):
+        if NationalRankingEntry.objects.filter(player=target_user, league=entry.league).exists():
+            entry.delete()
+            skipped += 1
+        else:
+            entry.player = target_user
+            entry.save()
+            moved += 1
+
+    # Champion - migra p1/p2/p3/p4
+    for field in ['p1', 'p2', 'p3', 'p4']:
+        Champion.objects.filter(**{field: source_user}).update(**{field: target_user})
+
+    # Apaga o usuário duplicado (e o Profile dele, via CASCADE)
+    source_user.delete()
+
+    messages.success(
+        request,
+        f"Mesclagem concluída: {moved} registros migrados, {skipped} descartados por já existirem no destino. "
+        f"'{source_username}' foi removido."
+    )
+    return redirect('administrators:merge_players_dashboard')
