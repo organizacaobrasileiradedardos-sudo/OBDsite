@@ -5,7 +5,6 @@ from django.contrib import messages
 from django.urls import reverse
 from obd.core.models import TournamentResult
 from obd.core.obdlib.webscraping.n01 import N01TournamentScraper
-from obd.dashboards.administrators.enviroments.models import Enviroment
 from obd.dashboards.administrators.fixtures.models import Fixture
 from obd.dashboards.administrators.leagues.models import League
 import pandas as pd 
