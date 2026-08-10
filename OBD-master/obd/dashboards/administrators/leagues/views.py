@@ -8,7 +8,6 @@ from django.utils.text import slugify
 from obd.core.obdlib.standardsession import ObdSession
 from obd.core.obdlib.fixturing import Fixturing
 from obd.dashboards.administrators.divisions.models import Division
-from obd.dashboards.administrators.enviroments.models import Enviroment
 from obd.dashboards.administrators.leagues.forms import NewLeagueForm
 from obd.dashboards.administrators.leagues.models import League
 from obd.dashboards.administrators.results.models import Result
