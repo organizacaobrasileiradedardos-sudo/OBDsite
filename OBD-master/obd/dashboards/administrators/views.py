@@ -14,6 +14,7 @@ import unicodedata
 from decimal import Decimal, InvalidOperation
 from obd.dashboards.administrators.leagues.models import League, OrderOfMeritEntry
 from obd.dashboards.administrators.leagues.models import NationalRankingEntry
+from obd.dashboards.administrators.champions.utils import get_or_create_player
 
 @login_required()
 @permission_required('profiles.has_admin_role', raise_exception=True)
@@ -133,6 +134,7 @@ def import_order_of_merit(request):
 
     matched = 0
     not_found = []
+    created_provisional = []
 
     for _, row in df.iterrows():
         name = str(row[col_player]).strip()
@@ -302,8 +304,9 @@ def import_national_ranking(request):
                 continue
 
         if not user:
-            not_found.append(name)
-            continue
+            # Cria cadastro provisório (não verificado), igual à Captura de Torneios
+            user = get_or_create_player(name, pin)
+            created_provisional.append(name)
 
         NationalRankingEntry.objects.update_or_create(
             player=user,
@@ -314,7 +317,9 @@ def import_national_ranking(request):
 
     action = "criado" if created else "encontrado"
     messages.success(request, f"Torneio '{tournament_name}' {action}. Importação concluída: {matched} jogadores atualizados.")
+    if created_provisional:
+        messages.info(request, f"{len(created_provisional)} cadastros provisórios criados (aguardando reivindicação): {', '.join(created_provisional)}")
     if not_found:
-        messages.warning(request, f"{len(not_found)} nomes não encontrados no cadastro: {', '.join(not_found)}")
+        messages.warning(request, f"{len(not_found)} nomes com problema: {', '.join(not_found)}")
 
     return redirect('administrators:national_ranking_dashboard')
