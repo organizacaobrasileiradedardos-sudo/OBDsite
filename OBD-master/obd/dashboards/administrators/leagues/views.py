@@ -645,7 +645,7 @@ def orderofmerit(request):
         'etapas': etapas,
         'ranking': ranking,
     }
-    return render(request, 'user_public_national_ranking.html', context)
+    return render(request, 'user_public_order_of_merit.html', context)
 
 
 def national_ranking(request):
