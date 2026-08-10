@@ -262,16 +262,35 @@
                 </div>
             </div>
 
-            <!-- Champions by Division -->
-            {% if division_champions %}
+            <!-- Champions by Etapa -->
+            {% if etapas_list %}
             <div class="mb-5" id="obd-stats">
-                <h3 class="text-center mb-4 fw-bold"><i class="bi bi-trophy-fill text-dartboard-gold"></i> Campeões Atuais por Divisão</h3>
-                <div class="row g-4">
+                <div class="d-flex justify-content-center mb-4">
+                    <form method="GET" action="{% url 'index' %}" class="w-100" style="max-width: 350px;">
+                        <select name="etapa" class="form-select bg-dark text-white border-secondary" onchange="this.form.submit()">
+                            {% for etapa in etapas_list %}
+                            <option value="{{ etapa.name }}" {% if etapa.name == selected_etapa %}selected{% endif %}>
+                                {{ etapa.name }} ({{ etapa.date|date:"d/m/Y" }})
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </form>
+                </div>
+
+                <h3 class="text-center mb-4 fw-bold"><i class="bi bi-trophy-fill text-dartboard-gold"></i>
+                    {% if division_champions.0.division %}Campeões por Divisão{% else %}Campeão do Torneio{% endif %}
+                    <br><small class="text-muted fs-6">({{ selected_etapa }})</small>
+                </h3>
+
+                <div class="row g-4 justify-content-center">
                     {% for champ in division_champions %}
                     <div class="col-md-3">
                         <div class="card card-dartboard border-warning h-100">
                             <div class="card-header card-header-dartboard gold text-center py-2">
-                                <h6 class="mb-0" style="font-size: 1rem;"><i class="bi bi-trophy-fill text-warning"></i> Divisão {{ champ.division }}</h6>
+                                <h6 class="mb-0" style="font-size: 1rem;">
+                                    <i class="bi bi-trophy-fill text-warning"></i>
+                                    {% if champ.division %}Divisão {{ champ.division }}{% else %}{{ champ.tournament_name }}{% endif %}
+                                </h6>
                             </div>
                             <div class="card-body text-center py-4 bg-white">
                                 <h4 class="fw-bold text-dartboard-gold mb-3">{{ champ.champion_name|upper }}</h4>
@@ -318,9 +337,6 @@
                                 <div class="d-flex justify-content-between small">
                                     <span>Melhor Leg (Dardos)</span><strong>{{ champ.best_leg }}</strong>
                                 </div>
-                            </div>
-                            <div class="card-footer text-center text-muted small">
-                                {{ champ.tournament_name }}
                             </div>
                         </div>
                     </div>

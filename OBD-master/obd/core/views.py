@@ -36,51 +36,80 @@ def index(request):
         average=avg,
     )
 
-    # === Campeões atuais por Divisão (A, B, C, D) - sempre a etapa mais recente de cada divisão ===
-    division_champions = []
-    for div_letter in ['A', 'B', 'C', 'D']:
-        latest_div_tournament = TournamentResult.objects.filter(
-            name__icontains=f'DIVISÃO {div_letter}'
-        ).order_by('-date').first()
+    # === Combobox de Etapas (agrupando divisões sob o mesmo nome de etapa) ===
+    all_results = TournamentResult.objects.order_by('-date')
 
-        if not latest_div_tournament:
-            continue
-
-        champion_stat = latest_div_tournament.stats.filter(rank=1).first()
-        if not champion_stat:
-            continue
-
-        div_stats = latest_div_tournament.stats.all()
-
-        div_matches = div_stats.aggregate(Sum('matches_played'))['matches_played__sum'] or 0
-        div_legs = div_stats.aggregate(Sum('legs_played'))['legs_played__sum'] or 0
-        div_players = div_stats.count()
-
-        if div_legs > 0:
-            weighted_sum = div_stats.aggregate(w=Sum(F('average_3_dart') * F('legs_played')))['w'] or 0
-            div_average = weighted_sum / div_legs
+    etapa_map = {}
+    for t in all_results:
+        if ' - DIVISÃO ' in t.name:
+            etapa_name = t.name.split(' - DIVISÃO ')[0].strip()
         else:
-            div_average = 0
+            etapa_name = t.name.strip()
+        etapa_map.setdefault(etapa_name, []).append(t)
 
-        division_champions.append({
-            'division': div_letter,
-            'tournament_name': latest_div_tournament.name,
-            'champion_name': champion_stat.player_name,
-            'champion_avg': champion_stat.average_3_dart,
-            'champion_matches_won': champion_stat.matches_won,
-            'champion_legs_won': champion_stat.legs_won,
-            'matches': div_matches,
-            'legs': div_legs,
-            'players': div_players,
-            'average': div_average,
-            'ton': div_stats.aggregate(Sum('count_100_plus'))['count_100_plus__sum'] or 0,
-            'ton40': div_stats.aggregate(Sum('count_140_plus'))['count_140_plus__sum'] or 0,
-            'ton70': div_stats.aggregate(Sum('count_170_plus'))['count_170_plus__sum'] or 0,
-            'ton80': div_stats.aggregate(Sum('count_180'))['count_180__sum'] or 0,
-            'highest_out': div_stats.aggregate(Max('high_finish'))['high_finish__max'] or 0,
-            'best_leg': div_stats.filter(best_leg__gte=9).aggregate(Min('best_leg'))['best_leg__min'] or 0,
-            'best_avg': div_stats.aggregate(Max('average_3_dart'))['average_3_dart__max'] or 0,
-        })
+    etapas_list = []
+    for etapa_name, results in etapa_map.items():
+        rep_date = max(r.date for r in results)
+        etapas_list.append({'name': etapa_name, 'date': rep_date})
+    etapas_list.sort(key=lambda x: x['date'], reverse=True)
+
+    selected_etapa = request.GET.get('etapa') or (etapas_list[0]['name'] if etapas_list else None)
+
+    # === Campeões da etapa selecionada (por divisão, ou card único se não houver divisões) ===
+    division_champions = []
+    if selected_etapa:
+        matching_results = etapa_map.get(selected_etapa, [])
+        has_divisions = any(' - DIVISÃO ' in r.name for r in matching_results)
+
+        def build_card(tournament, div_letter=None):
+            champion_stat = tournament.stats.filter(rank=1).first()
+            if not champion_stat:
+                return None
+
+            div_stats = tournament.stats.all()
+            div_matches = div_stats.aggregate(Sum('matches_played'))['matches_played__sum'] or 0
+            div_legs = div_stats.aggregate(Sum('legs_played'))['legs_played__sum'] or 0
+            div_players = div_stats.count()
+
+            if div_legs > 0:
+                weighted_sum = div_stats.aggregate(w=Sum(F('average_3_dart') * F('legs_played')))['w'] or 0
+                div_average = weighted_sum / div_legs
+            else:
+                div_average = 0
+
+            return {
+                'division': div_letter,
+                'tournament_name': tournament.name,
+                'champion_name': champion_stat.player_name,
+                'champion_avg': champion_stat.average_3_dart,
+                'champion_matches_won': champion_stat.matches_won,
+                'champion_legs_won': champion_stat.legs_won,
+                'matches': div_matches,
+                'legs': div_legs,
+                'players': div_players,
+                'average': div_average,
+                'ton': div_stats.aggregate(Sum('count_100_plus'))['count_100_plus__sum'] or 0,
+                'ton40': div_stats.aggregate(Sum('count_140_plus'))['count_140_plus__sum'] or 0,
+                'ton70': div_stats.aggregate(Sum('count_170_plus'))['count_170_plus__sum'] or 0,
+                'ton80': div_stats.aggregate(Sum('count_180'))['count_180__sum'] or 0,
+                'highest_out': div_stats.aggregate(Max('high_finish'))['high_finish__max'] or 0,
+                'best_leg': div_stats.filter(best_leg__gte=9).aggregate(Min('best_leg'))['best_leg__min'] or 0,
+                'best_avg': div_stats.aggregate(Max('average_3_dart'))['average_3_dart__max'] or 0,
+            }
+
+        if has_divisions:
+            for div_letter in ['A', 'B', 'C', 'D']:
+                div_tournament = next((r for r in matching_results if f'DIVISÃO {div_letter}' in r.name), None)
+                if not div_tournament:
+                    continue
+                card = build_card(div_tournament, div_letter)
+                if card:
+                    division_champions.append(card)
+        else:
+            if matching_results:
+                card = build_card(matching_results[0])
+                if card:
+                    division_champions.append(card)
 
     # NEW: Tournament Statistics Logic (Campeonato Brasileiro 2025)
     all_tournaments = TournamentResult.objects.order_by('-date')
@@ -203,6 +232,8 @@ def index(request):
                 'all_tournaments': all_tournaments,
                 'division_champions': division_champions,
                 'selected_tournament_id': int(selected_tournament_id) if selected_tournament_id else (latest_tournament.id if latest_tournament else None),
+                'etapas_list': etapas_list,
+                'selected_etapa': selected_etapa,
                 }
 
     return render(request, 'index.html', context)
