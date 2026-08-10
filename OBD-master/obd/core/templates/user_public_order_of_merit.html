@@ -68,15 +68,18 @@ Description: This is the page where main data will remains.
                                 {{ forloop.counter }}
                             </td>
                             <td>
-                                {% if row.player.profile.pin and row.player.first_name and row.player.last_name %}
-                                <a href="{% url 'profiles:publicprofile' pin=row.player.profile.pin first=row.player.first_name last=row.player.last_name %}">
-                                    {{ row.player.first_name }} {{ row.player.last_name }}
-                                </a>
-                                {% else %}
-                                {{ row.player.first_name }} {{ row.player.last_name }}
-                                {% endif %}
-                                {% if not row.player.profile.is_verified %}
-                                <span class="badge bg-warning text-dark">Não Verificado</span>
+    {% if row.player.profile.pin and row.player.first_name and row.player.last_name %}
+    <a href="{% url 'profiles:publicprofile' pin=row.player.profile.pin first=row.player.first_name last=row.player.last_name %}">
+        {{ row.player.first_name }} {{ row.player.last_name }}
+    </a>
+    {% elif row.player.profile.pin and not row.player.profile.is_verified %}
+    {{ row.player.first_name }} {{ row.player.last_name }}
+    <a href="{% url 'profiles:claim_account' pin=row.player.profile.pin %}" class="small">(é você? reivindique)</a>
+    {% else %}
+    {{ row.player.first_name }} {{ row.player.last_name }}
+    {% endif %}
+    {% if not row.player.profile.is_verified %}
+    <span class="badge bg-warning text-dark">Não Verificado</span>
                                 {% endif %}
                             </td>
                             {% for value in row.values %}
