@@ -1,6 +1,5 @@
 from django.contrib.auth.models import User
 from django.db import models
-from obd.dashboards.administrators.enviroments.models import Enviroment
 
 
 class League(models.Model):
@@ -29,7 +28,6 @@ class League(models.Model):
         (5, 'Comemorativa')
     ]
 
-    enviroment = models.ForeignKey(Enviroment, blank=True, null=True, on_delete=models.SET_NULL)
     created_by = models.ForeignKey(User, blank=True, null=True, on_delete=models.SET_NULL)
     name = models.CharField(max_length=100, blank=False, null=True, unique=True)
     description = models.CharField(max_length=250, blank=True, null=False, default='Liga Online OBD')
