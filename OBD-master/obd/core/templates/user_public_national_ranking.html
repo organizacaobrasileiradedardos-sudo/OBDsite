@@ -63,6 +63,9 @@
                                 <a href="{% url 'profiles:publicprofile' pin=row.player.profile.pin first=row.player.first_name last=row.player.last_name %}">
                                     {{ row.player.first_name }} {{ row.player.last_name }}
                                 </a>
+                                {% elif row.player.profile.pin and not row.player.profile.is_verified %}
+                                {{ row.player.first_name }} {{ row.player.last_name }}
+                                <a href="{% url 'profiles:claim_account' pin=row.player.profile.pin %}" class="small">(é você? reivindique)</a>
                                 {% else %}
                                 {{ row.player.first_name }} {{ row.player.last_name }}
                                 {% endif %}
