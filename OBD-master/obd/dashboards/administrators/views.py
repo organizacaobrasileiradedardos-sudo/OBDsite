@@ -16,6 +16,7 @@ from obd.dashboards.players.profiles.models import Profile
 from obd.dashboards.administrators.leagues.models import League, OrderOfMeritEntry
 from obd.dashboards.administrators.leagues.models import NationalRankingEntry
 from obd.dashboards.administrators.champions.utils import get_or_create_player
+from obd.dashboards.administrators.champions.models import Champion
 
 @login_required()
 @permission_required('profiles.has_admin_role', raise_exception=True)
