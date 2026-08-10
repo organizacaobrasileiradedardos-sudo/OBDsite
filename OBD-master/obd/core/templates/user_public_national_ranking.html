@@ -24,10 +24,7 @@
                     class="card-img figure-img img-fluid rounded" alt="...">
                 <div class="card-body">
                     <p><br></p>
-                    <p class="text-center mb-1" style="font-size: 3.2rem; font-weight: 600; letter-spacing: 3px; color: #6c757d; text-transform: uppercase;">Liga Nacional OBD</p>
-                    <h1 class="text-center"
-                        style="font-size: 2.7rem; font-weight: bold; letter-spacing: 2px; color: #003d7a;">OBD RANKING
-                        NACIONAL</h1>
+                    <p class="text-center mb-1" style="font-size: 3.2rem; font-weight: 600; letter-spacing: 3px; color: #6c757d; text-transform: uppercase;">OBD RANKING NACIONAL</p>
                     <p class="card-text text-center"><small class="text-muted">Ranking de pontuação, acumulado por etapa.</small></p>
                 </div>
             </div>
@@ -40,7 +37,7 @@
                             <th scope="col" class="text-center">#</th>
                             <th scope="col">Jogador</th>
                             {% for etapa in etapas %}
-                            <th scope="col" class="text-center" title="{{ etapa.name }}">Etapa {{ forloop.counter }}</th>
+                            <th scope="col" class="text-center">{{ etapa.name }}</th>
                             {% endfor %}
                             <th scope="col" class="text-center">Total</th>
                         </tr>
