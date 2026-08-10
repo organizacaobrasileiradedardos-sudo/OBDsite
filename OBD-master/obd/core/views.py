@@ -111,11 +111,6 @@ def index(request):
             tournament_stats['champion_matches_won'] = champion.matches_won
             tournament_stats['champion_legs_won'] = champion.legs_won
 
-        # Standings (Top 10)
-        tournament_standings = t_stats.order_by('rank')[:10]
-    else:
-        tournament_standings = []
-
     t_stats_qs = PlayerTournamentStat.objects.filter(player__isnull=False)
 
     def _leaderboard(field, agg_func, limit=5):
@@ -182,14 +177,12 @@ def index(request):
                 'documents': recent_documents,
                 'documents': recent_documents,
                 'tournament_stats': tournament_stats,
-                'tournament_standings': tournament_standings, # Top 10 standings
                 'all_tournaments': all_tournaments,
                 'division_champions': division_champions,
                 'selected_tournament_id': int(selected_tournament_id) if selected_tournament_id else (latest_tournament.id if latest_tournament else None),
                 }
 
     return render(request, 'index.html', context)
-
 
 
 def public_players(request):
