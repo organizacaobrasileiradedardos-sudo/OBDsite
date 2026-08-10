@@ -4,6 +4,7 @@ from django.shortcuts import render, redirect
 from django.contrib import messages
 from django.urls import reverse
 from obd.core.models import TournamentResult
+from obd.core.models import PlayerTournamentStat
 from obd.core.obdlib.webscraping.n01 import N01TournamentScraper
 from obd.dashboards.administrators.fixtures.models import Fixture
 from obd.dashboards.administrators.leagues.models import League
