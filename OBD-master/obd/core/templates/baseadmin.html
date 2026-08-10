@@ -160,7 +160,10 @@ Description: This is the BASE template of all OBD DASHOBDRD pages. It cotains th
                                 class="bi bi-file-earmark-spreadsheet"></i> IMPORTAR ORDER OF MERIT (NOVO)</a>
                         <a href="{% url 'administrators:national_ranking_dashboard' %}"
                             class="list-group-item list-group-item-action" style="color: red; font-weight: bold;"><i
-                                class="bi bi-file-earmark-spreadsheet"></i> IMPORTAR RANKING NACIONAL (NOVO)</a>        
+                                class="bi bi-file-earmark-spreadsheet"></i> IMPORTAR RANKING NACIONAL (NOVO)</a>
+                        <a href="{% url 'administrators:merge_players_dashboard' %}"
+                            class="list-group-item list-group-item-action font-weight: bold;"><i
+                                class="bi bi-people"></i> MESCLAR CADASTROS (NOVO)</a>                
                         <a href="{% url 'players:audit' %}" class="list-group-item list-group-item-action"><i
                                 class="bi bi-ui-checks"></i> Backup (Resultados)</a>
                         <a href="{% url 'players:logout' %}" class="btn btn-warning"><i

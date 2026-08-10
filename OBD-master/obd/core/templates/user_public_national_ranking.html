@@ -44,16 +44,16 @@
                     </thead>
                     <tbody>
                         {% for row in ranking %}
-                        <tr class="{% if forloop.counter == 1 %}rank-pos-1{% elif forloop.counter == 2 %}rank-pos-2{% elif forloop.counter == 3 %}rank-pos-3{% endif %}">
+                        <tr class="{% if row.position == 1 %}rank-pos-1{% elif row.position == 2 %}rank-pos-2{% elif row.position == 3 %}rank-pos-3{% endif %}">
                             <td class="text-center">
-                                {% if forloop.counter == 1 %}
+                                {% if row.position == 1 %}
                                 <i class="bi bi-trophy-fill" style="color: #d4af37;"></i>
-                                {% elif forloop.counter == 2 %}
+                                {% elif row.position == 2 %}
                                 <i class="bi bi-trophy-fill" style="color: #b0b0b0;"></i>
-                                {% elif forloop.counter == 3 %}
+                                {% elif row.position == 3 %}
                                 <i class="bi bi-trophy-fill" style="color: #cd7f32;"></i>
                                 {% endif %}
-                                {{ forloop.counter }}
+                                {{ row.position }}
                             </td>
                             <td>
                                 {% if row.player.profile.pin and row.player.first_name and row.player.last_name %}

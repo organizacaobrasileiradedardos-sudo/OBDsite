@@ -28,4 +28,6 @@ urlpatterns = [
     path('dashboard/admin/order-of-merit/import/', views.import_order_of_merit, name='import_order_of_merit'),
     path('dashboard/admin/national-ranking/', views.national_ranking_dashboard, name='national_ranking_dashboard'),
     path('dashboard/admin/national-ranking/import/', views.import_national_ranking, name='import_national_ranking'),
+    path('dashboard/admin/merge-players/', views.merge_players_dashboard, name='merge_players_dashboard'),
+    path('dashboard/admin/merge-players/execute/', views.merge_players_execute, name='merge_players_execute'),
 ]

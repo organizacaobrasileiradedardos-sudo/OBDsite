@@ -1,0 +1,87 @@
+{% extends 'baseadmin.html' %}
+
+{% block title %} Mesclar Cadastros {% endblock %}
+{% block page %}Mesclar Cadastros Duplicados{% endblock %}
+{% block boauser %} Administrador {% endblock %}
+
+{% block content %}
+
+{% if messages %}
+{% for message in messages %}
+<div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+  {{ message }}
+  <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+</div>
+{% endfor %}
+{% endif %}
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="card bg-dark text-white mb-4">
+            <div class="card-header">
+                <i class="bi bi-people"></i> Buscar Cadastros para Mesclar
+            </div>
+            <div class="card-body">
+                <form method="GET" action="{% url 'administrators:merge_players_dashboard' %}">
+                    <div class="row g-3">
+                        <div class="col-md-5">
+                            <label class="form-label">Usuário a MESCLAR (será removido)</label>
+                            <input type="text" name="source_username" class="form-control" value="{{ source_username }}" placeholder="ex: negao" required>
+                        </div>
+                        <div class="col-md-5">
+                            <label class="form-label">Usuário a MANTER (principal)</label>
+                            <input type="text" name="target_username" class="form-control" value="{{ target_username }}" placeholder="ex: andersonnegao" required>
+                        </div>
+                        <div class="col-md-2 d-flex align-items-end">
+                            <button type="submit" class="btn btn-primary w-100">Comparar</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% if show_confirm %}
+<div class="row">
+    <div class="col-md-6">
+        <div class="card border-danger mb-4">
+            <div class="card-header bg-danger text-white">Será REMOVIDO: {{ source_summary.user.username }}</div>
+            <ul class="list-group list-group-flush">
+                <li class="list-group-item">Nome: {{ source_summary.user.first_name }} {{ source_summary.user.last_name }}</li>
+                <li class="list-group-item">Estatísticas de Torneio: {{ source_summary.tournament_stats }}</li>
+                <li class="list-group-item">Order of Merit: {{ source_summary.order_of_merit }}</li>
+                <li class="list-group-item">Ranking Nacional: {{ source_summary.national_ranking }}</li>
+                <li class="list-group-item">Títulos de Campeão: {{ source_summary.champion_titles }}</li>
+            </ul>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card border-success mb-4">
+            <div class="card-header bg-success text-white">Será MANTIDO: {{ target_summary.user.username }}</div>
+            <ul class="list-group list-group-flush">
+                <li class="list-group-item">Nome: {{ target_summary.user.first_name }} {{ target_summary.user.last_name }}</li>
+                <li class="list-group-item">Estatísticas de Torneio: {{ target_summary.tournament_stats }}</li>
+                <li class="list-group-item">Order of Merit: {{ target_summary.order_of_merit }}</li>
+                <li class="list-group-item">Ranking Nacional: {{ target_summary.national_ranking }}</li>
+                <li class="list-group-item">Títulos de Campeão: {{ target_summary.champion_titles }}</li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<div class="alert alert-warning">
+    <i class="bi bi-exclamation-triangle-fill"></i> Todos os dados de <strong>{{ source_summary.user.username }}</strong> serão transferidos para <strong>{{ target_summary.user.username }}</strong>, e o cadastro de <strong>{{ source_summary.user.username }}</strong> será <strong>excluído permanentemente</strong>. Essa ação não pode ser desfeita.
+</div>
+
+<form method="POST" action="{% url 'administrators:merge_players_execute' %}">
+    {% csrf_token %}
+    <input type="hidden" name="source_username" value="{{ source_summary.user.username }}">
+    <input type="hidden" name="target_username" value="{{ target_summary.user.username }}">
+    <button type="submit" class="btn btn-danger" onclick="return confirm('Tem certeza? Essa ação não pode ser desfeita.');">
+        <i class="bi bi-arrow-left-right"></i> Confirmar Mesclagem
+    </button>
+</form>
+{% endif %}
+
+{% endblock %}
