@@ -50,6 +50,18 @@ def index(request):
         if not champion_stat:
             continue
 
+        div_stats = latest_div_tournament.stats.all()
+
+        div_matches = div_stats.aggregate(Sum('matches_played'))['matches_played__sum'] or 0
+        div_legs = div_stats.aggregate(Sum('legs_played'))['legs_played__sum'] or 0
+        div_players = div_stats.count()
+
+        if div_legs > 0:
+            weighted_sum = div_stats.aggregate(w=Sum(F('average_3_dart') * F('legs_played')))['w'] or 0
+            div_average = weighted_sum / div_legs
+        else:
+            div_average = 0
+
         division_champions.append({
             'division': div_letter,
             'tournament_name': latest_div_tournament.name,
@@ -57,6 +69,17 @@ def index(request):
             'champion_avg': champion_stat.average_3_dart,
             'champion_matches_won': champion_stat.matches_won,
             'champion_legs_won': champion_stat.legs_won,
+            'matches': div_matches,
+            'legs': div_legs,
+            'players': div_players,
+            'average': div_average,
+            'ton': div_stats.aggregate(Sum('count_100_plus'))['count_100_plus__sum'] or 0,
+            'ton40': div_stats.aggregate(Sum('count_140_plus'))['count_140_plus__sum'] or 0,
+            'ton70': div_stats.aggregate(Sum('count_170_plus'))['count_170_plus__sum'] or 0,
+            'ton80': div_stats.aggregate(Sum('count_180'))['count_180__sum'] or 0,
+            'highest_out': div_stats.aggregate(Max('high_finish'))['high_finish__max'] or 0,
+            'best_leg': div_stats.filter(best_leg__gte=9).aggregate(Min('best_leg'))['best_leg__min'] or 0,
+            'best_avg': div_stats.aggregate(Max('average_3_dart'))['average_3_dart__max'] or 0,
         })
 
     # NEW: Tournament Statistics Logic (Campeonato Brasileiro 2025)

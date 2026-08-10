@@ -1,3 +1,4 @@
+
 {% extends 'base.html' %}
 {% load static %}
 {% block csslib %}
@@ -179,14 +180,15 @@
                                         {{ line.user.first_name }} {{ line.user.last_name }}
                                     </span>
                                     {% endif %}
-                                    <span class="badge badge-dartboard badge-gold rounded-pill"  style="font-size: 1rem;">
+                                    <span class="badge badge-dartboard badge-gold rounded-pill" style="font-size: 1rem;">
                                         {{ line.value | floatformat:"2" }}
                                     </span>
                                 </li>
                                 {% endfor %}
                             </ul>
                         </div>
-                    </div> <!-- Best Checkouts -->
+                    </div>
+                    <!-- Best Checkouts -->
                     <div class="col-md-4">
                         <div class="card card-dartboard h-100">
                             <div
@@ -260,176 +262,18 @@
                 </div>
             </div>
 
-            <!-- Stats ETAPAS-->
-            <div class="mb-5" id="obd-stats">
-                <div class="d-flex justify-content-center mb-3">
-                    <form method="GET" action="{% url 'index' %}" class="d-inline-group w-100"
-                        style="max-width: 300px;">
-                        <select name="tournament_id" class="form-select bg-dark text-white border-secondary"
-                            onchange="sessionStorage.setItem('scrollPosition', window.scrollY); this.form.submit()"
-                            style="background-image: url('data:image/svg+xml,%3csvg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 16 16\'%3e%3cpath fill=\'none\' stroke=\'%23ffffff\' stroke-linecap=\'round\' stroke-linejoin=\'round\' stroke-width=\'2\' d=\'M2 5l6 6 6-6\'/%3e%3c/svg%3e');">
-                            {% for t in all_tournaments %}
-                            <option value="{{ t.id }}" {% if t.id == selected_tournament_id %}selected{% endif %}>
-                                {{ t.name }} ({{ t.date|date:"d/m/Y" }})
-                            </option>
-                            {% endfor %}
-                        </select>
-                    </form>
-                </div>
-                <h3 class="text-center mb-4 fw-bold">
-                    <i class="bi bi-graph-up text-accent"></i> Estatísticas do Torneio/Campeonato
-                    {% if tournament_stats %}
-                    <br>
-                    <small class="text-muted fs-6">({{ tournament_stats.name }})</small>
-                    {% endif %}
-                </h3>
-                <div class="row g-4">
-                    <div class="col-md-4">
-                        <div class="card h-100">
-                            <div class="card-header bg-secondary text-white">Dados Gerais</div>
-                            <ul class="list-group list-group-flush">
-                                <li class="list-group-item d-flex justify-content-between align-items-center">
-                                    Média Geral
-                                    <span class="badge bg-primary rounded-pill" style="font-size: 1rem;">
-                                        {% if tournament_stats %}
-                                        {{ tournament_stats.average|floatformat:"2" }}
-                                        {% else %}
-                                        {% if boa.average %}
-                                        {{ boa.average|floatformat:"2" }}
-                                        {% else %}
-                                        0
-                                        {% endif %}
-                                        {% endif %}
-                                    </span>
-                                </li>
-                                <li class="list-group-item d-flex justify-content-between align-items-center">
-                                    Partidas
-                                    <span class="badge bg-primary rounded-pill" style="font-size: 1rem;">
-                                        {% if tournament_stats %}
-                                        {{ tournament_stats.matches }}
-                                        {% else %}
-                                        {{ games|default:"0" }}
-                                        {% endif %}
-                                    </span>
-                                </li>
-                                <li class="list-group-item d-flex justify-content-between align-items-center">
-                                    Legs
-                                    <span class="badge bg-primary rounded-pill" style="font-size: 1rem;">
-                                        {% if tournament_stats %}
-                                        {{ tournament_stats.legs }}
-                                        {% else %}
-                                        {{ boa.legs|default:"0" }}
-                                        {% endif %}
-                                    </span>
-                                </li>
-                                <li class="list-group-item d-flex justify-content-between align-items-center">
-                                    Jogadores
-                                    <span class="badge bg-primary rounded-pill" style="font-size: 1rem;">
-                                        {% if tournament_stats %}
-                                        {{ tournament_stats.players }}
-                                        {% else %}
-                                        {{ members|default:"0" }}
-                                        {% endif %}
-                                    </span>
-                                </li>
-                            </ul>
-                        </div>
-                    </div>
-                    <div class="col-md-4">
-                        <div class="card h-100">
-                            <div class="card-header bg-secondary text-white">Scores</div>
-                            <ul class="list-group list-group-flush">
-                                <li class="list-group-item d-flex justify-content-between align-items-center">
-                                    100+
-                                    <span class="badge bg-primary rounded-pill" style="font-size: 1rem;">
-                                        {% if tournament_stats %}
-                                        {{ tournament_stats.ton }}
-                                        {% else %}
-                                        {{ boa.ton|default:"0" }}
-                                        {% endif %}
-                                    </span>
-                                </li>
-                                <li class="list-group-item d-flex justify-content-between align-items-center">
-                                    140+
-                                    <span class="badge bg-primary rounded-pill" style="font-size: 1rem;">
-                                        {% if tournament_stats %}
-                                        {{ tournament_stats.ton40 }}
-                                        {% else %}
-                                        {{ boa.ton40|default:"0" }}
-                                        {% endif %}
-                                    </span>
-                                </li>
-                                <li class="list-group-item d-flex justify-content-between align-items-center">
-                                    170+
-                                    <span class="badge bg-primary rounded-pill" style="font-size: 1rem;"> 
-                                        {% if tournament_stats %}
-                                        {{ tournament_stats.ton70 }}
-                                        {% else %}
-                                        {{ boa.ton70|default:"0" }}
-                                        {% endif %}
-                                    </span>
-                                </li>
-                                <li class="list-group-item d-flex justify-content-between align-items-center">
-                                    180s
-                                    <span class="badge bg-danger rounded-pill" style="font-size: 1rem;">
-                                        {% if tournament_stats %}
-                                        {{ tournament_stats.ton80 }}
-                                        {% else %}
-                                        {{ boa.ton80|default:"0" }}
-                                        {% endif %}
-                                    </span>
-                                </li>
-                            </ul>
-                        </div>
-                    </div>
-                    <div class="col-md-4">
-                        <div class="card h-100">
-                            {% with ts=tournament_stats %}
-                            {% if ts %}<div class="card-header bg-secondary text-white">Recordes</div>
-                            <ul class="list-group list-group-flush">
-                                <li class="list-group-item d-flex justify-content-between align-items-center">
-                                    Maior Fechamento
-                                    <span class="badge bg-primary rounded-pill" style="font-size: 1rem;">{{ ts.highest_out }}</span>
-                                </li>
-                                <li class="list-group-item d-flex justify-content-between align-items-center">
-                                    Melhor Leg (Dardos)
-                                    <span class="badge bg-primary rounded-pill" style="font-size: 1rem;">{{ ts.best_leg }}</span>
-                                </li>
-                                <li class="list-group-item d-flex justify-content-between align-items-center">
-                                    Melhor Média
-                                    <span class="badge bg-primary rounded-pill" style="font-size: 1rem;">{{ ts.best_avg|floatformat:"2" }}</span>
-                                </li>
-                            </ul>
-                            {% else %}
-                            <div class="card-header bg-secondary text-white">Servidores</div>
-                            <ul class="list-group list-group-flush">
-
-                                <li class="list-group-item d-flex justify-content-between align-items-center">Nakka
-                                    <span class="badge bg-primary rounded-pill" style="font-size: 1rem;">{{ server.nakka }}</span>
-                                </li>
-                                <li class="list-group-item d-flex justify-content-between align-items-center">Manual
-                                    <span class="badge bg-primary rounded-pill" style="font-size: 1rem;">{{ server.manual }}</span>
-                                </li>
-                            </ul>
-                            {% endif %}
-                            {% endwith %}
-                        </div>
-                    </div>
-                </div>
-            </div>
-
             <!-- Champions by Division -->
             {% if division_champions %}
-            <div class="mb-5">
+            <div class="mb-5" id="obd-stats">
                 <h3 class="text-center mb-4 fw-bold"><i class="bi bi-trophy-fill text-dartboard-gold"></i> Campeões Atuais por Divisão</h3>
                 <div class="row g-4">
                     {% for champ in division_champions %}
                     <div class="col-md-3">
                         <div class="card card-dartboard border-warning h-100">
                             <div class="card-header card-header-dartboard gold text-center py-2">
-                                <h6 class="mb-0" style="font-size: 2rem;"><i class="bi bi-trophy-fill text-warning"></i> Divisão {{ champ.division }}</h6>
+                                <h6 class="mb-0" style="font-size: 1rem;"><i class="bi bi-trophy-fill text-warning"></i> Divisão {{ champ.division }}</h6>
                             </div>
-                            <div class="card-body text-center py-4">
+                            <div class="card-body text-center py-4 bg-white">
                                 <h4 class="fw-bold text-dartboard-gold mb-3">{{ champ.champion_name|upper }}</h4>
                                 <div class="row">
                                     <div class="col-4">
@@ -447,6 +291,32 @@
                                         <div class="small text-muted">Legs</div>
                                         <div class="fw-bold">{{ champ.champion_legs_won }}</div>
                                     </div>
+                                </div>
+                            </div>
+                            <div class="bg-dark text-white p-3">
+                                <div class="d-flex justify-content-between small border-bottom border-secondary pb-1 mb-1">
+                                    <span>Média Geral</span><strong>{{ champ.average|floatformat:"2" }}</strong>
+                                </div>
+                                <div class="d-flex justify-content-between small border-bottom border-secondary pb-1 mb-1">
+                                    <span>Partidas</span><strong>{{ champ.matches }}</strong>
+                                </div>
+                                <div class="d-flex justify-content-between small border-bottom border-secondary pb-1 mb-1">
+                                    <span>Legs</span><strong>{{ champ.legs }}</strong>
+                                </div>
+                                <div class="d-flex justify-content-between small border-bottom border-secondary pb-1 mb-1">
+                                    <span>Jogadores</span><strong>{{ champ.players }}</strong>
+                                </div>
+                                <div class="d-flex justify-content-between small border-bottom border-secondary pb-1 mb-1">
+                                    <span>100+ / 140+ / 170+</span><strong>{{ champ.ton }} / {{ champ.ton40 }} / {{ champ.ton70 }}</strong>
+                                </div>
+                                <div class="d-flex justify-content-between small border-bottom border-secondary pb-1 mb-1">
+                                    <span>180s</span><strong class="text-danger">{{ champ.ton80 }}</strong>
+                                </div>
+                                <div class="d-flex justify-content-between small border-bottom border-secondary pb-1 mb-1">
+                                    <span>Maior Fechamento</span><strong>{{ champ.highest_out }}</strong>
+                                </div>
+                                <div class="d-flex justify-content-between small">
+                                    <span>Melhor Leg (Dardos)</span><strong>{{ champ.best_leg }}</strong>
                                 </div>
                             </div>
                             <div class="card-footer text-center text-muted small">
