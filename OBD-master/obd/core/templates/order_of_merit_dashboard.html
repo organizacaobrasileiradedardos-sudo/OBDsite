@@ -26,18 +26,12 @@
                 <form method="post" action="{% url 'administrators:import_order_of_merit' %}" enctype="multipart/form-data">
                     {% csrf_token %}
                     <div class="mb-3">
-                        <label for="league_id" class="form-label">Etapa (Liga Nacional)</label>
-                        <select class="form-select" id="league_id" name="league_id" required>
-                            <option value="">Selecione a etapa...</option>
-                            {% for league in leagues %}
-                            <option value="{{ league.id }}">{{ league.name }} ({{ league.start_date|date:"d/m/Y" }})</option>
-                            {% endfor %}
-                        </select>
-                    </div>
-                    <div class="mb-3">
                         <label for="file" class="form-label">Planilha (.xlsx)</label>
                         <input type="file" class="form-control" id="file" name="file" accept=".xlsx" required>
-                        <div class="form-text text-muted">A planilha deve conter as colunas: Posição, Jogador e Valor (R$).</div>
+                        <div class="form-text text-muted">
+                            A planilha deve ter: Linha 1 = "Etapa" e nome; Linha 2 = "Data" e data (DD/MM/AAAA);
+                            Linha 4 em diante = tabela com Colocação, Jogador e Valor.
+                        </div>
                     </div>
                     <button type="submit" class="btn btn-primary">Importar</button>
                 </form>

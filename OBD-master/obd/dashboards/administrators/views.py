@@ -87,8 +87,7 @@ def run_capture(request):
 @login_required
 @permission_required('profiles.has_admin_role', raise_exception=True)
 def order_of_merit_dashboard(request):
-    leagues = League.objects.filter(scope=2).order_by('-start_date')  # scope=2 = Nacional
-    return render(request, 'order_of_merit_dashboard.html', {'leagues': leagues})
+    return render(request, 'order_of_merit_dashboard.html')
 
 
 def _strip_accents(text):
@@ -103,35 +102,67 @@ def import_order_of_merit(request):
     if request.method != 'POST':
         return redirect('administrators:order_of_merit_dashboard')
 
-    league_id = request.POST.get('league_id')
     excel_file = request.FILES.get('file')
 
-    if not league_id or not excel_file:
-        messages.error(request, "Selecione a etapa e o arquivo antes de importar.")
+    if not excel_file:
+        messages.error(request, "Selecione o arquivo antes de importar.")
         return redirect('administrators:order_of_merit_dashboard')
 
     try:
-        league = League.objects.get(id=league_id)
-    except League.DoesNotExist:
-        messages.error(request, "Etapa não encontrada.")
-        return redirect('administrators:order_of_merit_dashboard')
-
-    try:
-        df = pd.read_excel(excel_file)
+        df_raw = pd.read_excel(excel_file, header=None)
     except Exception as e:
         messages.error(request, f"Não foi possível ler o arquivo: {e}")
         return redirect('administrators:order_of_merit_dashboard')
 
-    # Normaliza nomes de colunas (remove espaços, deixa minúsculo, tira acentos comuns)
+    try:
+        etapa_name = str(df_raw.iloc[0, 1]).strip()
+        raw_date = df_raw.iloc[1, 1]
+    except (IndexError, KeyError):
+        messages.error(request, "Formato inválido: verifique as linhas de Etapa e Data no início do arquivo.")
+        return redirect('administrators:order_of_merit_dashboard')
+
+    if not etapa_name or etapa_name.lower() == 'nan':
+        messages.error(request, "Nome da etapa não encontrado na linha 1.")
+        return redirect('administrators:order_of_merit_dashboard')
+
+    if isinstance(raw_date, (datetime.datetime, datetime.date)):
+        etapa_date = raw_date.date() if isinstance(raw_date, datetime.datetime) else raw_date
+    else:
+        try:
+            etapa_date = datetime.datetime.strptime(str(raw_date).strip(), '%d/%m/%Y').date()
+        except ValueError:
+            messages.error(request, f"Data inválida na linha 2: '{raw_date}'. Use o formato DD/MM/AAAA.")
+            return redirect('administrators:order_of_merit_dashboard')
+
+    # Etapa "geral" (sem divisão) - separada dos torneios por divisão da Captura de Torneios
+    slug = etapa_name.lower().replace(' ', '-')
+    league, created = League.objects.get_or_create(
+        name=etapa_name,
+        defaults={
+            'slug': slug,
+            'start_date': etapa_date,
+            'end_date': etapa_date,
+            'runoff': 1,
+            'phase': 4,
+            'scope': 2,
+            'status': True,
+        }
+    )
+
+    try:
+        df = pd.read_excel(excel_file, skiprows=3)
+    except Exception as e:
+        messages.error(request, f"Não foi possível ler a tabela de jogadores: {e}")
+        return redirect('administrators:order_of_merit_dashboard')
+
     df.columns = [str(c).strip().lower() for c in df.columns]
 
-    # Tenta localizar as colunas certas, aceitando pequenas variações
-    col_pos = next((c for c in df.columns if 'pos' in c), None)
+    col_pos = next((c for c in df.columns if 'pos' in c or 'coloca' in c), None)
     col_player = next((c for c in df.columns if 'jogador' in c or 'nome' in c), None)
     col_value = next((c for c in df.columns if 'valor' in c or 'premia' in c or 'r$' in c), None)
 
     if not col_player or not col_value:
-        messages.error(request, "Não foi possível identificar as colunas 'Jogador' e 'Valor' na planilha.")
+        messages.error(request, "Não foi possível identificar as colunas 'Jogador' e 'Valor' na tabela.")
         return redirect('administrators:order_of_merit_dashboard')
 
     matched = 0
@@ -161,17 +192,22 @@ def import_order_of_merit(request):
         user = User.objects.filter(username__iexact=pin).first()
 
         if not user:
-            # Fallback: nome na planilha pode ser abreviado (ex: "Rodrigo KEKO" vs
-            # cadastro completo "Rodrigo Keko Johan"). Tenta achar por prefixo.
             candidates = list(User.objects.filter(username__istartswith=pin))
+            if not candidates:
+                pin_no_accent = _strip_accents(pin)
+                candidates = [
+                    u for u in User.objects.only('id', 'username')
+                    if _strip_accents(u.username.lower()).startswith(pin_no_accent)
+                ]
             if len(candidates) == 1:
                 user = candidates[0]
             elif len(candidates) > 1:
                 not_found.append(f"{name} (ambíguo: várias correspondências possíveis)")
                 continue
-            else:
-                not_found.append(name)
-                continue
+
+        if not user:
+            user = get_or_create_player(name, pin)
+            created_provisional.append(name)
 
         OrderOfMeritEntry.objects.update_or_create(
             player=user,
@@ -180,9 +216,12 @@ def import_order_of_merit(request):
         )
         matched += 1
 
-    messages.success(request, f"Importação concluída: {matched} jogadores atualizados na etapa {league.name}.")
+    action = "criada" if created else "encontrada"
+    messages.success(request, f"Etapa '{etapa_name}' {action}. Importação concluída: {matched} jogadores atualizados.")
+    if created_provisional:
+        messages.info(request, f"{len(created_provisional)} cadastros provisórios criados: {', '.join(created_provisional)}")
     if not_found:
-        messages.warning(request, f"{len(not_found)} nomes não encontrados no cadastro: {', '.join(not_found)}")
+        messages.warning(request, f"{len(not_found)} nomes com problema: {', '.join(not_found)}")
 
     return redirect('administrators:order_of_merit_dashboard')
 
