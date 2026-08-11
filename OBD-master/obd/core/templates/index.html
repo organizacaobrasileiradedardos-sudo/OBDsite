@@ -105,10 +105,10 @@
                                                     {{ doc.get_category_display }} • {{ doc.publish_date|date:'d/m/Y' }}
                                                 </small>
                                             </div>
-                                            <a href="{{ doc.file.url }}" class="btn btn-sm btn-dartboard-outline"
-                                                target="_blank" download>
-                                                <i class="bi bi-download"></i>
-                                            </a>
+                                            <button type="button" class="btn btn-sm btn-dartboard-outline"
+                                                onclick="abrirDocumento('{{ doc.file.url }}', '{{ doc.title|escapejs }}')">
+                                                <i class="bi bi-eye"></i>
+                                            </button>
                                         </div>
                                         {% endfor %}
                                     </div>
@@ -563,6 +563,36 @@
         });
     });
 </script>
+
+<!-- Modal de Visualização de Documento -->
+<div class="modal fade" id="documentModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-xl">
+        <div class="modal-content" style="height: 90vh;">
+            <div class="modal-header">
+                <h5 class="modal-title" id="documentModalLabel">Documento</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+            </div>
+            <div class="modal-body p-0">
+                <iframe id="documentFrame" src="" style="width: 100%; height: 100%; border: none;"></iframe>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function abrirDocumento(url, titulo) {
+        document.getElementById('documentModalLabel').textContent = titulo;
+        document.getElementById('documentFrame').src = url + '#toolbar=0&navpanes=0&scrollbar=1';
+        var modal = new bootstrap.Modal(document.getElementById('documentModal'));
+        modal.show();
+
+        // Limpa o iframe ao fechar, para parar de carregar o PDF em segundo plano
+        document.getElementById('documentModal').addEventListener('hidden.bs.modal', function () {
+            document.getElementById('documentFrame').src = '';
+        }, { once: true });
+    }
+</script>
+
 
 {% endblock %}
 {% block jslib %}
