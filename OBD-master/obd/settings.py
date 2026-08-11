@@ -193,3 +193,4 @@ LOGGING = {
     "disable_existing_loggers": False,
 }
 
+X_FRAME_OPTIONS = 'SAMEORIGIN'
