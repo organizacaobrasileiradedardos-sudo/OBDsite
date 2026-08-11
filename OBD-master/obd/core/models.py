@@ -3,6 +3,7 @@ from django.utils import timezone
 from django.contrib.auth.models import User
 from django.db import models
 from django.utils import timezone
+from cloudinary.models import CloudinaryField
 
 
 class Event(models.Model):
@@ -74,7 +75,7 @@ class Document(models.Model):
     title = models.CharField('Título', max_length=200)
     description = models.TextField('Descrição')
     category = models.CharField('Categoria', max_length=50, choices=CATEGORY_CHOICES, default='other')
-    file = models.FileField('Arquivo', upload_to='documents/')
+    file = CloudinaryField('Arquivo', resource_type='raw', folder='documents')
     version = models.CharField('Versão', max_length=20, default='1.0')
     publish_date = models.DateField('Data de Publicação', default=timezone.now)
     is_active = models.BooleanField('Ativo', default=True)
