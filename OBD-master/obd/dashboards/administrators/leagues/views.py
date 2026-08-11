@@ -678,6 +678,15 @@ def national_ranking(request):
 
     ranking.sort(key=lambda x: x['total'], reverse=True)
 
+    # Calcula a posição considerando empates (ex: 1º, 2º, 2º, 4º)
+    rank = 0
+    prev_total = None
+    for idx, row in enumerate(ranking, start=1):
+        if row['total'] != prev_total:
+            rank = idx
+        row['position'] = rank
+        prev_total = row['total']
+
     context = {
         'etapas': etapas,
         'ranking': ranking,
