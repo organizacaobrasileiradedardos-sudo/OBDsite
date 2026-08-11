@@ -34,6 +34,41 @@ def get_or_create_player(name: str, pin: str) -> User:
         Profile.objects.filter(user=user).update(pin=pin, nickname=name, is_verified=False)
     return user
 
+def merge_player_accounts(source_user, target_user):
+    """Migra todos os dados vinculados de source_user para target_user e apaga source_user."""
+    from obd.core.models import PlayerTournamentStat
+    from obd.dashboards.administrators.leagues.models import OrderOfMeritEntry, NationalRankingEntry
+    from obd.dashboards.administrators.champions.models import Champion
+
+    moved = 0
+    skipped = 0
+
+    moved += PlayerTournamentStat.objects.filter(player=source_user).update(player=target_user)
+
+    for entry in OrderOfMeritEntry.objects.filter(player=source_user):
+        if OrderOfMeritEntry.objects.filter(player=target_user, league=entry.league).exists():
+            entry.delete()
+            skipped += 1
+        else:
+            entry.player = target_user
+            entry.save()
+            moved += 1
+
+    for entry in NationalRankingEntry.objects.filter(player=source_user):
+        if NationalRankingEntry.objects.filter(player=target_user, league=entry.league).exists():
+            entry.delete()
+            skipped += 1
+        else:
+            entry.player = target_user
+            entry.save()
+            moved += 1
+
+    for field in ['p1', 'p2', 'p3', 'p4']:
+        Champion.objects.filter(**{field: source_user}).update(**{field: target_user})
+
+    source_user.delete()
+
+    return moved, skipped
 
 def get_or_create_league(name: str, start_date: datetime.date) -> tuple[League, Division]:
     """Return a League and its principal Division.

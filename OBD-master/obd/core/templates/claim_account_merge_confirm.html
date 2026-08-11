@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+{% block title %}Mesclar Cadastros - OBD{% endblock %}
+{% block content %}
+
+<div class="container">
+    <div class="row">
+        <div class="col-md-3"></div>
+        <div class="col-md-6">
+
+            <div class="card mt-4">
+                <div class="card-header bg-warning text-dark">
+                    <i class="bi bi-patch-exclamation"></i> Este cadastro parece ser seu
+                </div>
+                <div class="card-body text-white">
+                    <p>Você está logado como <strong>{{ current_user.first_name }} {{ current_user.last_name }}</strong> ({{ current_user.username }}).</p>
+                    <p>O cadastro <strong>{{ profile.user.first_name }} {{ profile.user.last_name }}</strong> ({{ profile.user.username }}) que você está tentando reivindicar ainda não foi verificado por ninguém.</p>
+                    <p>Se esse cadastro também é seu (por exemplo, criado automaticamente a partir de um torneio), podemos juntar os dois automaticamente: todo o histórico de torneios, premiações e rankings será transferido para a sua conta atual, e o cadastro duplicado será removido.</p>
+
+                    {% if messages %}
+                    {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+                    {% endfor %}
+                    {% endif %}
+
+                    <form method="post">
+                        {% csrf_token %}
+                        <input type="hidden" name="confirm_merge" value="yes">
+                        <button type="submit" class="btn btn-warning text-dark" onclick="return confirm('Confirma a mesclagem? Essa ação não pode ser desfeita.');">
+                            <i class="bi bi-arrow-left-right"></i> Sim, este cadastro é meu — mesclar
+                        </button>
+                        <a href="/" class="btn btn-outline-secondary">Cancelar</a>
+                    </form>
+                </div>
+            </div>
+
+        </div>
+        <div class="col-md-3"></div>
+    </div>
+</div>
+
+{% endblock %}

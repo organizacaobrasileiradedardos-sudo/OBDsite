@@ -118,6 +118,21 @@ def claim_account(request, pin):
         messages.info(request, 'Este cadastro já foi verificado. Se for você, faça login normalmente ou use "Esqueci minha senha".')
         return HttpResponseRedirect(reverse('players:login'))
 
+    # Usuário já logado com outra conta - oferece mesclagem em vez do formulário de cadastro
+    if request.user.is_authenticated and request.user.id != profile.user.id:
+        if request.method == 'POST' and request.POST.get('confirm_merge') == 'yes':
+            from obd.dashboards.administrators.champions.utils import merge_player_accounts
+            source_user = profile.user
+            target_user = request.user
+            moved, skipped = merge_player_accounts(source_user, target_user)
+            messages.success(request, f'Cadastros mesclados com sucesso! {moved} registro(s) migrado(s) para a sua conta.')
+            return HttpResponseRedirect(reverse('players:dashboard'))
+
+        return render(request, 'claim_account_merge_confirm.html', {
+            'profile': profile,
+            'current_user': request.user,
+        })
+
     if request.method == 'POST':
         form = ClaimAccountForm(request.POST)
         if form.is_valid():
@@ -137,4 +152,4 @@ def claim_account(request, pin):
     else:
         form = ClaimAccountForm()
 
-    return render(request, 'claim_account.html', {'form': form, 'profile': profile})    
+    return render(request, 'claim_account.html', {'form': form, 'profile': profile})  

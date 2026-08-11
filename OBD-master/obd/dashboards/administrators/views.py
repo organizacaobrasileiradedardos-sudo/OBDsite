@@ -438,38 +438,8 @@ def merge_players_execute(request):
         messages.error(request, "Os dois usuários são o mesmo. Nada foi alterado.")
         return redirect('administrators:merge_players_dashboard')
 
-    moved = 0
-    skipped = 0
-
-    # PlayerTournamentStat - sem unique_together, sempre migra
-    moved += PlayerTournamentStat.objects.filter(player=source_user).update(player=target_user)
-
-    # OrderOfMeritEntry - unique_together (player, league): se já existir para o target, descarta o do source
-    for entry in OrderOfMeritEntry.objects.filter(player=source_user):
-        if OrderOfMeritEntry.objects.filter(player=target_user, league=entry.league).exists():
-            entry.delete()
-            skipped += 1
-        else:
-            entry.player = target_user
-            entry.save()
-            moved += 1
-
-    # NationalRankingEntry - mesma lógica
-    for entry in NationalRankingEntry.objects.filter(player=source_user):
-        if NationalRankingEntry.objects.filter(player=target_user, league=entry.league).exists():
-            entry.delete()
-            skipped += 1
-        else:
-            entry.player = target_user
-            entry.save()
-            moved += 1
-
-    # Champion - migra p1/p2/p3/p4
-    for field in ['p1', 'p2', 'p3', 'p4']:
-        Champion.objects.filter(**{field: source_user}).update(**{field: target_user})
-
-    # Apaga o usuário duplicado (e o Profile dele, via CASCADE)
-    source_user.delete()
+    from obd.dashboards.administrators.champions.utils import merge_player_accounts
+    moved, skipped = merge_player_accounts(source_user, target_user)
 
     messages.success(
         request,
