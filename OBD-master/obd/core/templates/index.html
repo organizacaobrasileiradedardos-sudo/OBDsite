@@ -22,8 +22,9 @@
 
             <!-- Hero Banner -->
             <div class="mb-2 d-flex justify-content-center">
-            <img src="{% static 'media/logos/grok-new-banner-obd.jpg' %}" class="img-fluid rounded shadow-lg w-100"
-                alt="OBD Banner" style="max-height: 220px; object-fit: cover;">
+            <img src="{% static 'media/logos/grok-new-banner-obd-menor.jpg' %}" class="img-fluid rounded shadow-lg w-100"
+                alt="OBD Banner">
+                 <!--style="max-height: 220px; object-fit: cover;">-->
             </div>
 
             <!-- Welcome Card -->
@@ -147,132 +148,89 @@
                 </div>
             </div>
 
-            <!-- Player Stats -->
+<!-- Player Stats -->
             <div class="mb-5">
-                <h3 class="text-center mb-4 fw-bold"><i class="bi bi-person-lines-fill text-dartboard-red"></i>
-                    Estatísticas
-                    OBD</h3>
-                <div class="row g-4">
-                    <!-- Best Averages -->
-                    <div class="col-md-4">
-                        <div class="card card-dartboard h-100">
-                            <div
-                                class="card-header card-header-dartboard d-flex justify-content-between align-items-center">
-                                <span>Melhores Médias</span> <i class="bi bi-award"></i>
-                            </div>
-                            <ul class="list-group list-group-flush">
-                                {% for line in stats_avg %}
-                                <li class="list-group-item d-flex justify-content-between align-items-center">
-                                    {% if line.user.profile.pin and line.user.first_name and line.user.last_name %}
-                                    <a href="{% url 'profiles:publicprofile' pin=line.user.profile.pin first=line.user.first_name last=line.user.last_name %}">
-                                        <span class="fw-bold text-muted me-2">{{ forloop.counter }}º</span>
-                                        {{ line.user.first_name }} {{ line.user.last_name }}
-                                    </a>
-                                    {% elif line.user.profile.pin and not line.user.profile.is_verified %}
-                                    <span>
-                                        <span class="fw-bold text-muted me-2">{{ forloop.counter }}º</span>
-                                        {{ line.user.first_name }} {{ line.user.last_name }}
-                                        <a href="{% url 'profiles:claim_account' pin=line.user.profile.pin %}" class="small">(é você? reivindique)</a>
-                                    </span>
-                                    {% else %}
-                                    <span>
-                                        <span class="fw-bold text-muted me-2">{{ forloop.counter }}º</span>
-                                        {{ line.user.first_name }} {{ line.user.last_name }}
-                                    </span>
-                                    {% endif %}
-                                    <span class="badge badge-dartboard badge-gold rounded-pill" style="font-size: 1.5rem;">
-                                        {{ line.value | floatformat:"2" }}
-                                    </span>
-                                </li>
-                                {% endfor %}
-                            </ul>
-                        </div>
-                    </div>
-                    <!-- Best Checkouts -->
-                    <div class="col-md-4">
-                        <div class="card card-dartboard h-100">
-                            <div
-                                class="card-header card-header-dartboard green d-flex justify-content-between align-items-center">
-                                <span>Melhores Fechadas</span> <i class="bi bi-calculator"></i>
-                            </div>
-                            <ul class="list-group list-group-flush">
-                                {% for line in stats_out %}
-                                <li class="list-group-item d-flex justify-content-between align-items-center">
-                                    {% if line.user.profile.pin and line.user.first_name and line.user.last_name %}
-                                    <a href="{% url 'profiles:publicprofile' pin=line.user.profile.pin first=line.user.first_name last=line.user.last_name %}">
-                                        <span class="fw-bold text-muted me-2">{{ forloop.counter }}º</span>
-                                        {{ line.user.first_name }} {{ line.user.last_name }}
-                                    </a>
-                                    {% elif line.user.profile.pin and not line.user.profile.is_verified %}
-                                    <span>
-                                        <span class="fw-bold text-muted me-2">{{ forloop.counter }}º</span>
-                                        {{ line.user.first_name }} {{ line.user.last_name }}
-                                        <a href="{% url 'profiles:claim_account' pin=line.user.profile.pin %}" class="small">(é você? reivindique)</a>
-                                    </span>
-                                    {% else %}
-                                    <span>
-                                        <span class="fw-bold text-muted me-2">{{ forloop.counter }}º</span>
-                                        {{ line.user.first_name }} {{ line.user.last_name }}
-                                    </span>
-                                    {% endif %}
-                                    <span class="badge badge-dartboard badge-gold rounded-pill" style="font-size: 1.5rem;">
-                                        {{ line.value }}
-                                    </span>
-                                </li>
-                                {% endfor %}
-                            </ul>
-                        </div>
-                    </div>
-
-                    <!-- Top 180s -->
-                    <div class="col-md-4">
-                        <div class="card card-dartboard h-100">
-                            <div
-                                class="card-header card-header-dartboard d-flex justify-content-between align-items-center">
-                                <span>Top 180s</span> <i class="bi bi-lightning-charge-fill"></i>
-                            </div>
-                            <ul class="list-group list-group-flush">
-                                {% for line in stats_180 %}
-                                <li class="list-group-item d-flex justify-content-between align-items-center">
-                                    {% if line.user.profile.pin and line.user.first_name and line.user.last_name %}
-                                    <a href="{% url 'profiles:publicprofile' pin=line.user.profile.pin first=line.user.first_name last=line.user.last_name %}">
-                                        <span class="fw-bold text-muted me-2">{{ forloop.counter }}º</span>
-                                        {{ line.user.first_name }} {{ line.user.last_name }}
-                                    </a>
-                                    {% elif line.user.profile.pin and not line.user.profile.is_verified %}
-                                    <span>
-                                        <span class="fw-bold text-muted me-2">{{ forloop.counter }}º</span>
-                                        {{ line.user.first_name }} {{ line.user.last_name }}
-                                        <a href="{% url 'profiles:claim_account' pin=line.user.profile.pin %}" class="small">(é você? reivindique)</a>
-                                    </span>
-                                    {% else %}
-                                    <span>
-                                        <span class="fw-bold text-muted me-2">{{ forloop.counter }}º</span>
-                                        {{ line.user.first_name }} {{ line.user.last_name }}
-                                    </span>
-                                    {% endif %}
-                                    <span class="badge badge-dartboard badge-gold rounded-pill" style="font-size: 1.5rem;">
-                                        {{ line.value }}
-                                    </span>
-                                </li>
-                                {% endfor %}
-                            </ul>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="mb-5">
-                <div class="card card-dartboard">
+                <div class="card card-dartboard" style="background-color: #fdf6e3;">
                     <div class="card-header card-header-dartboard gold text-center py-3">
-                        <i class="bi bi-bar-chart-fill"></i> OBD em Números
+                        <i class="bi bi-person-lines-fill"></i> Estatísticas OBD
                     </div>
                     <div class="card-body">
+
+                        <div class="row g-4 mb-4">
+                            <!-- Best Averages -->
+                            <div class="col-md-4">
+                                <div class="card card-dartboard h-100">
+                                    <div
+                                        class="card-header card-header-dartboard d-flex justify-content-between align-items-center">
+                                        <span>Melhores Médias</span> <i class="bi bi-award"></i>
+                                    </div>
+                                    <ul class="list-group list-group-flush">
+                                        {% for line in stats_avg %}
+                                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                                            <a href="{% url 'profiles:publicprofile_by_pin' pin=line.user.profile.pin %}">
+                                                <span class="fw-bold text-muted me-2">{{ forloop.counter }}º</span>
+                                                {{ line.user.first_name }} {{ line.user.last_name }}
+                                            </a>
+                                            <span class="badge badge-dartboard badge-gold rounded-pill" style="font-size: 1rem;">
+                                                {{ line.value | floatformat:"2" }}
+                                            </span>
+                                        </li>
+                                        {% endfor %}
+                                    </ul>
+                                </div>
+                            </div>
+                            <!-- Best Checkouts -->
+                            <div class="col-md-4">
+                                <div class="card card-dartboard h-100">
+                                    <div
+                                        class="card-header card-header-dartboard green d-flex justify-content-between align-items-center">
+                                        <span>Melhores Fechadas</span> <i class="bi bi-calculator"></i>
+                                    </div>
+                                    <ul class="list-group list-group-flush">
+                                        {% for line in stats_out %}
+                                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                                            <a href="{% url 'profiles:publicprofile_by_pin' pin=line.user.profile.pin %}">
+                                                <span class="fw-bold text-muted me-2">{{ forloop.counter }}º</span>
+                                                {{ line.user.first_name }} {{ line.user.last_name }}
+                                            </a>
+                                            <span class="badge badge-dartboard badge-gold rounded-pill" style="font-size: 1rem;">
+                                                {{ line.value }}
+                                            </span>
+                                        </li>
+                                        {% endfor %}
+                                    </ul>
+                                </div>
+                            </div>
+                            <!-- Top 180s -->
+                            <div class="col-md-4">
+                                <div class="card card-dartboard h-100">
+                                    <div
+                                        class="card-header card-header-dartboard d-flex justify-content-between align-items-center">
+                                        <span>Top 180s</span> <i class="bi bi-lightning-charge-fill"></i>
+                                    </div>
+                                    <ul class="list-group list-group-flush">
+                                        {% for line in stats_180 %}
+                                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                                            <a href="{% url 'profiles:publicprofile_by_pin' pin=line.user.profile.pin %}">
+                                                <span class="fw-bold text-muted me-2">{{ forloop.counter }}º</span>
+                                                {{ line.user.first_name }} {{ line.user.last_name }}
+                                            </a>
+                                            <span class="badge badge-dartboard badge-gold rounded-pill" style="font-size: 1rem;">
+                                                {{ line.value }}
+                                            </span>
+                                        </li>
+                                        {% endfor %}
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+
+                        <h5 class="text-center mb-3 fw-bold"><i class="bi bi-bar-chart-fill" style="font-size: 1.5rem;"></i> OBD em Números</h5>
                         <div class="row g-4 text-center">
                             <div class="col-6 col-md-2">
                                 <i class="bi bi-trophy fs-2 text-dartboard-red"></i>
                                 <h3 class="fw-bold mt-2">{{ obd_numbers.tournaments }}</h3>
-                                <small class="text-muted">Torneios Realizados</small>
+                                <small class="text-muted">Torneios Realizados em 2026</small>
                             </div>
                             <div class="col-6 col-md-2">
                                 <i class="bi bi-people-fill fs-2 text-dartboard-green"></i>
@@ -287,7 +245,7 @@
                             <div class="col-6 col-md-2">
                                 <i class="bi bi-lightning-charge-fill fs-2 text-dartboard-red"></i>
                                 <h3 class="fw-bold mt-2">{{ obd_numbers.total_180 }}</h3>
-                                <small class="text-muted">180s na História</small>
+                                <small class="text-muted">180s no ano</small>
                             </div>
                             <div class="col-12 col-md-3">
                                 <i class="bi bi-cash-coin fs-2 text-dartboard-green"></i>
@@ -295,6 +253,7 @@
                                 <small class="text-muted">Premiação Distribuída</small>
                             </div>
                         </div>
+
                     </div>
                 </div>
             </div>
@@ -304,7 +263,7 @@
             <div class="mb-5" id="obd-stats">
                 <div class="card card-dartboard" style="background-color: #fdf6e3;">
                     <div class="card-header card-header-dartboard gold text-center py-3">
-                        <i class="bi bi-trophy-fill" style="font-size: 1rem;"></i> Estatísticas por Torneio/Campeonato
+                        <i class="bi bi-trophy-fill" style="font-size: 1.5rem;"></i> Estatísticas por Torneio/Campeonato
                     </div>
                     <div class="card-body">
 
