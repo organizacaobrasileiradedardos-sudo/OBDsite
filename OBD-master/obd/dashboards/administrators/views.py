@@ -87,7 +87,8 @@ def run_capture(request):
 @login_required
 @permission_required('profiles.has_admin_role', raise_exception=True)
 def order_of_merit_dashboard(request):
-    return render(request, 'order_of_merit_dashboard.html')
+    existing_leagues = League.objects.all().order_by('-start_date')
+    return render(request, 'order_of_merit_dashboard.html', {'existing_leagues': existing_leagues})
 
 
 def _strip_accents(text):
@@ -229,7 +230,8 @@ def import_order_of_merit(request):
 @login_required
 @permission_required('profiles.has_admin_role', raise_exception=True)
 def national_ranking_dashboard(request):
-    return render(request, 'national_ranking_dashboard.html')
+    existing_leagues = League.objects.all().order_by('-start_date')
+    return render(request, 'national_ranking_dashboard.html', {'existing_leagues': existing_leagues})
 
 
 @login_required
