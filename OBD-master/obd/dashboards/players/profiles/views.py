@@ -116,33 +116,10 @@ def publicprofile(request, pin, first, last):
 
     recent_tournaments = t_stats.select_related('tournament').order_by('-tournament__date')[:10]
 
-    labels = []
-    data = []
-    title = ''
-    averages = Result.objects.filter(validation=1, player=profile.user, average__gt=0).order_by('-on_date')[:20]
-    totals = averages.count()
-    if totals > 0:
-        for label in range(totals):
-            label = label + 1
-            labels.append(f'JG {label}')
-
-        for average in averages:
-            data.append(float(average.average))
-
-        data = list(reversed(data))
-        min_data = min(data)
-        max_data = max(data)
-        avg = profile.user.stat.bcmAvg
-        title = f'Mín: {min_data}, Média: {avg}, Máx: {max_data}'
-
     context = {'total': total,
                'profile': profile,
                'stat': stat,
                'matches': matches,
-               'labels': labels,
-               'data': data,
-               'title': title,
-               'graph': totals,
                'recent_tournaments': recent_tournaments,
                'tournament_summary': tournament_summary}
 
