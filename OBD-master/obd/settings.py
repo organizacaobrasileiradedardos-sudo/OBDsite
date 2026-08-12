@@ -167,7 +167,8 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 # Email Configuration
 ADMINS = [("OBD", "organizacaobrasileiradedardos@gmail.com")]    # config('ALERT_ERRORS_TO')
 MANAGERS = ADMINS  # config('ALERT_ERRORS_TO')
-EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
+EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 EMAIL_HOST = config('EMAIL_HOST')
 EMAIL_PORT = config('EMAIL_PORT', cast=int)
 EMAIL_HOST_USER = config('EMAIL_HOST_USER')
