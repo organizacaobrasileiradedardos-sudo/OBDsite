@@ -114,6 +114,8 @@ def publicprofile(request, pin, first, last):
             'best_leg': best_leg_qs['best_leg'],
         }
 
+    recent_tournaments = t_stats.select_related('tournament').order_by('-tournament__date')[:10]
+
     labels = []
     data = []
     title = ''
@@ -141,6 +143,7 @@ def publicprofile(request, pin, first, last):
                'data': data,
                'title': title,
                'graph': totals,
+               'recent_tournaments': recent_tournaments,
                'tournament_summary': tournament_summary}
 
     return render(request, 'user_public_profile.html', context)
