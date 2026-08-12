@@ -70,12 +70,49 @@ def showprofile(request):
            {'form': ProfileForm(),
             'profile': Profile.objects.get(user=request.user)})
 
+from django.db.models import Sum, Max, Min, Count, F
+from obd.core.models import PlayerTournamentStat
+
+
 def publicprofile(request, pin, first, last):
 
     profile = Profile.objects.get(pin=pin)
     matches = Fixture.objects.filter(status=1, validation=1, players__profile=profile).order_by('-on_date')[:5]
     stat = Stat.objects.get(user=profile.user)
     total = stat.divAwinner + stat.divBwinner + stat.divCwinner + stat.divDwinner + stat.divOtherswinner
+
+    # === Estatísticas de Torneios (PlayerTournamentStat) ===
+    t_stats = PlayerTournamentStat.objects.filter(player=profile.user)
+    tournament_summary = None
+
+    if t_stats.exists():
+        agg = t_stats.aggregate(
+            matches_played=Sum('matches_played'),
+            matches_won=Sum('matches_won'),
+            legs_played=Sum('legs_played'),
+            total_100=Sum('count_100_plus'),
+            total_140=Sum('count_140_plus'),
+            total_170=Sum('count_170_plus'),
+            total_180=Sum('count_180'),
+            highest_out=Max('high_finish'),
+            best_avg=Max('average_3_dart'),
+        )
+
+        best_leg_qs = t_stats.filter(best_leg__gte=9).aggregate(best_leg=Min('best_leg'))
+
+        career_avg = 0
+        if agg['legs_played']:
+            weighted = t_stats.aggregate(w=Sum(F('average_3_dart') * F('legs_played')))['w'] or 0
+            career_avg = weighted / agg['legs_played']
+
+        titles = t_stats.filter(rank=1).count()
+
+        tournament_summary = {
+            **agg,
+            'career_avg': career_avg,
+            'titles': titles,
+            'best_leg': best_leg_qs['best_leg'],
+        }
 
     labels = []
     data = []
@@ -103,7 +140,8 @@ def publicprofile(request, pin, first, last):
                'labels': labels,
                'data': data,
                'title': title,
-               'graph': totals}
+               'graph': totals,
+               'tournament_summary': tournament_summary}
 
     return render(request, 'user_public_profile.html', context)
 

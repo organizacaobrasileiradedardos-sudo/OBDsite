@@ -1,20 +1,10 @@
 <!--
 Project name: OBD - Organização Brasileira de Dardos
-Property: Nathan Perkes
-Developers: Walisson Oliveira
+Property: OBD
+Developers: GUILHERME ALTOMAR
 Page name: Perfil do Usuário *Público*
-Start date of this page: Jul-03-2021
+Start date of this page: DEZ-2025
 Last update: Jul-03-2021
-Description: This is the page where main data will remains.
--->
-<!--
-Project name: OBD - Organização Brasileira de Dardos
-Property: Nathan Perkes
-Developers: Walisson Oliveira
-Page name: Perfil do Usuário *Público*
-Start date of this page: Jul-03-2021
-Last update: Jul-03-2021
-Description: This is the page where main data will remains.
 -->
 {% extends 'base.html' %}
 {% load static %}
@@ -62,12 +52,11 @@ Description: This is the page where main data will remains.
 
             <h5><strong><i class="bi bi-list-stars"></i> Estatísticas de {{ profile.user.first_name }} {{ profile.user.last_name }}</strong></h5>
 
+            {% if tournament_summary %}
             <table class="table">
                 <thead>
                     <tr>
                         <th scope="col" style="text-align: center; vertical-align: middle;">#ID</th>
-                        <th scope="col" style="text-align: center; vertical-align: middle;">Classe</th>
-                        <th scope="col" style="text-align: center; vertical-align: middle;">OBD Score</th>
                         <th scope="col" style="text-align: center; vertical-align: middle;">Best Leg</th>
                         <th scope="col" style="text-align: center; vertical-align: middle;">Melhor Fechada</th>
                         <th scope="col" style="text-align: center; vertical-align: middle;">Média</th>
@@ -83,21 +72,22 @@ Description: This is the page where main data will remains.
                 <tbody>
                     <tr>
                         <td scope="row" style="text-align: center; vertical-align: middle;">{{ profile.user.id }}</td>
-                        <td style="text-align: center; vertical-align: middle;">{{ profile.user.stat.get_bcmClass_display }}</td>
-                        <td style="text-align: center; vertical-align: middle;">{{ profile.user.stat.bcmPoints }}</td>
-                        <td style="text-align: center; vertical-align: middle;">{{ profile.user.stat.bcmLeg }}</td>
-                        <td style="text-align: center; vertical-align: middle;">{{ profile.user.stat.bcmOut }}</td>
-                        <td style="text-align: center; vertical-align: middle;">{{ profile.user.stat.bcmAvg|floatformat:"2" }}</td>
-                        <td style="text-align: center; vertical-align: middle;">{{ total }}</td>
-                        <td style="text-align: center; vertical-align: middle;">{{ profile.user.stat.leagueParticipation }}</td>
-                        <td style="text-align: center; vertical-align: middle;">{{ profile.user.stat.bcmWin }}</td>
-                        <td style="text-align: center; vertical-align: middle;">{{ profile.user.stat.bcmTon }}</td>
-                        <td style="text-align: center; vertical-align: middle;">{{ profile.user.stat.bcmTon40 }}</td>
-                        <td style="text-align: center; vertical-align: middle;">{{ profile.user.stat.bcmTon70 }}</td>
-                        <td style="text-align: center; vertical-align: middle;">{{ profile.user.stat.bcmTon80 }}</td>
+                        <td style="text-align: center; vertical-align: middle;">{% if tournament_summary.best_leg %}{{ tournament_summary.best_leg }}{% else %}—{% endif %}</td>
+                        <td style="text-align: center; vertical-align: middle;">{{ tournament_summary.highest_out }}</td>
+                        <td style="text-align: center; vertical-align: middle;">{{ tournament_summary.career_avg|floatformat:"2" }}</td>
+                        <td style="text-align: center; vertical-align: middle;">{{ tournament_summary.titles }}</td>
+                        <td style="text-align: center; vertical-align: middle;">{{ tournament_summary.matches_played }}</td>
+                        <td style="text-align: center; vertical-align: middle;">{{ tournament_summary.matches_won }}</td>
+                        <td style="text-align: center; vertical-align: middle;">{{ tournament_summary.total_100 }}</td>
+                        <td style="text-align: center; vertical-align: middle;">{{ tournament_summary.total_140 }}</td>
+                        <td style="text-align: center; vertical-align: middle;">{{ tournament_summary.total_170 }}</td>
+                        <td style="text-align: center; vertical-align: middle;">{{ tournament_summary.total_180 }}</td>
                     </tr>
                 </tbody>
             </table>
+            {% else %}
+            <p class="text-muted">Nenhuma estatística de torneio encontrada ainda.</p>
+            {% endif %}
             <p><br></p>
 
             <h5><strong><i class="bi bi-list-stars"></i> Últimos 5 jogos:</strong></h5>

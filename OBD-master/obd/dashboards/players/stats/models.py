@@ -20,19 +20,8 @@ class Stat(models.Model):
         (0, 'Formação'),
     ]
 
-    LEAGUE_CLASS = [
-        (1, 'CLASS PRO'),
-        (2, 'CLASS A'),
-        (3, 'CLASS B'),
-        (4, 'CLASS C'),
-        (5, 'CLASS D'),
-        (99, 'CLASS R')
-    ]
-
     user = models.OneToOneField(User, on_delete=models.CASCADE)
-    bcmClass = models.IntegerField(choices=LEAGUE_CLASS, default=99)
     bcmDiv = models.IntegerField(choices=LEAGUE_DIV, default=10)
-    bcmPoints = models.FloatField(default=0)
     bcmAvg = models.FloatField(default=0)
     best3da = models.FloatField(default=0)
     bcmMatches = models.IntegerField(default=0)
@@ -59,7 +48,7 @@ class Stat(models.Model):
         ordering = ('-created_at',)
 
     def __str__(self):
-        return str(self.bcmClass)
+        return str(self.user)
 
 @receiver(post_save, sender=User)
 def create_user_stat(sender, instance, created, **kwargs):

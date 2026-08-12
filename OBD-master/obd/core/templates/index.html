@@ -271,8 +271,9 @@
                     </div>
                     <div class="card-body">
 
-                        <div class="d-flex justify-content-center mb-4">
-                            <form method="GET" action="{% url 'index' %}" class="w-100" style="max-width: 350px;">
+                        <div class="text-center mb-4">
+                            <p class="text-muted small mb-2"><i class="bi bi-hand-index-thumb"></i> Escolha aqui o torneio que deseja visualizar:</p>
+                            <form method="GET" action="{% url 'index' %}" class="mx-auto" style="max-width: 350px;">
                                 <select name="etapa" class="form-select bg-dark text-white border-secondary" onchange="sessionStorage.setItem('scrollPosition', window.scrollY); this.form.submit()">
                                     {% for etapa in etapas_list %}
                                     <option value="{{ etapa.name }}" {% if etapa.name == selected_etapa %}selected{% endif %}>
@@ -293,7 +294,7 @@
                             <div class="col-md-3">
                                 <div class="card card-dartboard border-warning h-100">
                                     <div class="card-header card-header-dartboard gold text-center py-2">
-                                        <h6 class="mb-0" style="font-size: 1rem;">
+                                        <h6 class="mb-0" style="font-size: 1.5rem;">
                                             <i class="bi bi-trophy-fill text-warning"></i>
                                             {% if champ.division %}Divisão {{ champ.division }}{% else %}{{ champ.tournament_name }}{% endif %}
                                         </h6>
