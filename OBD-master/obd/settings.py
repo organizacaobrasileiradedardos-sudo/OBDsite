@@ -165,15 +165,15 @@ MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 # Email Configuration
-ADMINS = [("OBD", "organizacaobrasileiradedardos@gmail.com")]    # config('ALERT_ERRORS_TO')
-MANAGERS = ADMINS  # config('ALERT_ERRORS_TO')
+ADMINS = [("OBD", "organizacaobrasileiradedardos@gmail.com")]
+MANAGERS = ADMINS
 EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
-DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 EMAIL_HOST = config('EMAIL_HOST')
 EMAIL_PORT = config('EMAIL_PORT', cast=int)
 EMAIL_HOST_USER = config('EMAIL_HOST_USER')
 EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD')
 EMAIL_USE_SSL = config('EMAIL_USE_SSL', cast=bool)
+DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 
 cloudinary.config(
     cloud_name=config('CLOUDINARY_NAME'),
