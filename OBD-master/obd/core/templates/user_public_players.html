@@ -60,28 +60,13 @@ Description: This is the page where main data will remains.
         {% for player in players %}
         <div class="col">
           <div class="card h-100">
-            {% if player.profile.pin and player.first_name and player.last_name %}
-            <a href="{% url 'profiles:publicprofile' pin=player.profile.pin first=player.first_name last=player.last_name %}"
-                class="list-group-item list-group-item-action active text-white" aria-current="true">
-                {{ player.first_name }} {{ player.last_name }}
-                {% if not player.profile.is_verified %}
-                <span class="badge bg-warning text-dark">Não Verificado</span>
-                {% endif %}
-            </a>
-            {% elif player.profile.pin and not player.profile.is_verified %}
-            <div class="list-group-item list-group-item-action active text-white" aria-current="true">
-                {{ player.first_name }} {{ player.last_name }}
-                <a href="{% url 'profiles:claim_account' pin=player.profile.pin %}" class="small text-white">(é você? reivindique)</a>
-                <span class="badge bg-warning text-dark">Não Verificado</span>
-            </div>
-            {% else %}
-            <div class="list-group-item list-group-item-action active text-white" aria-current="true">
-                {{ player.first_name }} {{ player.last_name }}
-                {% if not player.profile.is_verified %}
-                <span class="badge bg-warning text-dark">Não Verificado</span>
-                {% endif %}
-            </div>
-            {% endif %}
+              <a href="{% url 'profiles:publicprofile_by_pin' pin=player.profile.pin %}"
+                  class="list-group-item list-group-item-action active text-white" aria-current="true">
+                  {{ player.first_name }} {{ player.last_name }}
+                  {% if not player.profile.is_verified %}
+                  <span class="badge bg-warning text-dark">Não Verificado</span>
+                  {% endif %}
+              </a>
             <div class="rect-img-container">
               <img class="rect-img figure-img img-fluid rounded" src="{{ player.profile.photo }}" align="center"
                 title="{{ profile.nickname }}" alt="{{ profile.nickname }}">
@@ -91,11 +76,7 @@ Description: This is the page where main data will remains.
               <div class="list-group" align="center">
               </div>
               <li class="list-group-item">{{ player.profile.bio | truncatechars:120 }}...
-                  {% if player.profile.pin and player.first_name and player.last_name %}
-                  <a href="{% url 'profiles:publicprofile' pin=player.profile.pin first=player.first_name last=player.last_name %}">ver perfil.</a>
-                  {% elif player.profile.pin and not player.profile.is_verified %}
-                  <a href="{% url 'profiles:claim_account' pin=player.profile.pin %}">é você? reivindique.</a>
-                  {% endif %}
+                  <a href="{% url 'profiles:publicprofile_by_pin' pin=player.profile.pin %}">ver perfil.</a>
               </li>
               <li class="list-group-item">{{ player.profile.country }} - {{ player.profile.state }}</li>
               <li class="list-group-item">{{ player.profile.darts }}</li>

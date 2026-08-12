@@ -125,6 +125,12 @@ def publicprofile(request, pin, first, last):
 
     return render(request, 'user_public_profile.html', context)
 
+def publicprofile_by_pin(request, pin):
+    profile = Profile.objects.get(pin=pin)
+    first = profile.user.first_name or profile.pin
+    last = profile.user.last_name or ''
+    return publicprofile(request, pin, first, last)    
+
 def claim_account(request, pin):
     try:
         profile = Profile.objects.get(pin=pin)
