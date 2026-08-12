@@ -5,6 +5,7 @@ from obd.dashboards.administrators.divisions.models import Division
 from obd.dashboards.administrators.fixtures.models import Fixture
 from obd.dashboards.administrators.leagues.models import League
 from obd.dashboards.administrators.results.models import Result
+from obd.dashboards.administrators.leagues.models import OrderOfMeritEntry
 from django.db.models import Avg, Sum, Min, Count, Q, Max, F, Value
 
 from obd.dashboards.players.stats.models import Stat
@@ -180,6 +181,15 @@ def index(request):
     stats_out = _leaderboard('high_finish', Max)
     stats_180 = _leaderboard('count_180', Sum)
 
+    # === OBD em Números (estatísticas gerais) ===
+    obd_numbers = {
+        'tournaments': TournamentResult.objects.count(),
+        'players': User.objects.filter(profile__isnull=False).count(),
+        'matches': (PlayerTournamentStat.objects.aggregate(Sum('matches_played'))['matches_played__sum'] or 0) // 2,
+        'total_180': PlayerTournamentStat.objects.aggregate(Sum('count_180'))['count_180__sum'] or 0,
+        'prize_total': OrderOfMeritEntry.objects.aggregate(Sum('value'))['value__sum'] or 0,
+    }
+
     matches = Fixture.objects.filter(status=1).order_by('-on_date')[:6]
 
     server = Fixture.objects.filter(status=1).values('server').aggregate(
@@ -234,6 +244,9 @@ def index(request):
                 'selected_tournament_id': int(selected_tournament_id) if selected_tournament_id else (latest_tournament.id if latest_tournament else None),
                 'etapas_list': etapas_list,
                 'selected_etapa': selected_etapa,
+                'etapas_list': etapas_list,
+                'selected_etapa': selected_etapa,
+                'obd_numbers': obd_numbers,
                 }
 
     return render(request, 'index.html', context)

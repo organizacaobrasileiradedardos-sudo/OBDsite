@@ -262,6 +262,43 @@
                 </div>
             </div>
 
+            <div class="mb-5">
+                <div class="card card-dartboard">
+                    <div class="card-header card-header-dartboard gold text-center py-3">
+                        <i class="bi bi-bar-chart-fill"></i> OBD em Números
+                    </div>
+                    <div class="card-body">
+                        <div class="row g-4 text-center">
+                            <div class="col-6 col-md-2">
+                                <i class="bi bi-trophy fs-2 text-dartboard-red"></i>
+                                <h3 class="fw-bold mt-2">{{ obd_numbers.tournaments }}</h3>
+                                <small class="text-muted">Torneios Realizados</small>
+                            </div>
+                            <div class="col-6 col-md-2">
+                                <i class="bi bi-people-fill fs-2 text-dartboard-green"></i>
+                                <h3 class="fw-bold mt-2">{{ obd_numbers.players }}</h3>
+                                <small class="text-muted">Jogadores Cadastrados</small>
+                            </div>
+                            <div class="col-6 col-md-3">
+                                <i class="bi bi-controller fs-2 text-dartboard-gold"></i>
+                                <h3 class="fw-bold mt-2">{{ obd_numbers.matches }}</h3>
+                                <small class="text-muted">Partidas Disputadas</small>
+                            </div>
+                            <div class="col-6 col-md-2">
+                                <i class="bi bi-lightning-charge-fill fs-2 text-dartboard-red"></i>
+                                <h3 class="fw-bold mt-2">{{ obd_numbers.total_180 }}</h3>
+                                <small class="text-muted">180s na História</small>
+                            </div>
+                            <div class="col-12 col-md-3">
+                                <i class="bi bi-cash-coin fs-2 text-dartboard-green"></i>
+                                <h3 class="fw-bold mt-2">R$ {{ obd_numbers.prize_total|floatformat:2 }}</h3>
+                                <small class="text-muted">Premiação Distribuída</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <!-- Champions by Etapa -->
             {% if etapas_list %}
             <div class="mb-5" id="obd-stats">
