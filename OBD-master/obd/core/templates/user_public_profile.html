@@ -150,8 +150,8 @@ Last update: Jul-03-2021
                 </div>
                 <div class="card-body">
                     <h5 class="card-title">Este é o seu perfil?</h5>
-                    <p class="card-text"><small class="text-muted">Este cadastro foi criado automaticamente a partir dos resultados de torneios.
-                        Se for você, reivindique-o para acessar seu Dashboard e atualizar suas informações.</small></p>
+                    <p class="card-text"><span class="text-muted" style="font-size: 1.2rem;">Este cadastro foi criado automaticamente a partir dos resultados de torneios.
+                        Se for você, reivindique-o para acessar seu Dashboard e atualizar suas informações.</span></p>
                     <a href="{% url 'profiles:claim_account' pin=profile.pin %}"
                         class="btn btn-warning text-dark">Reivindicar este cadastro</a>
                 </div>
@@ -171,6 +171,3 @@ Last update: Jul-03-2021
 {% block jslib %}
 
 {% endblock %}
-
-
-                            <p class="card-text"><small class="text-muted">Membro desde {{ profile.created_at|date:"d/M/y" }}</small></p>
