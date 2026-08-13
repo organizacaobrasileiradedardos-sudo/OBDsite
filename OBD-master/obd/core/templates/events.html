@@ -175,7 +175,8 @@
 
                     <div id="detail-flyer-container" style="display: none;">
                         <div class="detail-label"><i class="bi bi-image"></i> Flyer</div>
-                        <img id="detail-flyer" src="" class="img-fluid rounded mb-3" alt="Flyer do evento" style="max-width: 100%;">
+                        <img id="detail-flyer" src="" class="img-fluid rounded mb-3" alt="Flyer do evento"
+                            style="max-width: 100%; cursor: zoom-in;" data-bs-toggle="modal" data-bs-target="#flyerModal">
                     </div>
                 </div>
 
@@ -220,6 +221,21 @@
     </div>
     {% endif %}
 </div>
+
+    <!-- Modal de Zoom do Flyer -->
+    <div class="modal fade" id="flyerModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content bg-dark">
+                <div class="modal-header border-0">
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Fechar"></button>
+                </div>
+                <div class="modal-body text-center pt-0">
+                    <img id="flyerModalImg" src="" class="img-fluid rounded" alt="Flyer do evento (tamanho original)">
+                </div>
+            </div>
+        </div>
+    </div>
+
 {% endblock %}
 
 {% block jslib %}
@@ -277,8 +293,10 @@
             // Flyer (se existir)
             var flyerContainer = document.getElementById('detail-flyer-container');
             var flyerImg = document.getElementById('detail-flyer');
+            var flyerModalImg = document.getElementById('flyerModalImg');
             if (info.event.extendedProps.flyer) {
                 flyerImg.src = info.event.extendedProps.flyer;
+                flyerModalImg.src = info.event.extendedProps.flyer;
                 flyerContainer.style.display = 'block';
             } else {
                 flyerContainer.style.display = 'none';
