@@ -172,6 +172,11 @@
 
                     <div class="detail-label"><i class="bi bi-card-text"></i> Descrição</div>
                     <div class="detail-value text-muted small" id="detail-description"></div>
+
+                    <div id="detail-flyer-container" style="display: none;">
+                        <div class="detail-label"><i class="bi bi-image"></i> Flyer</div>
+                        <img id="detail-flyer" src="" class="img-fluid rounded mb-3" alt="Flyer do evento" style="max-width: 100%;">
+                    </div>
                 </div>
 
                 <div id="empty-state" class="empty-state">
@@ -268,6 +273,16 @@
 
             document.getElementById('detail-location').textContent = info.event.extendedProps.location || 'Local não informado';
             document.getElementById('detail-description').textContent = info.event.extendedProps.description || 'Sem descrição disponível.';
+
+            // Flyer (se existir)
+            var flyerContainer = document.getElementById('detail-flyer-container');
+            var flyerImg = document.getElementById('detail-flyer');
+            if (info.event.extendedProps.flyer) {
+                flyerImg.src = info.event.extendedProps.flyer;
+                flyerContainer.style.display = 'block';
+            } else {
+                flyerContainer.style.display = 'none';
+            }
 
             // Simple fade in animation
             setTimeout(function () {

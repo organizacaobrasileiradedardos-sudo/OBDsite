@@ -23,6 +23,7 @@ class Event(models.Model):
     location = models.CharField('Local', max_length=200)
     event_type = models.CharField('Tipo', max_length=50, choices=EVENT_TYPES, default='other')
     registration_link = models.URLField('Link de Inscrição', blank=True)
+    flyer = CloudinaryField('Flyer', blank=True, null=True)
     is_active = models.BooleanField('Ativo', default=True)
     created_at = models.DateTimeField('Criado em', auto_now_add=True)
     updated_at = models.DateTimeField('Atualizado em', auto_now=True)

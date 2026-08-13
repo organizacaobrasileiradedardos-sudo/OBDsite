@@ -393,6 +393,8 @@ def events_list(request):
     for event in upcoming_events:
         # Check if it's a multi-day event
         # Check if it's a multi-day event
+        flyer_url = event.flyer.url if event.flyer else None
+
         if event.end_date and event.end_date.date() > event.event_date.date():
             current_date = event.event_date.date()
             end_date = event.end_date.date()
@@ -406,7 +408,8 @@ def events_list(request):
                     'location': event.location,
                     'extendedProps': {
                         'location': event.location,
-                        'description': event.description
+                        'description': event.description,
+                        'flyer': flyer_url
                     }
                 })
                 current_date += timedelta(days=1)
@@ -420,7 +423,8 @@ def events_list(request):
                 'location': event.location,
                 'extendedProps': {
                     'location': event.location,
-                    'description': event.description
+                    'description': event.description,
+                    'flyer': flyer_url
                 }
             })
     
