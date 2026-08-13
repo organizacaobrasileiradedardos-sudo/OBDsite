@@ -16,6 +16,9 @@ class EventAdmin(admin.ModelAdmin):
         ('Data e Local', {
             'fields': ('event_date', 'end_date', 'location')
         }),
+        ('Flyer', {
+            'fields': ('flyer',)
+        }),
         ('Configurações', {
             'fields': ('registration_link', 'is_active')
         }),
