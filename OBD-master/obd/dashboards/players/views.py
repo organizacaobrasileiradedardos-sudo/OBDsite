@@ -35,6 +35,8 @@ def dashboard(request):
     t_stats = PlayerTournamentStat.objects.filter(player=request.user)
     tournament_summary = None
 
+    has_played_liga_nacional = t_stats.filter(tournament__name__icontains='LIGA NACIONAL').exists()
+
     if t_stats.exists():
         agg = t_stats.aggregate(
             tournaments=Count('id'),
@@ -117,6 +119,7 @@ def dashboard(request):
 
     context = {'fullname': fullname,
                'qr_code': qr_code_base64,
+               'has_played_liga_nacional': has_played_liga_nacional,
                'tournament_summary': tournament_summary}
 
     return render(request, 'dashuser.html', context)

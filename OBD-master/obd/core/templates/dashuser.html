@@ -145,12 +145,12 @@
     </p>
     <p></p>
 
-    <h5><strong><i class="bi bi-list-stars"></i> Situação na liga:</strong></h5>
+    <h5><strong><i class="bi bi-list-stars"></i> Situação na Liga Nacional:</strong></h5>
     <p>
-        {% if perms.profiles.can_play_league %}
-        <span class="badge bg-success">Habilitado para jogar<br></span>
+        {% if has_played_liga_nacional %}
+        <span class="badge bg-success">Já participou da Liga Nacional<br></span>
         {% else %}
-        <span class="badge bg-danger">Não habilitado para jogar<br></span>
+        <span class="badge bg-secondary">Ainda não participou da Liga Nacional<br></span>
         {% endif %}
     </p>
     <!-- <p><br></p> -->
