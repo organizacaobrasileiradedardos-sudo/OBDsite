@@ -135,6 +135,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 CSRF_TRUSTED_ORIGINS = [
     "https://obdsite-production.up.railway.app",
+    "https://www.obdardos.com.br",
 ]
 
 # Internationalization
