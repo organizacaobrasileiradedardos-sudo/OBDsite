@@ -216,35 +216,27 @@ def recoverypassword(request):
         token = boasession.startSession()
         return render(request, 'login.html', {'form': form, 'token': token})
 
-    # DIAGNÓSTICO TEMPORÁRIO - remover após identificar a causa do 500
-    try:
-        u = User.objects.get(email=form.cleaned_data['email'])
+    u = User.objects.get(email=form.cleaned_data['email'])
 
-        for x in range(5):
-            key = hashlib.md5(str(time.time()).split('.')[1].encode('utf-8')).hexdigest()
-            for y in range(5):
-                force = hashlib.md5(str(time.time()).split('.')[1].encode('utf-8')).hexdigest()
+    for x in range(5):
+        key = hashlib.md5(str(time.time()).split('.')[1].encode('utf-8')).hexdigest()
+        for y in range(5):
+            force = hashlib.md5(str(time.time()).split('.')[1].encode('utf-8')).hexdigest()
 
-        code = (force+key+config('RECOVERY_KEY')).encode('utf-8')
-        code = hashlib.md5(code).hexdigest()[:11]
+    code = (force+key+config('RECOVERY_KEY')).encode('utf-8')
+    code = hashlib.md5(code).hexdigest()[:11]
 
-        context = {'code': code,
-                   'username': u.username,
-                   'first': u.first_name.capitalize(),
-                   'last': u.last_name.capitalize()}
+    context = {'code': code,
+               'username': u.username,
+               'first': u.first_name.capitalize(),
+               'last': u.last_name.capitalize()}
 
-        # Send E-Mail to new member with a CC List to OBD Org.
-        _send_email('SOLICITAÇÃO DE RECUPERAÇÃO DE SENHA OBD',
-                    settings.DEFAULT_FROM_EMAIL,
-                    form.cleaned_data['email'],
-                    'recovery_password.txt',
-                    context)
-    except Exception as e:
-        import traceback
-        messages.error(request, f'DIAGNÓSTICO: {type(e).__name__}: {e} | {traceback.format_exc()[-800:]}')
-        boasession = ObdSession()
-        token = boasession.startSession()
-        return render(request, 'login.html', {'token': token})
+    # Send E-Mail to new member with a CC List to OBD Org.
+    _send_email('SOLICITAÇÃO DE RECUPERAÇÃO DE SENHA OBD',
+                settings.DEFAULT_FROM_EMAIL,
+                form.cleaned_data['email'],
+                'recovery_password.txt',
+                context)
 
     # Success feedback
     messages.success(request, f'Recebemos sua solicitação. Se o e-mail for válido, você receberá em minutos uma nova senha. Atualize a mesma após o login.')
