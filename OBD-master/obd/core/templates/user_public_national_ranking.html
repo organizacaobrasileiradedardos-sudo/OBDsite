@@ -16,6 +16,7 @@
     .sticky-col-2 { left: 56px; min-width: 160px; box-shadow: 2px 0 4px -2px rgba(0,0,0,0.2); }
     .sticky-col-right { right: 0; min-width: 90px; box-shadow: -2px 0 4px -2px rgba(0,0,0,0.2); }
     thead .sticky-col { z-index: 3; background-color: #212529; color: #fff; }
+    .etapa-col { font-size: 0.7rem; line-height: 1.15; }
     tbody tr.rank-pos-1 .sticky-col { background-color: #fdf6df; }
     tbody tr.rank-pos-2 .sticky-col { background-color: #f5f5f5; }
     tbody tr.rank-pos-3 .sticky-col { background-color: #fbeee2; }
@@ -46,7 +47,7 @@
                             <th scope="col" class="text-center sticky-col sticky-col-1">#</th>
                             <th scope="col" class="sticky-col sticky-col-2">Jogador</th>
                             {% for etapa in etapas %}
-                            <th scope="col" class="text-center">{{ etapa.name }}</th>
+                            <th scope="col" class="text-center etapa-col">{{ etapa.name }}</th>
                             {% endfor %}
                             <th scope="col" class="text-center sticky-col sticky-col-right">Total</th>
                         </tr>
