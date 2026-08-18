@@ -16,6 +16,7 @@ from decouple import config, Csv
 import cloudinary
 import cloudinary.uploader
 import cloudinary.api
+import resend
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -31,6 +32,8 @@ SECRET_KEY = config('SECRET_KEY')
 DEBUG = os.getenv('DEBUG', 'False') == 'true'
 ALLOWED_HOSTS = os.getenv("ALLOWED_HOSTS", "").split(",")
 DEFAULT_FROM_EMAIL = config('DEFAULT_FROM_EMAIL')
+RESEND_API_KEY = config('RESEND_API_KEY')
+resend.api_key = RESEND_API_KEY
 LOGIN_URL = '/dashboard/player/login'
 
 # Application definition
@@ -168,13 +171,6 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 # Email Configuration
 ADMINS = [("OBD", "organizacaobrasileiradedardos@gmail.com")]
 MANAGERS = ADMINS
-EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
-EMAIL_HOST = config('EMAIL_HOST')
-EMAIL_PORT = config('EMAIL_PORT', cast=int)
-EMAIL_HOST_USER = config('EMAIL_HOST_USER')
-EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD')
-EMAIL_USE_SSL = config('EMAIL_USE_SSL', cast=bool)
-DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 
 cloudinary.config(
     cloud_name=config('CLOUDINARY_NAME'),

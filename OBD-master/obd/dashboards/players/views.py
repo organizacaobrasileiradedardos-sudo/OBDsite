@@ -2,11 +2,11 @@ import datetime
 import hashlib
 import time
 import io
+import resend
 from decouple import config
 from django.contrib import messages
 from django.conf import settings
 from django.contrib.auth.models import User
-from django.core.mail import send_mail
 from django.template.loader import render_to_string
 from django.contrib.auth import login, authenticate, logout
 from django.urls import reverse
@@ -249,7 +249,12 @@ def recoverypassword(request):
 
 def _send_email(subject, from_, to, template_name, context):
     body = render_to_string(template_name, context)
-    send_mail(subject, body, from_, [from_, to])
+    resend.Emails.send({
+        "from": from_,
+        "to": [from_, to],
+        "subject": subject,
+        "text": body,
+    })
 
 
 def updatelogin(request):

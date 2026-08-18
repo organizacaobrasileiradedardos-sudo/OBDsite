@@ -1,7 +1,7 @@
+import resend
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth import logout
-from django.core.mail import send_mail
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
 from django.template.defaultfilters import slugify
@@ -73,4 +73,9 @@ def MemberSubscriptionPage(request):
 
 def _send_email(subject, from_, to, template_name, context):
     body = render_to_string(template_name, context)
-    send_mail(subject, body, from_, [from_, to])
+    resend.Emails.send({
+        "from": from_,
+        "to": [from_, to],
+        "subject": subject,
+        "text": body,
+    })
