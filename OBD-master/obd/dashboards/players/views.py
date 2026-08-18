@@ -232,11 +232,18 @@ def recoverypassword(request):
                'last': u.last_name.capitalize()}
 
     # Send E-Mail to new member with a CC List to OBD Org.
-    _send_email('SOLICITAÇÃO DE RECUPERAÇÃO DE SENHA OBD',
-                settings.DEFAULT_FROM_EMAIL,
-                form.cleaned_data['email'],
-                'recovery_password.txt',
-                context)
+    try:
+        _send_email('SOLICITAÇÃO DE RECUPERAÇÃO DE SENHA OBD',
+                    settings.DEFAULT_FROM_EMAIL,
+                    form.cleaned_data['email'],
+                    'recovery_password.txt',
+                    context)
+    except Exception as e:
+        # DIAGNÓSTICO TEMPORÁRIO - remover após identificar a causa do 500
+        messages.error(request, f'DIAGNÓSTICO: {e}')
+        boasession = ObdSession()
+        token = boasession.startSession()
+        return render(request, 'login.html', {'token': token})
 
     # Success feedback
     messages.success(request, f'Recebemos sua solicitação. Se o e-mail for válido, você receberá em minutos uma nova senha. Atualize a mesma após o login.')
