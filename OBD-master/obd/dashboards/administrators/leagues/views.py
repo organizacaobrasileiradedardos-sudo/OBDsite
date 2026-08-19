@@ -630,7 +630,7 @@ def orderofmerit(request):
             'total': data['total'],
         })
 
-    ranking.sort(key=lambda x: x['total'], reverse=True)
+    ranking.sort(key=lambda x: (-x['total'], x['player'].first_name.lower(), x['player'].last_name.lower()))
 
     # Calcula a posição considerando empates (ex: 1º, 2º, 2º, 4º)
     rank = 0
@@ -676,7 +676,7 @@ def national_ranking(request):
             'total': data['total'],
         })
 
-    ranking.sort(key=lambda x: x['total'], reverse=True)
+    ranking.sort(key=lambda x: (-x['total'], x['player'].first_name.lower(), x['player'].last_name.lower()))
 
     # Calcula a posição considerando empates (ex: 1º, 2º, 2º, 4º)
     rank = 0
