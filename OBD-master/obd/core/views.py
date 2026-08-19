@@ -1,3 +1,5 @@
+import re
+
 from django.contrib.auth.models import User
 from django.shortcuts import render, redirect
 from django.db.models.functions import Cast, Coalesce
@@ -10,6 +12,16 @@ from django.db.models import Avg, Sum, Min, Count, Q, Max, F, Value
 
 from obd.dashboards.players.stats.models import Stat
 from obd.core.models import TournamentResult, PlayerTournamentStat
+
+# Etapas com várias divisões (ex: "1ª ETAPA LIGA NACIONAL OBD 2026 - DIVISÃO A")
+# geram um TournamentResult por divisão. Para contar "torneios realizados" por
+# evento (não por divisão), agrupamos removendo o sufixo "- DIVISÃO X" do nome.
+_DIVISION_SUFFIX_RE = re.compile(r'\s*-\s*divis[aã]o\b.*$', re.IGNORECASE)
+
+
+def _tournament_event_key(name):
+    return _DIVISION_SUFFIX_RE.sub('', name).strip()
+
 
 def index(request):
 
@@ -182,8 +194,15 @@ def index(request):
     stats_180 = _leaderboard('count_180', Sum)
 
     # === OBD em Números (estatísticas gerais) ===
+    current_year = timezone.now().year
+    tournament_names_this_year = TournamentResult.objects.filter(
+        date__year=current_year
+    ).values_list('name', flat=True)
+    tournaments_count = len({_tournament_event_key(name) for name in tournament_names_this_year})
+
     obd_numbers = {
-        'tournaments': TournamentResult.objects.count(),
+        'year': current_year,
+        'tournaments': tournaments_count,
         'players': User.objects.filter(profile__isnull=False).count(),
         'matches': (PlayerTournamentStat.objects.aggregate(Sum('matches_played'))['matches_played__sum'] or 0) // 2,
         'total_180': PlayerTournamentStat.objects.aggregate(Sum('count_180'))['count_180__sum'] or 0,
