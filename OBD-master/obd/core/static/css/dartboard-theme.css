@@ -320,6 +320,11 @@ h6 {
     background: linear-gradient(135deg, var(--dartboard-green) 0%, var(--dartboard-green-dark) 100%);
 }
 
+.card-header-dartboard.gold {
+    background: linear-gradient(135deg, var(--dartboard-gold) 0%, var(--dartboard-gold-dark) 100%);
+    color: var(--dartboard-black);
+}
+
 .card-header-dartboard.black {
     background: linear-gradient(135deg, var(--dartboard-black) 0%, var(--dartboard-gray-dark) 100%);
 }
