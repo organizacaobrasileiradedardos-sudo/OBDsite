@@ -98,7 +98,18 @@ class TournamentResult(models.Model):
     source_url = models.URLField('URL da Fonte')
     date = models.DateField('Data do Torneio', default=timezone.now)
     created_at = models.DateTimeField('Capturado em', auto_now_add=True)
-    
+    prize_value = models.DecimalField(
+        'Premiação Distribuída (R$)',
+        max_digits=10,
+        decimal_places=2,
+        null=True,
+        blank=True,
+        default=None,
+        help_text='Preencha apenas para torneios avulsos (ex: Tour Online). '
+                   'Etapas da Liga Nacional já têm a premiação somada via Order of Merit, '
+                   'não preencha aqui para evitar contar em dobro.',
+    )
+
     class Meta:
         verbose_name = 'Resultado de Torneio'
         verbose_name_plural = 'Resultados de Torneios'

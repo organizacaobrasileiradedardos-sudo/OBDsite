@@ -200,13 +200,18 @@ def index(request):
     ).values_list('name', flat=True)
     tournaments_count = len({_tournament_event_key(name) for name in tournament_names_this_year})
 
+    order_of_merit_prize_total = OrderOfMeritEntry.objects.aggregate(Sum('value'))['value__sum'] or 0
+    standalone_prize_total = TournamentResult.objects.filter(
+        date__year=current_year
+    ).aggregate(Sum('prize_value'))['prize_value__sum'] or 0
+
     obd_numbers = {
         'year': current_year,
         'tournaments': tournaments_count,
         'players': User.objects.filter(profile__isnull=False).count(),
         'matches': (PlayerTournamentStat.objects.aggregate(Sum('matches_played'))['matches_played__sum'] or 0) // 2,
         'total_180': PlayerTournamentStat.objects.aggregate(Sum('count_180'))['count_180__sum'] or 0,
-        'prize_total': OrderOfMeritEntry.objects.aggregate(Sum('value'))['value__sum'] or 0,
+        'prize_total': order_of_merit_prize_total + standalone_prize_total,
     }
 
     matches = Fixture.objects.filter(status=1).order_by('-on_date')[:6]

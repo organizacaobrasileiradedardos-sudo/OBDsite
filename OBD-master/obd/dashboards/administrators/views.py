@@ -1,6 +1,6 @@
 from django.contrib.auth.decorators import login_required, permission_required
 from django.contrib.auth.models import User
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from django.urls import reverse
 from obd.core.models import TournamentResult
@@ -80,7 +80,27 @@ def run_capture(request):
                 messages.error(request, f"Erro: {message}")
         else:
             messages.error(request, "URL não fornecida.")
-    
+
+    return redirect('administrators:scraping_dashboard')
+
+
+@login_required
+@permission_required('profiles.has_admin_role', raise_exception=True)
+def update_tournament_prize(request, tournament_id):
+    tournament = get_object_or_404(TournamentResult, id=tournament_id)
+    if request.method == 'POST':
+        raw_value = request.POST.get('prize_value', '').strip()
+        if not raw_value:
+            tournament.prize_value = None
+        else:
+            try:
+                tournament.prize_value = Decimal(raw_value.replace(',', '.'))
+            except InvalidOperation:
+                messages.error(request, f"Valor de premiação inválido: {raw_value}")
+                return redirect('administrators:scraping_dashboard')
+        tournament.save(update_fields=['prize_value'])
+        messages.success(request, f"Premiação de \"{tournament.name}\" atualizada.")
+
     return redirect('administrators:scraping_dashboard')
 
 

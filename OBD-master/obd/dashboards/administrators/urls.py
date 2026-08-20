@@ -24,6 +24,7 @@ urlpatterns = [
     path('dashboard/admin/logout', views.logoutAdm, name='logout'),
     path('dashboard/admin/scraping/', views.scraping_dashboard, name='scraping_dashboard'),
     path('dashboard/admin/scraping/run/', views.run_capture, name='run_capture'),
+    path('dashboard/admin/scraping/prize/<int:tournament_id>/', views.update_tournament_prize, name='update_tournament_prize'),
     path('dashboard/admin/order-of-merit/', views.order_of_merit_dashboard, name='order_of_merit_dashboard'),
     path('dashboard/admin/order-of-merit/import/', views.import_order_of_merit, name='import_order_of_merit'),
     path('dashboard/admin/national-ranking/', views.national_ranking_dashboard, name='national_ranking_dashboard'),
