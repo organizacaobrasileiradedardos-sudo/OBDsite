@@ -130,7 +130,7 @@
                 <!-- Sponsors Carousel -->
                 <div class="col-lg-4">
                     <div class="card card-dartboard h-100">
-                        <div class="card-header card-header-dartboard gold">
+                        <div class="card-header card-header-dartboard">
                             <i class="bi bi-star"></i> Apoiadores
                         </div>
                         <div class="card-body p-0 d-flex align-items-center bg-white rounded-bottom">
@@ -163,7 +163,7 @@
 <!-- Player Stats -->
             <div class="mb-5">
                 <div class="card card-dartboard" style="background-color: #fdf6e3;">
-                    <div class="card-header card-header-dartboard gold text-center py-3" style="font-size: 2rem;">
+                    <div class="card-header card-header-dartboard text-center py-3" style="font-size: 2rem;">
                         <i class="bi bi-person-lines-fill" style="font-size: 2rem;"></i> Estatísticas OBD
                     </div>
                     <div class="card-body">
@@ -274,7 +274,7 @@
             {% if etapas_list %}
             <div class="mb-5" id="obd-stats">
                 <div class="card card-dartboard" style="background-color: #fdf6e3;">
-                    <div class="card-header card-header-dartboard gold text-center py-3" style="font-size: 2rem;">
+                    <div class="card-header card-header-dartboard text-center py-3" style="font-size: 2rem;">
                         <i class="bi bi-trophy-fill" style="font-size: 2rem;"></i> Estatísticas por Torneio/Campeonato
                     </div>
                     <div class="card-body">
@@ -301,7 +301,7 @@
                             {% for champ in division_champions %}
                             <div class="col-md-3">
                                 <div class="card card-dartboard border-warning h-100">
-                                    <div class="card-header card-header-dartboard gold text-center py-2">
+                                    <div class="card-header card-header-dartboard text-center py-2">
                                         <h6 class="mb-0" style="font-size: 1.5rem;">
                                             <i class="bi bi-trophy-fill text-warning"></i>
                                             {% if champ.division %}Divisão {{ champ.division }}{% else %}{{ champ.tournament_name }}{% endif %}
