@@ -10,6 +10,7 @@
     .rank-pos-3 { background: linear-gradient(90deg, rgba(205,127,50,0.15), transparent); border-left: 4px solid #cd7f32; }
     .rank-total { font-weight: bold; color: #14532d; }
     .rank-empty { color: #ced4da; }
+    .rank-discarded { color: #adb5bd; text-decoration: line-through; }
 
     .sticky-col { position: sticky; z-index: 2; background-color: #fff; vertical-align: middle; }
     .sticky-col-1 { left: 0; width: 56px; }
@@ -41,7 +42,8 @@
 
             <div class="table-responsive">
                 <table class="table table-striped table-bordered caption-top align-middle">
-                    <caption>Pontos recebidos por jogador em cada etapa da Liga Nacional.</caption>
+                    <caption>Pontos recebidos por jogador em cada etapa da Liga Nacional. O total considera apenas os
+                        8 melhores resultados de cada jogador — etapas riscadas em cinza não entraram na conta.</caption>
                     <thead class="table-dark">
                         <tr>
                             <th scope="col" class="text-center sticky-col sticky-col-1">#</th>
@@ -80,10 +82,10 @@
                                 <span class="badge bg-warning text-dark">Não Verificado</span>
                                 {% endif %}
                             </td>
-                            {% for value in row.values %}
+                            {% for v in row.values %}
                             <td class="text-center">
-                                {% if value %}
-                                {{ value|floatformat:0 }}
+                                {% if v.value %}
+                                <span {% if not v.counted %}class="rank-discarded" title="Não contou no total (fora dos 8 melhores resultados)"{% endif %}>{{ v.value|floatformat:0 }}</span>
                                 {% else %}
                                 <span class="rank-empty">—</span>
                                 {% endif %}

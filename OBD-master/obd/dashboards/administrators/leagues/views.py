@@ -648,6 +648,9 @@ def orderofmerit(request):
     return render(request, 'user_public_order_of_merit.html', context)
 
 
+NATIONAL_RANKING_BEST_OF = 8
+
+
 def national_ranking(request):
     etapas = League.objects.filter(
         national_ranking_entries__isnull=False
@@ -662,18 +665,37 @@ def national_ranking(request):
             player_data[pid] = {
                 'player': entry.player,
                 'values_by_league': {},
-                'total': Decimal('0'),
             }
         player_data[pid]['values_by_league'][entry.league_id] = entry.points
-        player_data[pid]['total'] += entry.points
 
     ranking = []
     for data in player_data.values():
-        values = [data['values_by_league'].get(etapa.id) for etapa in etapas]
+        values_by_league = data['values_by_league']
+
+        # A partir da 9ª participação, só os 8 maiores resultados contam no total.
+        counted_league_ids = {
+            league_id
+            for league_id, _ in sorted(
+                values_by_league.items(), key=lambda item: item[1], reverse=True
+            )[:NATIONAL_RANKING_BEST_OF]
+        }
+        total = sum(
+            points for league_id, points in values_by_league.items()
+            if league_id in counted_league_ids
+        )
+
+        values = [
+            {
+                'value': values_by_league.get(etapa.id),
+                'counted': etapa.id in counted_league_ids,
+            }
+            for etapa in etapas
+        ]
+
         ranking.append({
             'player': data['player'],
             'values': values,
-            'total': data['total'],
+            'total': total,
         })
 
     ranking.sort(key=lambda x: (-x['total'], x['player'].first_name.lower(), x['player'].last_name.lower()))
