@@ -12,6 +12,19 @@ Last update: Jul-03-2021
 {% endblock %}
 {% block title %}{{ profile.user.first_name }} {{ profile.user.last_name }} - Perfil público jogador OBD{% endblock %}
 {% block styles %}
+<style>
+    /* .card (style.css) tem fundo escuro (#1e293b) quase idêntico à cor padrão
+       de texto/headings do tema (--dartboard-gray-dark/--dartboard-black),
+       deixando bio, links sociais e títulos dos cards praticamente invisíveis. */
+    .card-header,
+    .card-title,
+    .card-text,
+    .card h5,
+    .card h6,
+    .card p {
+        color: var(--text-primary, #f8fafc);
+    }
+</style>
 {% endblock %}
 {% block content %}
 
