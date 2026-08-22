@@ -1,6 +1,7 @@
 from django import forms
 from django.contrib.auth import authenticate
 from django.contrib.auth.models import User
+from django.contrib.auth.password_validation import validate_password
 from obd.core.obdlib.standardsession import ObdSession
 
 # Class Form for Login action
@@ -80,18 +81,27 @@ class UpdateLoginForm(forms.Form):
             return email2
 
 
-# Class RecoveryPassword Form for new User password being sent by email.
+# Class RecoveryPassword Form to request a password reset link by email.
 class RecoveryPasswordForm(forms.Form):
-    email = forms.EmailField(label='Email', required=False)
+    email = forms.EmailField(label='Email', required=True)
 
-    def clean_email(self):
-        email = self.cleaned_data['email']
-        try:
-            u = User.objects.get(email__iexact=email)
-        except User.DoesNotExist:
-            raise forms.ValidationError(u'O e-mail informado não pertence a nenhum usuário do OBD.')
-        else:
-            return self.cleaned_data['email']
+
+# Class for the player to choose a new password after clicking the reset link.
+class SetNewPasswordForm(forms.Form):
+    password1 = forms.CharField(label='Nova senha', widget=forms.PasswordInput, required=True)
+    password2 = forms.CharField(label='Confirme a nova senha', widget=forms.PasswordInput, required=True)
+
+    def clean_password1(self):
+        password1 = self.cleaned_data['password1']
+        validate_password(password1)
+        return password1
+
+    def clean_password2(self):
+        password1 = self.cleaned_data.get('password1')
+        password2 = self.cleaned_data['password2']
+        if password1 and password2 and password1 != password2:
+            raise forms.ValidationError('As senhas informadas não conferem.')
+        return password2
 
 
 

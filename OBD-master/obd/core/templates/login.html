@@ -85,7 +85,7 @@ Description: This is the page where players can log-in
                         de criptografia/segurança.
                         Por isso, caso esqueça sua senha, é impossível recuperar a mesma através de nosso banco de
                         dados.
-                        Ao receber uma nova senha, você poderá atualizá-la em sua página Profile.
+                        Você receberá por e-mail um link para escolher uma nova senha.
                     </p>
                     <form action="{% url 'players:recoverypassowrd' %}" method="post">
                         {% csrf_token %}

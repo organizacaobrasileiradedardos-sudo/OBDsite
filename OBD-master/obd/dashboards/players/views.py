@@ -1,12 +1,10 @@
 import datetime
-import hashlib
-import time
 import io
 import resend
-from decouple import config
 from django.contrib import messages
 from django.conf import settings
 from django.contrib.auth.models import User
+from django.contrib.auth.tokens import default_token_generator
 from django.template.loader import render_to_string
 from django.contrib.auth import login, authenticate, logout
 from django.urls import reverse
@@ -14,11 +12,13 @@ from django.contrib.auth.decorators import login_required, permission_required
 from django.contrib.messages import get_messages
 from django.http import HttpResponseRedirect, HttpResponse
 from django.shortcuts import render
+from django.utils.encoding import force_bytes, force_str
+from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from obd.core.obdlib.standardsession import ObdSession
 from obd.dashboards.administrators.divisions.models import Division
 from obd.dashboards.administrators.fixtures.models import Fixture
 from obd.dashboards.administrators.leagues.models import League
-from obd.dashboards.players.logins.forms import LoginUserForm, UpdateLoginForm, RecoveryPasswordForm
+from obd.dashboards.players.logins.forms import LoginUserForm, UpdateLoginForm, RecoveryPasswordForm, SetNewPasswordForm
 from obd.dashboards.players.stats.models import Stat
 from obd.dashboards.administrators.results.models import Result
 import pandas as pd
@@ -216,35 +216,67 @@ def recoverypassword(request):
         token = boasession.startSession()
         return render(request, 'login.html', {'form': form, 'token': token})
 
-    u = User.objects.get(email=form.cleaned_data['email'])
+    email = form.cleaned_data['email']
+    try:
+        u = User.objects.get(email__iexact=email)
+    except User.DoesNotExist:
+        u = None
 
-    for x in range(5):
-        key = hashlib.md5(str(time.time()).split('.')[1].encode('utf-8')).hexdigest()
-        for y in range(5):
-            force = hashlib.md5(str(time.time()).split('.')[1].encode('utf-8')).hexdigest()
+    # Só envia o e-mail se o cadastro existir, mas a mensagem exibida é sempre
+    # a mesma (evita revelar se um e-mail está ou não cadastrado no OBD).
+    if u is not None:
+        uidb64 = urlsafe_base64_encode(force_bytes(u.pk))
+        reset_token = default_token_generator.make_token(u)
+        reset_link = request.build_absolute_uri(
+            reverse('players:password_reset_confirm', kwargs={'uidb64': uidb64, 'token': reset_token})
+        )
 
-    code = (force+key+config('RECOVERY_KEY')).encode('utf-8')
-    code = hashlib.md5(code).hexdigest()[:11]
+        context = {'reset_link': reset_link,
+                   'username': u.username,
+                   'first': u.first_name.capitalize(),
+                   'last': u.last_name.capitalize()}
 
-    context = {'code': code,
-               'username': u.username,
-               'first': u.first_name.capitalize(),
-               'last': u.last_name.capitalize()}
+        _send_email('SOLICITAÇÃO DE RECUPERAÇÃO DE SENHA OBD',
+                    settings.DEFAULT_FROM_EMAIL,
+                    email,
+                    'recovery_password.txt',
+                    context)
 
-    # Send E-Mail to new member with a CC List to OBD Org.
-    _send_email('SOLICITAÇÃO DE RECUPERAÇÃO DE SENHA OBD',
-                settings.DEFAULT_FROM_EMAIL,
-                form.cleaned_data['email'],
-                'recovery_password.txt',
-                context)
-
-    # Success feedback
-    messages.success(request, f'Recebemos sua solicitação. Se o e-mail for válido, você receberá em minutos uma nova senha. Atualize a mesma após o login.')
+    # Success feedback (genérico, independente de o e-mail existir ou não)
+    messages.success(request, 'Recebemos sua solicitação. Se o e-mail informado estiver cadastrado, você receberá em instantes um link para redefinir sua senha.')
     boasession = ObdSession()
     token = boasession.startSession()
-    u.set_password(code)
-    u.save()
     return render(request, 'login.html', {'token': token})
+
+
+def password_reset_confirm(request, uidb64, token):
+    try:
+        uid = force_str(urlsafe_base64_decode(uidb64))
+        u = User.objects.get(pk=uid)
+    except (TypeError, ValueError, OverflowError, User.DoesNotExist):
+        u = None
+
+    valid_link = u is not None and default_token_generator.check_token(u, token)
+
+    if not valid_link:
+        boasession = ObdSession()
+        session_token = boasession.startSession()
+        messages.error(request, 'Este link de redefinição de senha é inválido ou já expirou. Solicite um novo.')
+        return render(request, 'login.html', {'form': LoginUserForm(), 'token': session_token})
+
+    if request.method == 'POST':
+        form = SetNewPasswordForm(request.POST)
+        if form.is_valid():
+            u.set_password(form.cleaned_data['password1'])
+            u.save()
+            boasession = ObdSession()
+            session_token = boasession.startSession()
+            messages.success(request, 'Senha redefinida com sucesso! Faça login com sua nova senha.')
+            return render(request, 'login.html', {'form': LoginUserForm(), 'token': session_token})
+    else:
+        form = SetNewPasswordForm()
+
+    return render(request, 'password_reset_confirm.html', {'form': form})
 
 
 def _send_email(subject, from_, to, template_name, context):

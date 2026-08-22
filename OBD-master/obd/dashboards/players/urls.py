@@ -22,6 +22,7 @@ urlpatterns = [
     path('dashboard/player/', views.dashboard, name='dashboard'),
     path('dashboard/player/login', views.loginuser, name='login'),
     path('dashboard/player/login/recovery/password', views.recoverypassword, name='recoverypassowrd'),
+    path('dashboard/player/login/recovery/password/confirm/<uidb64>/<token>', views.password_reset_confirm, name='password_reset_confirm'),
     path('dashboard/player/logout', views.logoutuser, name='logout'),
     path('dashboard/player/access', views.currentlogin, name='access'),
     path('dashboard/player/access/admin/audit', views.audit, name='audit'),
