@@ -67,17 +67,17 @@ Description: This is the page where main data will remains.
                   <span class="badge bg-warning text-dark">Não Verificado</span>
                   {% endif %}
               </a>
-            <div class="rect-img-container">
-              <img class="rect-img figure-img img-fluid rounded" src="{{ player.profile.photo }}" align="center"
-                title="{{ profile.nickname }}" alt="{{ profile.nickname }}">
-            </div>
+            <a href="{% url 'profiles:publicprofile_by_pin' pin=player.profile.pin %}">
+              <div class="rect-img-container">
+                <img class="rect-img figure-img img-fluid rounded" src="{{ player.profile.photo }}" align="center"
+                  title="{{ profile.nickname }}" alt="{{ profile.nickname }}">
+              </div>
+            </a>
             <div class="card-body">
               <p class="card-text">
               <div class="list-group" align="center">
               </div>
-              <li class="list-group-item">{{ player.profile.bio | truncatechars:120 }}...
-                  <a href="{% url 'profiles:publicprofile_by_pin' pin=player.profile.pin %}">ver perfil.</a>
-              </li>
+              <li class="list-group-item">{{ player.profile.bio | truncatechars:120 }}...</li>
               <li class="list-group-item">{{ player.profile.country }} - {{ player.profile.state }}</li>
               <li class="list-group-item">{{ player.profile.darts }}</li>
 
