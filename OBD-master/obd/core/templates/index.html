@@ -5,6 +5,13 @@
 {% endblock %}
 {% block title %}Página Inicial | OBD - Organização Brasileira de Dardos{% endblock %}
 {% block styles %}
+<style>
+    /* .list-group-item (style.css) tem fundo escuro (#1e293b) quase idêntico à cor
+       padrão de h1-h6 (--dartboard-black: #1F2937), deixando o título invisível. */
+    #obd-news .list-group-item h6 {
+        color: var(--text-primary, #f8fafc);
+    }
+</style>
 {% endblock %}
 {% block content %}
 
