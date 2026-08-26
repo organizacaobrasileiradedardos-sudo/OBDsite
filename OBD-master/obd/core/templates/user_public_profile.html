@@ -40,7 +40,7 @@ Last update: Jul-03-2021
             <a href="{% url 'boaplayers' %}" class="btn btn-outline-secondary btn-sm mb-3">
                 <i class="bi bi-arrow-left"></i> Voltar para Jogadores OBD
             </a>
-            <h2 class="card-title"><strong><i class="bi bi-list-stars"></i> Perfil Público de {{ profile.user.first_name }} {{ profile.user.last_name }} @{{ profile.nickname }}</strong>
+            <h2 class="card-title"><strong><i class="bi bi-list-stars"></i> Perfil Público de {{ profile.user.first_name }} {{ profile.user.last_name }}{% if profile.nickname %} @{{ profile.nickname }}{% endif %}</strong>
                 {% if not profile.is_verified %}
                 <span class="badge bg-warning text-dark">Não Verificado</span>
                 {% endif %}
