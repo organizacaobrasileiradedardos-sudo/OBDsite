@@ -34,7 +34,7 @@ class NewsAdmin(admin.ModelAdmin):
     ordering = ('-published_date',)
     fieldsets = (
         ('Informações da Notícia', {
-            'fields': ('title', 'summary', 'link', 'source')
+            'fields': ('title', 'summary', 'content', 'link', 'source')
         }),
         ('Mídia', {
             'fields': ('image', 'image_url'),

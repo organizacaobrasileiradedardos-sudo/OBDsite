@@ -45,6 +45,12 @@ class News(models.Model):
     """Model for darts news"""
     title = models.CharField('Título', max_length=200)
     summary = models.TextField('Resumo')
+    content = models.TextField(
+        'Conteúdo Completo',
+        blank=True,
+        help_text='Preencha para notícias próprias da OBD (sem link de fonte externa). '
+                   'Vira a página que abre ao clicar na notícia no site.',
+    )
     link = models.URLField('Link da Notícia (fonte externa, opcional)', blank=True)
     source = models.CharField('Fonte', max_length=100)
     published_date = models.DateField('Data de Publicação')

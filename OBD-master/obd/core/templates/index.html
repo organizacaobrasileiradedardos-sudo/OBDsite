@@ -79,25 +79,15 @@
                                             class="bi bi-newspaper text-dartboard-green"></i> Notícias</h5>
                                     {% if news %}<div class="list-group list-group-flush">
                                         {% for item in news %}
-                                        {% if item.link %}
-                                        <a href="{{ item.link }}"
-                                            class="list-group-item list-group-item-action flex-column align-items-start"
-                                            target="_blank">
+                                        <a href="{% if item.link %}{{ item.link }}{% else %}{% url 'news_detail' pk=item.id %}{% endif %}"
+                                            {% if item.link %}target="_blank"{% endif %}
+                                            class="list-group-item list-group-item-action flex-column align-items-start">
                                             <div class="d-flex w-100 justify-content-between">
                                                 <h6 class="mb-1 fw-bold">{{ item.title }}</h6>
                                                 <small class="text-muted">{{ item.published_date|date:'d/m/Y' }}</small>
                                             </div>
                                             <p class="mb-1 small text-muted">{{ item.summary|truncatechars:60 }}</p>
                                         </a>
-                                        {% else %}
-                                        <div class="list-group-item flex-column align-items-start">
-                                            <div class="d-flex w-100 justify-content-between">
-                                                <h6 class="mb-1 fw-bold">{{ item.title }}</h6>
-                                                <small class="text-muted">{{ item.published_date|date:'d/m/Y' }}</small>
-                                            </div>
-                                            <p class="mb-1 small text-muted">{{ item.summary|truncatechars:60 }}</p>
-                                        </div>
-                                        {% endif %}
                                         {% endfor %}
                                     </div>
                                     <div class="mt-3 text-center">

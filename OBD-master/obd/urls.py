@@ -27,9 +27,10 @@ from obd.core.views import (  # Imports explícitos para clareza e evitar NameEr
     public_league_view, 
     public_division_view, 
     public_result,
-    events_list, 
-    news_list, 
-    documents_list, 
+    events_list,
+    news_list,
+    news_detail,
+    documents_list,
     obd_organization
 )
 from obd.subscriptions.views import subscribe
@@ -69,6 +70,7 @@ urlpatterns = [
     # New URLs for Events, News, and Documents
     path('eventos/', events_list, name='events'),
     path('noticias/', news_list, name='news'),
+    path('noticias/<int:pk>/', news_detail, name='news_detail'),
     path('documentos/', documents_list, name='documents'),
     path('obd/', obd_organization, name='obd_organization'),
     path('favicon.ico', RedirectView.as_view(url=static("media/logos/LOGO_OBD.png"))),

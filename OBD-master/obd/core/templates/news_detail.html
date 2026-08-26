@@ -1,0 +1,56 @@
+<!--
+Project name: OBD - Organização Brasileira de Dardos
+Property: Organização Brasileira de Dardos
+Developers: Guilherme Altomar by IA
+Page name: news_detail.html (Página com o conteúdo completo de uma notícia da OBD)
+Description: This is the page where the full content of a single news article is shown.
+-->
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ news.title }} | OBD{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="row">
+        <div class="col-lg-8 mx-auto">
+
+            <a href="{% url 'news' %}" class="btn btn-outline-secondary btn-sm mb-3">
+                <i class="bi bi-arrow-left"></i> Voltar para Notícias
+            </a>
+
+            <article class="card card-dartboard">
+                {% if news.display_image_url %}
+                <img src="{{ news.display_image_url }}" class="card-img-top" alt="{{ news.title }}"
+                    style="max-height: 400px; object-fit: cover;">
+                {% endif %}
+                <div class="card-body">
+                    {% if news.is_featured %}
+                    <span class="badge bg-warning text-dark mb-2">
+                        <i class="bi bi-star-fill"></i> Destaque
+                    </span>
+                    {% endif %}
+                    <h1 class="h2 fw-bold">{{ news.title }}</h1>
+                    <p class="text-muted small mb-4">
+                        <i class="bi bi-calendar3"></i> {{ news.published_date|date:"d/m/Y" }} |
+                        <i class="bi bi-building"></i> {{ news.source }}
+                    </p>
+
+                    <div class="news-content">
+                        {{ news.content|default:news.summary|linebreaks }}
+                    </div>
+
+                    {% if news.link %}
+                    <p class="mt-4">
+                        <a href="{{ news.link }}" target="_blank" class="btn btn-dartboard-secondary btn-sm">
+                            <i class="bi bi-box-arrow-up-right"></i> Ver fonte original
+                        </a>
+                    </p>
+                    {% endif %}
+                </div>
+            </article>
+
+        </div>
+    </div>
+</div>
+{% endblock %}

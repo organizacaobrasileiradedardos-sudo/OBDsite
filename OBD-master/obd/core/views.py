@@ -1,7 +1,7 @@
 import re
 
 from django.contrib.auth.models import User
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.db.models.functions import Cast, Coalesce
 from obd.dashboards.administrators.divisions.models import Division
 from obd.dashboards.administrators.fixtures.models import Fixture
@@ -464,12 +464,18 @@ def news_list(request):
     """Display news articles"""
     featured_news = News.objects.filter(is_active=True, is_featured=True).order_by('-published_date')[:3]
     all_news = News.objects.filter(is_active=True).order_by('-published_date')[:20]
-    
+
     context = {
         'featured_news': featured_news,
         'all_news': all_news,
     }
     return render(request, 'news.html', context)
+
+
+def news_detail(request, pk):
+    """Display the full content of a single OBD-authored news article"""
+    news = get_object_or_404(News, pk=pk, is_active=True)
+    return render(request, 'news_detail.html', {'news': news})
 
 
 def documents_list(request):
