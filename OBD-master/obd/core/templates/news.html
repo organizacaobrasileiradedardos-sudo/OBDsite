@@ -44,11 +44,13 @@
                                 <i class="bi bi-building"></i> {{ news.source }}
                             </p>
                         </div>
+                        {% if news.link %}
                         <div class="card-footer card-footer-dartboard">
                             <a href="{{ news.link }}" target="_blank" class="btn btn-dartboard-secondary btn-sm w-100">
                                 <i class="bi bi-box-arrow-up-right"></i> Ler Notícia Completa
                             </a>
                         </div>
+                        {% endif %}
                     </div>
                 </div>
                 {% endfor %}
@@ -73,10 +75,14 @@
                             <div class="row align-items-center">
                                 <div class="col-md-8">
                                     <h5 class="card-title mb-2">
+                                        {% if news.link %}
                                         <a href="{{ news.link }}" target="_blank"
                                             class="text-decoration-none text-dark">
                                             {{ news.title }}
                                         </a>
+                                        {% else %}
+                                        {{ news.title }}
+                                        {% endif %}
                                     </h5>
                                     <p class="card-text text-muted mb-2">{{ news.summary|truncatewords:30 }}</p>
                                     <p class="small text-muted mb-0">
@@ -84,11 +90,13 @@
                                         <i class="bi bi-building"></i> {{ news.source }}
                                     </p>
                                 </div>
+                                {% if news.link %}
                                 <div class="col-md-4 text-end">
                                     <a href="{{ news.link }}" target="_blank" class="btn btn-outline-primary btn-sm">
                                         <i class="bi bi-box-arrow-up-right"></i> Ler Mais
                                     </a>
                                 </div>
+                                {% endif %}
                             </div>
                         </div>
                     </div>
