@@ -26,8 +26,8 @@
                 {% for news in featured_news %}
                 <div class="col-md-4">
                     <div class="card card-dartboard h-100 hover-lift">
-                        {% if news.image_url %}
-                        <img src="{{ news.image_url }}" class="card-img-top" alt="{{ news.title }}"
+                        {% if news.display_image_url %}
+                        <img src="{{ news.display_image_url }}" class="card-img-top" alt="{{ news.title }}"
                             style="height: 200px; object-fit: cover;">
                         {% else %}
                         <div class="card-img-top bg-gradient"

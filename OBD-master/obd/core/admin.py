@@ -37,7 +37,8 @@ class NewsAdmin(admin.ModelAdmin):
             'fields': ('title', 'summary', 'link', 'source')
         }),
         ('Mídia', {
-            'fields': ('image_url',)
+            'fields': ('image', 'image_url'),
+            'description': 'Envie um arquivo de imagem OU informe uma URL externa. Se as duas forem preenchidas, o upload tem prioridade.'
         }),
         ('Data e Configurações', {
             'fields': ('published_date', 'is_featured', 'is_active')

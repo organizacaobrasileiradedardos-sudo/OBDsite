@@ -48,7 +48,8 @@ class News(models.Model):
     link = models.URLField('Link da Notícia')
     source = models.CharField('Fonte', max_length=100)
     published_date = models.DateField('Data de Publicação')
-    image_url = models.URLField('URL da Imagem', blank=True)
+    image = CloudinaryField('Imagem (upload)', blank=True, null=True)
+    image_url = models.URLField('URL da Imagem (alternativa ao upload)', blank=True)
     is_featured = models.BooleanField('Destaque', default=False)
     is_active = models.BooleanField('Ativo', default=True)
     created_at = models.DateTimeField('Criado em', auto_now_add=True)
@@ -61,6 +62,13 @@ class News(models.Model):
     
     def __str__(self):
         return f"{self.title} - {self.source}"
+
+    @property
+    def display_image_url(self):
+        """Prioriza a imagem enviada por upload; usa a URL externa como alternativa."""
+        if self.image:
+            return self.image.url
+        return self.image_url
 
 
 class Document(models.Model):
