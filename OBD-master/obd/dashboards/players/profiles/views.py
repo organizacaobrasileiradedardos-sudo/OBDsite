@@ -116,12 +116,48 @@ def publicprofile(request, pin, first, last):
 
     recent_tournaments = t_stats.select_related('tournament').order_by('-tournament__date')[:10]
 
+    # QR Code (mesma lógica do dashboard) apontando para esta própria página pública
+    qr_code_base64 = None
+    if profile.pin and profile.user.first_name and profile.user.last_name:
+        try:
+            import qrcode
+            import base64
+            import io
+
+            profile_url = reverse('profiles:publicprofile', kwargs={
+                'pin': profile.pin,
+                'first': profile.user.first_name,
+                'last': profile.user.last_name
+            })
+            full_url = request.build_absolute_uri(profile_url)
+
+            qr = qrcode.QRCode(
+                version=1,
+                error_correction=qrcode.constants.ERROR_CORRECT_L,
+                box_size=10,
+                border=4,
+            )
+            qr.add_data(full_url)
+            qr.make(fit=True)
+
+            img = qr.make_image(fill_color="black", back_color="white")
+
+            buffer = io.BytesIO()
+            img.save(buffer, format="PNG")
+            qr_image = base64.b64encode(buffer.getvalue()).decode()
+            qr_code_base64 = f"data:image/png;base64,{qr_image}"
+
+        except Exception as e:
+            print(f"Error generating QR code: {e}")
+            qr_code_base64 = None
+
     context = {'total': total,
                'profile': profile,
                'stat': stat,
                'matches': matches,
                'recent_tournaments': recent_tournaments,
-               'tournament_summary': tournament_summary}
+               'tournament_summary': tournament_summary,
+               'qr_code': qr_code_base64}
 
     return render(request, 'user_public_profile.html', context)
 
