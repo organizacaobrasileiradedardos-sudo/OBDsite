@@ -277,7 +277,7 @@ def index(request):
 
 
 def public_players(request):
-    players = User.objects.all().order_by('first_name', 'last_name')
+    players = User.objects.filter(is_superuser=False).order_by('first_name', 'last_name')
     return render(request, 'user_public_players.html', {'players': players})
 
 def public_leagues(request):
