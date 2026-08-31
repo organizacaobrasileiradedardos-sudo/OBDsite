@@ -48,8 +48,8 @@ Description: This is the page where the full content of a single news article is
                     <div class="row g-2 mt-3">
                         {% for img in news.gallery_images.all %}
                         <div class="col-6 col-md-4">
-                            <a href="{{ img.image.url }}" target="_blank">
-                                <img src="{{ img.image.url }}" class="img-fluid rounded" alt="{{ img.caption|default:news.title }}"
+                            <a href="{{ img.display_url }}" target="_blank">
+                                <img src="{{ img.display_url }}" class="img-fluid rounded" alt="{{ img.caption|default:news.title }}"
                                     style="height: 150px; width: 100%; object-fit: cover;">
                             </a>
                             {% if img.caption %}

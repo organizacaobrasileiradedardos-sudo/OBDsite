@@ -73,7 +73,10 @@ class News(models.Model):
     def display_image_url(self):
         """Prioriza a imagem enviada por upload; usa a URL externa como alternativa."""
         if self.image:
-            return self.image.url
+            # angle='exif' aplica a rotação correta com base no EXIF da foto
+            # (comum em fotos de celular), já que nem todo visualizador/crawler
+            # (ex: gerador de prévia do WhatsApp) respeita o EXIF sozinho.
+            return self.image.build_url(angle='exif')
         return self.image_url
 
 
@@ -91,6 +94,10 @@ class NewsImage(models.Model):
 
     def __str__(self):
         return f"Imagem de {self.news.title}"
+
+    @property
+    def display_url(self):
+        return self.image.build_url(angle='exif')
 
 
 class Document(models.Model):
