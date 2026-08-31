@@ -73,7 +73,7 @@ urlpatterns = [
     path('noticias/<int:pk>/', news_detail, name='news_detail'),
     path('documentos/', documents_list, name='documents'),
     path('obd/', obd_organization, name='obd_organization'),
-    path('favicon.ico', RedirectView.as_view(url=static("media/logos/LOGO_OBD.png"))),
+    path('favicon.ico', RedirectView.as_view(url=static("media/logos/Logo_OBD_3.jpeg"))),
 ]
 
 # Serve media files in development
