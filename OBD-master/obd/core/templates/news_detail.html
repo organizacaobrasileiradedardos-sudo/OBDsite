@@ -41,7 +41,7 @@ Description: This is the page where the full content of a single news article is
                     </p>
 
                     <div class="news-content">
-                        {{ news.content|default:news.summary|linebreaks }}
+                        {{ news.content|default:news.summary|urlize|linebreaks }}
                     </div>
 
                     {% if news.gallery_images.all %}
