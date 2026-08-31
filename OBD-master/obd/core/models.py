@@ -77,6 +77,22 @@ class News(models.Model):
         return self.image_url
 
 
+class NewsImage(models.Model):
+    """Extra gallery images for a News article, in addition to its main image"""
+    news = models.ForeignKey(News, on_delete=models.CASCADE, related_name='gallery_images')
+    image = CloudinaryField('Imagem')
+    caption = models.CharField('Legenda', max_length=200, blank=True)
+    order = models.PositiveIntegerField('Ordem', default=0)
+
+    class Meta:
+        verbose_name = 'Imagem da Galeria'
+        verbose_name_plural = 'Imagens da Galeria'
+        ordering = ['order', 'id']
+
+    def __str__(self):
+        return f"Imagem de {self.news.title}"
+
+
 class Document(models.Model):
     """Model for official documents"""
     CATEGORY_CHOICES = [

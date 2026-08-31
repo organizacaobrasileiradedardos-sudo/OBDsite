@@ -1,5 +1,11 @@
 from django.contrib import admin
-from .models import Event, News, Document
+from .models import Event, News, NewsImage, Document
+
+
+class NewsImageInline(admin.TabularInline):
+    model = NewsImage
+    extra = 1
+    fields = ('image', 'caption', 'order')
 
 
 @admin.register(Event)
@@ -32,13 +38,16 @@ class NewsAdmin(admin.ModelAdmin):
     search_fields = ('title', 'summary', 'source')
     date_hierarchy = 'published_date'
     ordering = ('-published_date',)
+    inlines = [NewsImageInline]
     fieldsets = (
         ('Informações da Notícia', {
             'fields': ('title', 'summary', 'content', 'link', 'source')
         }),
         ('Mídia', {
             'fields': ('image', 'image_url'),
-            'description': 'Envie um arquivo de imagem OU informe uma URL externa. Se as duas forem preenchidas, o upload tem prioridade.'
+            'description': 'Imagem principal: envie um arquivo OU informe uma URL externa (se as duas forem '
+                            'preenchidas, o upload tem prioridade). Para adicionar mais fotos, use a seção '
+                            '"Imagens da Galeria" logo abaixo.'
         }),
         ('Data e Configurações', {
             'fields': ('published_date', 'is_featured', 'is_active')

@@ -44,6 +44,22 @@ Description: This is the page where the full content of a single news article is
                         {{ news.content|default:news.summary|linebreaks }}
                     </div>
 
+                    {% if news.gallery_images.all %}
+                    <div class="row g-2 mt-3">
+                        {% for img in news.gallery_images.all %}
+                        <div class="col-6 col-md-4">
+                            <a href="{{ img.image.url }}" target="_blank">
+                                <img src="{{ img.image.url }}" class="img-fluid rounded" alt="{{ img.caption|default:news.title }}"
+                                    style="height: 150px; width: 100%; object-fit: cover;">
+                            </a>
+                            {% if img.caption %}
+                            <p class="small text-muted mb-0 mt-1">{{ img.caption }}</p>
+                            {% endif %}
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+
                     {% if news.link %}
                     <p class="mt-4">
                         <a href="{{ news.link }}" target="_blank" class="btn btn-dartboard-secondary btn-sm">
