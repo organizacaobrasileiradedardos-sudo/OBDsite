@@ -12,7 +12,7 @@ Description: This is the page where the full content of a single news article is
 
 {% block og_title %}{{ news.title }}{% endblock %}
 {% block og_description %}{{ news.content|default:news.summary|truncatewords:30 }}{% endblock %}
-{% block og_image %}{% if news.display_image_url %}{{ news.display_image_url }}{% else %}{{ request.scheme }}://{{ request.get_host }}{% static 'media/logos/LOGO_OBD.png' %}{% endif %}{% endblock %}
+{% block og_image %}{% if news.display_image_url %}{{ news.display_image_url }}{% else %}{{ request.scheme }}://{{ request.get_host }}{% static 'media/logos/Logo_OBD_3.jpeg' %}{% endif %}{% endblock %}
 
 {% block content %}
 <div class="container my-5">
