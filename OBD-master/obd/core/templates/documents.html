@@ -124,7 +124,7 @@
 <script>
     function abrirDocumento(url, titulo) {
         document.getElementById('documentModalLabel').textContent = titulo;
-        document.getElementById('documentFrame').src = url + '#toolbar=0&navpanes=0&scrollbar=1';
+        document.getElementById('documentFrame').src = url + '#toolbar=1&navpanes=0&scrollbar=1';
         var modal = new bootstrap.Modal(document.getElementById('documentModal'));
         modal.show();
 
