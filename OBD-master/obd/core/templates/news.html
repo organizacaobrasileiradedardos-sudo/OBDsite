@@ -77,7 +77,7 @@
                                     <h5 class="card-title mb-2">
                                         <a href="{% if news.link %}{{ news.link }}{% else %}{% url 'news_detail' pk=news.id %}{% endif %}"
                                             {% if news.link %}target="_blank"{% endif %}
-                                            class="text-decoration-none text-dark">
+                                            class="text-decoration-none text-white">
                                             {{ news.title }}
                                         </a>
                                     </h5>
