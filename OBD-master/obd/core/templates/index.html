@@ -11,6 +11,13 @@
     #obd-news .list-group-item h6 {
         color: var(--text-primary, #f8fafc);
     }
+
+    /* .list-group-item-action:hover (Bootstrap) troca pra um fundo claro por padrão,
+       o que deixava o título (forçado branco acima) ilegível ao passar o mouse. */
+    #obd-news .list-group-item-action:hover,
+    #obd-news .list-group-item-action:focus {
+        background-color: #263449;
+    }
 </style>
 {% endblock %}
 {% block content %}
