@@ -421,8 +421,16 @@ EVENT_COLOR_PALETTE = [
 def events_list(request):
     """Display upcoming and past events"""
     now = timezone.now()
-    upcoming_events = Event.objects.filter(is_active=True, event_date__gte=now).order_by('event_date')
-    past_events = Event.objects.filter(is_active=True, event_date__lt=now).order_by('-event_date')[:10]
+
+    # Um evento é "passado" quando já terminou (end_date, se houver, senão
+    # event_date) — não simplesmente quando já começou. Assim, um evento em
+    # andamento (começou mas ainda não acabou) continua aparecendo como
+    # futuro/atual no calendário, em vez de cair em "Eventos Passados".
+    still_upcoming = Q(end_date__isnull=False, end_date__gte=now) | Q(end_date__isnull=True, event_date__gte=now)
+    already_past = Q(end_date__isnull=False, end_date__lt=now) | Q(end_date__isnull=True, event_date__lt=now)
+
+    upcoming_events = Event.objects.filter(is_active=True).filter(still_upcoming).order_by('event_date')
+    past_events = Event.objects.filter(is_active=True).filter(already_past).order_by('-event_date')[:10]
 
     # Serialize events for FullCalendar
     calendar_events = []
