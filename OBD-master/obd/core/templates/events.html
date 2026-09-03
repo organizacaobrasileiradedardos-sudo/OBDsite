@@ -310,22 +310,12 @@
         },
 
         eventDidMount: function (info) {
-            // Create dartboard icon element
-            var icon = document.createElement('img');
-            icon.src = "{% static 'media/dartboard_event_icon_v2.png' %}";
-            // Larger size and background matching calendar theme
-            icon.style.width = '40px';
-            icon.style.height = '40px';
-            icon.style.display = 'block';
-            icon.style.margin = '0 auto 4px';
-            icon.style.backgroundColor = 'transparent'; // Transparent to show grid background
-            // Insert icon above the event title
+            // Aplica a cor própria do evento no "pill" do título (permite
+            // distinguir visualmente eventos que coincidem no mesmo dia)
             var titleEl = info.el.querySelector('.fc-event-title');
-            if (titleEl) {
-                // Insert icon before title element
-                titleEl.parentNode.insertBefore(icon, titleEl);
+            if (titleEl && info.event.backgroundColor) {
+                titleEl.style.backgroundColor = info.event.backgroundColor;
             }
-            // Preserve existing tooltip
             info.el.title = info.event.title + '\n' + (info.event.extendedProps.location || '');
         }
     });

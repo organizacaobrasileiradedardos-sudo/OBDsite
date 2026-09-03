@@ -406,18 +406,29 @@ from django.core.serializers.json import DjangoJSONEncoder
 
 from datetime import timedelta
 
+# Paleta de cores cíclica para distinguir eventos que coincidem no calendário
+EVENT_COLOR_PALETTE = [
+    '#b91d47',  # vermelho (dartboard)
+    '#059669',  # verde (dartboard)
+    '#d97706',  # dourado
+    '#2563eb',  # azul
+    '#7c3aed',  # roxo
+    '#db2777',  # rosa
+    '#0891b2',  # ciano
+    '#ea580c',  # laranja
+]
+
 def events_list(request):
     """Display upcoming and past events"""
     now = timezone.now()
     upcoming_events = Event.objects.filter(is_active=True, event_date__gte=now).order_by('event_date')
     past_events = Event.objects.filter(is_active=True, event_date__lt=now).order_by('-event_date')[:10]
-    
+
     # Serialize events for FullCalendar
     calendar_events = []
-    for event in upcoming_events:
-        # Check if it's a multi-day event
-        # Check if it's a multi-day event
+    for idx, event in enumerate(upcoming_events):
         flyer_url = event.flyer.url if event.flyer else None
+        event_color = EVENT_COLOR_PALETTE[idx % len(EVENT_COLOR_PALETTE)]
 
         if event.end_date and event.end_date.date() > event.event_date.date():
             current_date = event.event_date.date()
@@ -430,6 +441,8 @@ def events_list(request):
                     'allDay': True, # Force all-day rendering for each block
                     'description': event.description,
                     'location': event.location,
+                    'backgroundColor': event_color,
+                    'borderColor': event_color,
                     'extendedProps': {
                         'location': event.location,
                         'description': event.description,
@@ -445,6 +458,8 @@ def events_list(request):
                 'allDay': True,
                 'description': event.description,
                 'location': event.location,
+                'backgroundColor': event_color,
+                'borderColor': event_color,
                 'extendedProps': {
                     'location': event.location,
                     'description': event.description,
