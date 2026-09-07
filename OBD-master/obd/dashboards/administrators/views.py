@@ -72,7 +72,8 @@ def run_capture(request):
     if request.method == 'POST':
         url = request.POST.get('url')
         if url:
-            scraper = N01TournamentScraper(url)
+            in_progress = request.POST.get('in_progress') == 'on'
+            scraper = N01TournamentScraper(url, in_progress=in_progress)
             success, message = scraper.run()
             if success:
                 messages.success(request, message)
@@ -100,6 +101,35 @@ def update_tournament_prize(request, tournament_id):
                 return redirect('administrators:scraping_dashboard')
         tournament.save(update_fields=['prize_value'])
         messages.success(request, f"Premiação de \"{tournament.name}\" atualizada.")
+
+    return redirect('administrators:scraping_dashboard')
+
+
+@login_required
+@permission_required('profiles.has_admin_role', raise_exception=True)
+def update_tournament_progress(request, tournament_id):
+    tournament = get_object_or_404(TournamentResult, id=tournament_id)
+    if request.method != 'POST':
+        return redirect('administrators:scraping_dashboard')
+
+    was_in_progress = tournament.in_progress
+    tournament.in_progress = request.POST.get('in_progress') == 'on'
+    tournament.save(update_fields=['in_progress'])
+
+    if tournament.in_progress:
+        messages.success(request, f"\"{tournament.name}\" marcada como etapa em andamento.")
+        return redirect('administrators:scraping_dashboard')
+
+    messages.success(request, f"\"{tournament.name}\" marcada como finalizada.")
+
+    # Finalizar é o momento de registrar o campeão: o pódio já está no banco.
+    if was_in_progress:
+        from obd.dashboards.administrators.champions.utils import register_champion_from_tournament
+        champion = register_champion_from_tournament(tournament)
+        if champion:
+            messages.success(request, f"Campeão registrado: {champion.p1.first_name} {champion.p1.last_name}.")
+        else:
+            messages.warning(request, "Nenhum 1º colocado encontrado — campeão não registrado.")
 
     return redirect('administrators:scraping_dashboard')
 

@@ -128,3 +128,26 @@ def register_champion(league: League, division: Division, champion_user: User, p
             champion.p3 = p3_user
         champion.save()
     return champion
+
+
+def register_champion_from_tournament(tournament):
+    """Registra o campeão de um torneio já capturado, usando os dados do banco.
+
+    Serve para o momento em que uma etapa é marcada como finalizada: o pódio já
+    está gravado em PlayerTournamentStat, então não é preciso recapturar nada.
+    Devolve o Champion criado/atualizado, ou None se não houver 1º colocado.
+    """
+    def player_at(rank):
+        stat = tournament.stats.filter(rank=rank).first()
+        return stat.player if stat else None
+
+    champion_user = player_at(1)
+    if not champion_user:
+        return None
+
+    league, division = get_or_create_league(tournament.name, tournament.date)
+    return register_champion(
+        league, division, champion_user,
+        p2_user=player_at(2),
+        p3_user=player_at(3),
+    )

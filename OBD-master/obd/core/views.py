@@ -83,7 +83,9 @@ def index(request):
     )
 
     # === Combobox de Etapas (agrupando divisões sob o mesmo nome de etapa) ===
-    all_results = TournamentResult.objects.order_by('-date')
+    # Etapas em andamento ficam de fora: o rank 1 delas é só o líder do momento,
+    # e este bloco anuncia "Campeão". Elas aparecem no painel da Liga Nacional.
+    all_results = TournamentResult.objects.filter(in_progress=False).order_by('-date')
 
     etapa_map = {}
     for t in all_results:
@@ -228,8 +230,9 @@ def index(request):
 
     # === OBD em Números (estatísticas gerais) ===
     current_year = timezone.now().year
+    # "Realizados" = já encerrados; etapa em andamento ainda não conta.
     tournament_names_this_year = TournamentResult.objects.filter(
-        date__year=current_year
+        date__year=current_year, in_progress=False
     ).values_list('name', flat=True)
     tournaments_count = len({_tournament_event_key(name) for name in tournament_names_this_year})
 

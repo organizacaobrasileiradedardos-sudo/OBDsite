@@ -7,8 +7,12 @@ import json
 from obd.dashboards.administrators.champions.utils import get_or_create_player, get_or_create_league, register_champion
 
 class N01TournamentScraper:
-    def __init__(self, url):
+    def __init__(self, url, in_progress=None):
+        # in_progress=None significa "não mexer no status": é o caso das
+        # recapturas (botão e agendamento), que nunca devem finalizar nem
+        # reabrir uma etapa por conta própria.
         self.url = url
+        self.in_progress = in_progress
         self.session = requests.Session()
         self.session.headers.update({
             'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.114 Safari/537.36',
@@ -118,12 +122,16 @@ class N01TournamentScraper:
             return False, "No stats data found"
 
         # 3. Save Data
+        defaults = {
+            'name': tournament_name,
+            'date': timezone.now().date(),
+        }
+        if self.in_progress is not None:
+            defaults['in_progress'] = self.in_progress
+
         tournament, created = TournamentResult.objects.update_or_create(
             source_url=self.url,
-            defaults={
-                'name': tournament_name,
-                'date': timezone.now().date()
-            }
+            defaults=defaults,
         )
 
         PlayerTournamentStat.objects.filter(tournament=tournament).delete()
@@ -260,8 +268,9 @@ class N01TournamentScraper:
             )
             count += 1
 
-        # Register champion if we captured rank 1
-        if champion_user:
+        # Etapa em andamento não tem campeão: o rank 1 é só quem lidera agora.
+        # O registro acontece quando a etapa for marcada como finalizada.
+        if champion_user and not tournament.in_progress:
             league, division = get_or_create_league(tournament_name, timezone.now().date())
             register_champion(league, division, champion_user, p2_user=runner_up_user, p3_user=third_place_user)
         return True, f"Successfully captured {count} player stats for '{tournament_name}'"

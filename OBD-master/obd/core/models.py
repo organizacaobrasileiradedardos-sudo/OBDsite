@@ -146,6 +146,13 @@ class TournamentResult(models.Model):
                    'Etapas da Liga Nacional já têm a premiação somada via Order of Merit, '
                    'não preencha aqui para evitar contar em dobro.',
     )
+    in_progress = models.BooleanField(
+        'Etapa em andamento',
+        default=False,
+        help_text='Marque enquanto a etapa ainda estiver em disputa. Enquanto marcada, o campeão '
+                   'não é registrado no Hall dos Campeões e a etapa não aparece na tela inicial. '
+                   'Desmarque quando a etapa terminar — o campeão é registrado nesse momento.',
+    )
 
     class Meta:
         verbose_name = 'Resultado de Torneio'
