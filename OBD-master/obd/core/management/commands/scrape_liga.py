@@ -5,13 +5,16 @@ from obd.core.views import _current_national_league_stage
 
 
 class Command(BaseCommand):
-    help = 'Recaptura todas as divisões da etapa atual da Liga Nacional (para agendamento)'
+    help = 'Recaptura as divisões da etapa em andamento da Liga Nacional (para agendamento)'
 
     def handle(self, *args, **options):
+        # Só faz sentido atualizar a etapa em disputa: as concluídas não mudam mais.
         stage_name, divisions = _current_national_league_stage()
 
         if not divisions:
-            self.stdout.write(self.style.WARNING('Nenhuma etapa da Liga Nacional capturada ainda. Nada a fazer.'))
+            self.stdout.write(self.style.WARNING(
+                'Nenhuma etapa da Liga Nacional em andamento. Nada a fazer.'
+            ))
             return
 
         self.stdout.write(f'Atualizando "{stage_name}" ({len(divisions)} divisão(ões))...')

@@ -89,10 +89,27 @@ Description: Painel com os rankings da etapa atual da Liga Nacional, por divisã
                 <i class="bi bi-trophy-fill text-dartboard-gold"></i> Liga Nacional
             </h1>
             {% if stage_name %}
-            <p class="text-muted mb-1">{{ stage_name }}</p>
+            <p class="text-muted mb-1">
+                {{ stage_name }}
+                {% if stage_in_progress %}
+                <span class="badge bg-success ms-1">Em andamento</span>
+                {% endif %}
+            </p>
             {% endif %}
             {% if last_capture %}
             <p class="text-muted small">Dados atualizados em {{ last_capture|date:"d/m/Y H:i" }}</p>
+            {% endif %}
+
+            {% if stages|length > 1 %}
+            <form method="GET" class="mx-auto mt-3" style="max-width: 420px;">
+                <select name="etapa" class="form-select" onchange="this.form.submit()">
+                    {% for item in stages %}
+                    <option value="{{ item.name }}" {% if item.name == stage_name %}selected{% endif %}>
+                        {{ item.name }}{% if item.in_progress %} (em andamento){% endif %}
+                    </option>
+                    {% endfor %}
+                </select>
+            </form>
             {% endif %}
         </div>
     </div>
@@ -110,6 +127,7 @@ Description: Painel com os rankings da etapa atual da Liga Nacional, por divisã
     <div class="text-end mb-3">
         <form method="post" action="{% url 'refresh_league_stats' %}" class="d-inline">
             {% csrf_token %}
+            <input type="hidden" name="etapa" value="{{ stage_name }}">
             <button type="submit" class="btn btn-sm btn-outline-secondary">
                 <i class="bi bi-arrow-clockwise"></i> Atualizar agora
             </button>

@@ -1,6 +1,8 @@
 import re
+from urllib.parse import quote
 
 from django.contrib.auth.models import User
+from django.urls import reverse
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required, permission_required
@@ -316,22 +318,55 @@ def public_players(request):
     players = User.objects.filter(is_superuser=False).order_by('first_name', 'last_name')
     return render(request, 'user_public_players.html', {'players': players})
 
+def _national_league_stages():
+    """Etapas da Liga Nacional já capturadas, da mais recente para a mais antiga.
+
+    Uma etapa é considerada em andamento se qualquer uma de suas divisões
+    estiver marcada assim.
+    """
+    grouped = {}
+    for tournament in TournamentResult.objects.filter(name__icontains='LIGA NACIONAL'):
+        grouped.setdefault(_tournament_event_key(tournament.name), []).append(tournament)
+
+    stages = [
+        {
+            'name': name,
+            'divisions': sorted(items, key=lambda t: _division_label(t.name)),
+            'in_progress': any(t.in_progress for t in items),
+            # created_at (auto_now_add) marca a primeira captura e nunca muda; já
+            # o campo date é regravado com "hoje" a cada recaptura, então não
+            # serve para ordenar as etapas depois que o agendamento roda.
+            'created_at': max(t.created_at for t in items),
+        }
+        for name, items in grouped.items()
+    ]
+    stages.sort(key=lambda s: s['created_at'], reverse=True)
+    return stages
+
+
+def _select_national_league_stage(stages, requested_name=None):
+    """Etapa a exibir: a pedida, senão a em andamento, senão a última concluída."""
+    if requested_name:
+        for stage in stages:
+            if stage['name'] == requested_name:
+                return stage
+
+    for stage in stages:
+        if stage['in_progress']:
+            return stage
+
+    concluded = [stage for stage in stages if not stage['in_progress']]
+    if concluded:
+        return concluded[0]
+    return stages[0] if stages else None
+
+
 def _current_national_league_stage():
-    """Divisões da etapa mais recente da Liga Nacional já capturada."""
-    tournaments = TournamentResult.objects.filter(name__icontains='LIGA NACIONAL')
-    if not tournaments:
-        return None, []
-
-    stages = {}
-    for tournament in tournaments:
-        stages.setdefault(_tournament_event_key(tournament.name), []).append(tournament)
-
-    # created_at (auto_now_add) marca a primeira captura e nunca muda; já o
-    # campo date é regravado com "hoje" a cada recaptura, então não serve para
-    # dizer qual etapa é a mais recente depois que o agendamento começa a rodar.
-    stage_name = max(stages, key=lambda key: max(t.created_at for t in stages[key]))
-    divisions = sorted(stages[stage_name], key=lambda t: _division_label(t.name))
-    return stage_name, divisions
+    """Etapa em andamento da Liga Nacional, se houver (usada pela recaptura)."""
+    for stage in _national_league_stages():
+        if stage['in_progress']:
+            return stage['name'], stage['divisions']
+    return None, []
 
 
 def public_leagues(request):
@@ -339,7 +374,11 @@ def public_leagues(request):
         messages.info(request, 'Página de acesso exclusivo para usuários logados. Crie seu login ou faça o login')
         return redirect(settings.LOGIN_URL)
 
-    stage_name, division_tournaments = _current_national_league_stage()
+    stages = _national_league_stages()
+    stage = _select_national_league_stage(stages, request.GET.get('etapa'))
+
+    stage_name = stage['name'] if stage else None
+    division_tournaments = stage['divisions'] if stage else []
 
     divisions = []
     for tournament in division_tournaments:
@@ -358,6 +397,8 @@ def public_leagues(request):
 
     context = {
         'stage_name': stage_name,
+        'stage_in_progress': stage['in_progress'] if stage else False,
+        'stages': stages,
         'divisions': divisions,
         'total_pending': sum(d['pending']['pending'] for d in divisions),
         'last_capture': max((t.created_at for t in division_tournaments), default=None),
@@ -368,23 +409,25 @@ def public_leagues(request):
 @login_required
 @permission_required('profiles.has_admin_role', raise_exception=True)
 def refresh_league_stats(request):
-    """Recaptura as divisões da etapa atual a partir das URLs já guardadas."""
+    """Recaptura as divisões da etapa exibida, a partir das URLs já guardadas."""
     if request.method != 'POST':
         return redirect('boaleagues')
 
-    _, divisions = _current_national_league_stage()
-    if not divisions:
+    stage_name = request.POST.get('etapa') or None
+    stage = _select_national_league_stage(_national_league_stages(), stage_name)
+    if not stage:
         messages.error(request, 'Nenhuma etapa da Liga Nacional capturada ainda.')
         return redirect('boaleagues')
 
-    updated, failed = refresh_tournaments(divisions)
+    updated, failed = refresh_tournaments(stage['divisions'])
 
     if updated:
         messages.success(request, f'{updated} divisão(ões) atualizada(s) com sucesso.')
     for name, error in failed:
         messages.error(request, f'Falha ao atualizar "{name}": {error}')
 
-    return redirect('boaleagues')
+    # Volta para a mesma etapa que estava sendo vista
+    return redirect(f"{reverse('boaleagues')}?etapa={quote(stage['name'])}")
 
 def public_league_view(request, slug):
     league = League.objects.get(slug=slug)
