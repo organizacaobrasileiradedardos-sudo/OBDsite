@@ -238,9 +238,48 @@ class N01TournamentScraper:
             )
             count += 1
 
+        # Inscritos que ainda não disputaram nenhuma partida não aparecem em
+        # stats_data, só na lista de inscritos. Sem eles não dá para saber o
+        # total de participantes da etapa (base do cálculo de jogos pendentes),
+        # e justamente eles são os que precisam ser cobrados.
+        registered_pids = {p_data['pid'] for p_data in processed_stats}
+        for pid, name in player_map.items():
+            if pid in registered_pids:
+                continue
+
+            pin = name.replace(' ', '').lower()
+            user_obj = get_or_create_player(name, pin)
+
+            PlayerTournamentStat.objects.create(
+                tournament=tournament,
+                player_name=name,
+                player=user_obj,
+                rank=999,
+                win_rate_matches="0.0%",
+                win_rate_legs="0.0%",
+            )
+            count += 1
+
         # Register champion if we captured rank 1
         if champion_user:
             league, division = get_or_create_league(tournament_name, timezone.now().date())
             register_champion(league, division, champion_user, p2_user=runner_up_user, p3_user=third_place_user)
         return True, f"Successfully captured {count} player stats for '{tournament_name}'"
+
+
+def refresh_tournaments(tournaments):
+    """Recaptura torneios já existentes usando a source_url guardada em cada um.
+
+    Evita ter que cadastrar as URLs em outro lugar: quem já foi capturado uma
+    vez sabe de onde veio. Devolve (atualizados, [(nome, erro), ...]).
+    """
+    updated = 0
+    failed = []
+    for tournament in tournaments:
+        success, message = N01TournamentScraper(tournament.source_url).run()
+        if success:
+            updated += 1
+        else:
+            failed.append((tournament.name, message))
+    return updated, failed
 

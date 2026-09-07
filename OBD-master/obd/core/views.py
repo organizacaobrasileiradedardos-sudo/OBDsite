@@ -1,6 +1,9 @@
 import re
 
 from django.contrib.auth.models import User
+from django.conf import settings
+from django.contrib import messages
+from django.contrib.auth.decorators import login_required, permission_required
 from django.shortcuts import render, redirect, get_object_or_404
 from django.db.models.functions import Cast, Coalesce
 from obd.dashboards.administrators.divisions.models import Division
@@ -12,6 +15,7 @@ from django.db.models import Avg, Sum, Min, Count, Q, Max, F, Value
 
 from obd.dashboards.players.stats.models import Stat
 from obd.core.models import TournamentResult, PlayerTournamentStat
+from obd.core.obdlib.webscraping.n01 import refresh_tournaments
 
 # Etapas com várias divisões (ex: "1ª ETAPA LIGA NACIONAL OBD 2026 - DIVISÃO A")
 # geram um TournamentResult por divisão. Para contar "torneios realizados" por
@@ -21,6 +25,35 @@ _DIVISION_SUFFIX_RE = re.compile(r'\s*-\s*divis[aã]o\b.*$', re.IGNORECASE)
 
 def _tournament_event_key(name):
     return _DIVISION_SUFFIX_RE.sub('', name).strip()
+
+
+_DIVISION_LABEL_RE = re.compile(r'-\s*(divis[aã]o\b.*)$', re.IGNORECASE)
+
+
+def _division_label(name):
+    """Extrai 'DIVISÃO X' do nome do torneio; vazio se a etapa não tem divisões."""
+    match = _DIVISION_LABEL_RE.search(name)
+    return match.group(1).strip().upper() if match else ''
+
+
+def _pending_matches(stats):
+    """Jogos que faltam disputar numa divisão em formato todos-contra-todos.
+
+    Só vale para turno único: cada dupla de inscritos se enfrenta uma vez.
+    matches_played é somado por jogador, então cada partida conta duas vezes.
+    """
+    entrants = len(stats)
+    if entrants < 2:
+        return {'entrants': entrants, 'possible': 0, 'played': 0, 'pending': 0}
+
+    possible = entrants * (entrants - 1) // 2
+    played = sum(s.matches_played for s in stats) // 2
+    return {
+        'entrants': entrants,
+        'possible': possible,
+        'played': played,
+        'pending': max(possible - played, 0),
+    }
 
 
 def index(request):
@@ -280,9 +313,72 @@ def public_players(request):
     players = User.objects.filter(is_superuser=False).order_by('first_name', 'last_name')
     return render(request, 'user_public_players.html', {'players': players})
 
+def _current_national_league_stage():
+    """Divisões da etapa mais recente da Liga Nacional já capturada."""
+    tournaments = TournamentResult.objects.filter(name__icontains='LIGA NACIONAL')
+    if not tournaments:
+        return None, []
+
+    stages = {}
+    for tournament in tournaments:
+        stages.setdefault(_tournament_event_key(tournament.name), []).append(tournament)
+
+    stage_name = max(stages, key=lambda key: max(t.date for t in stages[key]))
+    divisions = sorted(stages[stage_name], key=lambda t: _division_label(t.name))
+    return stage_name, divisions
+
+
 def public_leagues(request):
-    leagues = League.objects.all().order_by('-created_at')
-    return render(request, 'user_public_leagues.html', {'leagues': leagues})
+    if not request.user.is_authenticated:
+        messages.info(request, 'Página de acesso exclusivo para usuários logados. Crie seu login ou faça o login')
+        return redirect(settings.LOGIN_URL)
+
+    stage_name, division_tournaments = _current_national_league_stage()
+
+    divisions = []
+    for tournament in division_tournaments:
+        stats = list(tournament.stats.all())
+
+        divisions.append({
+            'tournament': tournament,
+            'label': _division_label(tournament.name) or tournament.name,
+            'matches': sorted(stats, key=lambda s: -s.matches_played),
+            'count_180': sorted([s for s in stats if s.count_180], key=lambda s: -s.count_180),
+            'high_finish': sorted([s for s in stats if s.high_finish], key=lambda s: -s.high_finish),
+            'best_leg': sorted([s for s in stats if s.best_leg], key=lambda s: s.best_leg),
+            'pending': _pending_matches(stats),
+            'least_active': sorted(stats, key=lambda s: s.matches_played)[:3],
+        })
+
+    context = {
+        'stage_name': stage_name,
+        'divisions': divisions,
+        'total_pending': sum(d['pending']['pending'] for d in divisions),
+        'last_capture': max((t.created_at for t in division_tournaments), default=None),
+    }
+    return render(request, 'user_public_leagues.html', context)
+
+
+@login_required
+@permission_required('profiles.has_admin_role', raise_exception=True)
+def refresh_league_stats(request):
+    """Recaptura as divisões da etapa atual a partir das URLs já guardadas."""
+    if request.method != 'POST':
+        return redirect('boaleagues')
+
+    _, divisions = _current_national_league_stage()
+    if not divisions:
+        messages.error(request, 'Nenhuma etapa da Liga Nacional capturada ainda.')
+        return redirect('boaleagues')
+
+    updated, failed = refresh_tournaments(divisions)
+
+    if updated:
+        messages.success(request, f'{updated} divisão(ões) atualizada(s) com sucesso.')
+    for name, error in failed:
+        messages.error(request, f'Falha ao atualizar "{name}": {error}')
+
+    return redirect('boaleagues')
 
 def public_league_view(request, slug):
     league = League.objects.get(slug=slug)

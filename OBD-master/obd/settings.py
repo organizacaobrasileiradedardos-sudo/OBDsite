@@ -34,7 +34,7 @@ ALLOWED_HOSTS = os.getenv("ALLOWED_HOSTS", "").split(",")
 DEFAULT_FROM_EMAIL = config('DEFAULT_FROM_EMAIL')
 RESEND_API_KEY = config('RESEND_API_KEY')
 resend.api_key = RESEND_API_KEY
-LOGIN_URL = '/dashboard/player/login'
+LOGIN_URL = '/dashboard/players/dashboard/player/login'
 
 # Application definition
 

@@ -23,7 +23,8 @@ from django.conf.urls.static import static
 from obd.core.views import (  # Imports explícitos para clareza e evitar NameError
     index, 
     public_players, 
-    public_leagues, 
+    public_leagues,
+    refresh_league_stats,
     public_league_view, 
     public_division_view, 
     public_result,
@@ -59,6 +60,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('obd/players/', public_players, name='boaplayers'),
     path('obd/leagues/', public_leagues, name='boaleagues'),
+    path('obd/leagues/atualizar/', refresh_league_stats, name='refresh_league_stats'),
     path('obd/leagues/<slug:slug>/details', public_league_view, name='boaleagueview'),
     path('obd/leagues/divisions/<slug:slug>/details', public_division_view, name='boadivisionview'),
     # Compatibilidade: antigas URLs /boa/... redirecionam para /obd/...
