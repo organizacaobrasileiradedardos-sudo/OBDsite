@@ -323,7 +323,10 @@ def _current_national_league_stage():
     for tournament in tournaments:
         stages.setdefault(_tournament_event_key(tournament.name), []).append(tournament)
 
-    stage_name = max(stages, key=lambda key: max(t.date for t in stages[key]))
+    # created_at (auto_now_add) marca a primeira captura e nunca muda; já o
+    # campo date é regravado com "hoje" a cada recaptura, então não serve para
+    # dizer qual etapa é a mais recente depois que o agendamento começa a rodar.
+    stage_name = max(stages, key=lambda key: max(t.created_at for t in stages[key]))
     divisions = sorted(stages[stage_name], key=lambda t: _division_label(t.name))
     return stage_name, divisions
 
