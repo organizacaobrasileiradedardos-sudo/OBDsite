@@ -35,6 +35,7 @@
 
 <h5><strong><i class="bi bi-award-fill"></i> Sumário Geral das Ligas OBD</strong></h5>
 <p></p>
+<div class="table-responsive">
 <table class="table table-sm table-dark">
   <thead>
     <tr>
@@ -61,11 +62,13 @@
     </tr>
   </tbody>
 </table>
+</div>
 
 <p><br></p>
 
 <h5><strong><i class="bi bi-arrow-repeat"></i> Ligas em Andamento</strong></h5>
 <p></p>
+<div class="table-responsive">
 <table class="table table-sm table-dark">
   <thead>
     <tr>
@@ -111,6 +114,7 @@
 
   </tbody>
 </table>
+</div>
 
 <p><br></p>
 
@@ -119,6 +123,7 @@
 <p></p>
 
 {% if pending %}
+<div class="table-responsive">
 <table class="table">
   <thead>
     <tr>
@@ -275,6 +280,7 @@
     {% endfor %}
   </tbody>
 </table>
+</div>
 <p><br></p>
 {% else %}
 <p>Fala aí, {{ user.first_name }} {{ user.last_name }}! Não há jojogos pendentes de validação no momento.</p>

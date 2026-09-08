@@ -26,6 +26,7 @@
 
 {% if tournaments %}
 <p><br></p>
+<div class="table-responsive">
 <table class="table">
     <thead>
         <tr>
@@ -70,6 +71,7 @@
         {% endfor %}
     </tbody>
 </table>
+</div>
 <p><br></p>
 {% else %}
 <p>Você não está participando de nenhuma competição no momento, {{ user.first_name }}.</p>

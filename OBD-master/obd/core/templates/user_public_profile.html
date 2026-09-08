@@ -142,6 +142,7 @@ Last update: Jul-03-2021
             <h5><strong><i class="bi bi-list-stars"></i> Estatísticas de {{ profile.user.first_name }} {{ profile.user.last_name }}</strong></h5>
 
             {% if tournament_summary %}
+            <div class="table-responsive">
             <table class="table">
                 <thead class="table-dark">
                     <tr>
@@ -174,6 +175,7 @@ Last update: Jul-03-2021
                     </tr>
                 </tbody>
             </table>
+            </div>
             {% else %}
             <p class="text-muted">Nenhuma estatística de torneio encontrada ainda.</p>
             {% endif %}

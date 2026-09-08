@@ -200,6 +200,7 @@
     <div class="row">
         <div class="col-md-6">
             <h6><strong><i class="bi bi-star-fill"></i> Recordes Pessoais</strong></h6>
+            <div class="table-responsive">
             <table class="table table-sm">
                 <tbody>
                     <tr>
@@ -224,9 +225,11 @@
                     </tr>
                 </tbody>
             </table>
+            </div>
         </div>
         <div class="col-md-6">
             <h6><strong><i class="bi bi-bullseye"></i> Totais de Carreira</strong></h6>
+            <div class="table-responsive">
             <table class="table table-sm">
                 <tbody>
                     <tr>
@@ -251,11 +254,13 @@
                     </tr>
                 </tbody>
             </table>
+            </div>
         </div>
     </div>
 
     {% if tournament_summary.recent_form %}
     <h6><strong><i class="bi bi-graph-up-arrow"></i> Histórico Recente (últimos torneios)</strong></h6>
+    <div class="table-responsive">
     <table class="table table-sm">
         <thead>
             <tr>
@@ -276,6 +281,7 @@
             {% endfor %}
         </tbody>
     </table>
+    </div>
     {% endif %}
 
     {% else %}
