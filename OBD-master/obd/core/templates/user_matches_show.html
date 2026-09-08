@@ -54,17 +54,13 @@
         {% for match in matches %}
         <tr>
             <td>{{ match.id }}</td>
-            <td><strong>{{ match.result_set.first.player.first_name }} {{ match.result_set.first.player.last_name
-                    }}</strong>
+            <td><strong>{{ match.result_set.first.player.first_name }} {{ match.result_set.first.player.last_name }}</strong>
                 <h6 style="font-size: smaller">({{ match.result_set.first.player.username }})</h6>
             </td>
-            <td><span class="badge bg-warning text-dark">{% if match.result_set.first.legs is None %} 0 {% else %} {{
-                    match.result_set.first.legs }}{% endif %} </span></td>
+            <td><span class="badge bg-warning text-dark">{% if match.result_set.first.legs is None %} 0 {% else %} {{ match.result_set.first.legs }}{% endif %} </span></td>
             <td><strong>Vs.</strong></td>
-            <td><span class="badge bg-warning text-dark">{% if match.result_set.last.legs is None %} 0 {% else %} {{
-                    match.result_set.last.legs }} {% endif %}</span></td>
-            <td><strong>{{ match.result_set.last.player.first_name }} {{ match.result_set.last.player.last_name
-                    }}</strong>
+            <td><span class="badge bg-warning text-dark">{% if match.result_set.last.legs is None %} 0 {% else %} {{ match.result_set.last.legs }} {% endif %}</span></td>
+            <td><strong>{{ match.result_set.last.player.first_name }} {{ match.result_set.last.player.last_name }}</strong>
                 <h6 style="font-size: smaller">({{ match.result_set.last.player.username }})</h6>
             </td>
             <td>{{ match.get_status_display.capitalize }}</td>
@@ -128,8 +124,7 @@
                     <div class="modal-header">
 
 
-                        <h5 class="modal-title" id="exampleModalLabel" style="font-size: medium">{{ match.division.name
-                            | upper }} - Partida <strong>#{{ match.id }}</strong></h5>
+                        <h5 class="modal-title" id="exampleModalLabel" style="font-size: medium">{{ match.division.name | upper }} - Partida <strong>#{{ match.id }}</strong></h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body modal-lg">
@@ -137,8 +132,7 @@
                         <div class="container-fluid">
                             <div class="row">
                                 <div class="col-sm-4"><strong></strong></div>
-                                <div class="col justify-content-md-center">{{ match.result_set.first.player.first_name
-                                    }}</div>
+                                <div class="col justify-content-md-center">{{ match.result_set.first.player.first_name }}</div>
                                 <div class="col justify-content-md-center">{{ match.result_set.last.player.first_name }}
                                 </div>
                             </div>
@@ -207,8 +201,7 @@
                                 <div class="col-sm">{{ match.result_set.last.ton80 }}</div>
                             </div>
                             <hr>
-                            <p align="center"><strong>OBD</strong> | Resultado #{{ match.id }} acessado em {% now
-                                "d/m/Y" %}</p>
+                            <p align="center"><strong>OBD</strong> | Resultado #{{ match.id }} acessado em {% now "d/m/Y" %}</p>
                             <p align="center">www.obdassociacao.com.br</p>
                         </div>
                         <div class="modal-footer">
@@ -235,8 +228,7 @@
 </div>
 
 <p>
-    <strong>Atenção!</strong> A janela para lançamento dos resultados/jogos ficará ativa até {{
-    matches.first.division.league.end_date }}.
+    <strong>Atenção!</strong> A janela para lançamento dos resultados/jogos ficará ativa até {{ matches.first.division.league.end_date }}.
 </p>
 
 
@@ -254,18 +246,12 @@
 
                 <ul class="list-group">
                     <li class="list-group-item active" aria-current="true">Regras Gerais / Todas as divisões</li>
-                    <li class="list-group-item">Pontos por vitória: <span class="badge bg-warning text-dark">{{
-                            matches.first.division.league.enviroment.matchWinPoints }}</span></li>
-                    <li class="list-group-item">Pontos por empate: <span class="badge bg-warning text-dark">{{
-                            matches.first.division.league.enviroment.matchDrawPoints }}</span></li>
-                    <li class="list-group-item">Permitir auto bye (WO): <span class="badge bg-warning text-dark">{{
-                            matches.first.division.league.enviroment.allowAutoBye }} ausência(s) máx</span></li>
-                    <li class="list-group-item">Promoção automática: <span class="badge bg-warning text-dark">{{
-                            matches.first.division.league.enviroment.allowAutoPromo }} jogador(es)</span></li>
-                    <li class="list-group-item">Rebaixamento automático: <span class="badge bg-warning text-dark">{{
-                            matches.first.division.league.enviroment.allowAutoDemo }} jogador(es)</span></li>
-                    <li class="list-group-item">Início da liga: <span class="badge bg-warning text-dark">{{
-                            matches.first.division.league.start_date }}</span></li>
+                    <li class="list-group-item">Pontos por vitória: <span class="badge bg-warning text-dark">{{ matches.first.division.league.enviroment.matchWinPoints }}</span></li>
+                    <li class="list-group-item">Pontos por empate: <span class="badge bg-warning text-dark">{{ matches.first.division.league.enviroment.matchDrawPoints }}</span></li>
+                    <li class="list-group-item">Permitir auto bye (WO): <span class="badge bg-warning text-dark">{{ matches.first.division.league.enviroment.allowAutoBye }} ausência(s) máx</span></li>
+                    <li class="list-group-item">Promoção automática: <span class="badge bg-warning text-dark">{{ matches.first.division.league.enviroment.allowAutoPromo }} jogador(es)</span></li>
+                    <li class="list-group-item">Rebaixamento automático: <span class="badge bg-warning text-dark">{{ matches.first.division.league.enviroment.allowAutoDemo }} jogador(es)</span></li>
+                    <li class="list-group-item">Início da liga: <span class="badge bg-warning text-dark">{{ matches.first.division.league.start_date }}</span></li>
                     <li class="list-group-item">Data limite para completar jogos: <span
                             class="badge bg-warning text-dark">{{ matches.first.division.league.end_date }}</span></li>
 
@@ -289,36 +275,24 @@
                     <tbody>
                         <tr>
                             <th scope="row">Sets</th>
-                            <td><span class="badge bg-warning text-dark">{{
-                                    matches.first.division.league.enviroment.leagueAMaxSet }}</span></td>
-                            <td><span class="badge bg-warning text-dark">{{
-                                    matches.first.division.league.enviroment.leagueBMaxSet }}</span></td>
-                            <td><span class="badge bg-warning text-dark">{{
-                                    matches.first.division.league.enviroment.leagueCMaxSet }}</span></td>
-                            <td><span class="badge bg-warning text-dark">{{
-                                    matches.first.division.league.enviroment.leagueOthersMaxSet }}</span></td>
+                            <td><span class="badge bg-warning text-dark">{{ matches.first.division.league.enviroment.leagueAMaxSet }}</span></td>
+                            <td><span class="badge bg-warning text-dark">{{ matches.first.division.league.enviroment.leagueBMaxSet }}</span></td>
+                            <td><span class="badge bg-warning text-dark">{{ matches.first.division.league.enviroment.leagueCMaxSet }}</span></td>
+                            <td><span class="badge bg-warning text-dark">{{ matches.first.division.league.enviroment.leagueOthersMaxSet }}</span></td>
                         </tr>
                         <tr>
                             <th scope="row">Best Of (legs)</th>
-                            <td><span class="badge bg-warning text-dark">{{
-                                    matches.first.division.league.enviroment.leagueABestof }}</span></td>
-                            <td><span class="badge bg-warning text-dark">{{
-                                    matches.first.division.league.enviroment.leagueBBestof }}</span></td>
-                            <td><span class="badge bg-warning text-dark">{{
-                                    matches.first.division.league.enviroment.leagueCBestof }}</span></td>
-                            <td><span class="badge bg-warning text-dark">{{
-                                    matches.first.division.league.enviroment.leagueOthersBestof }}</span></td>
+                            <td><span class="badge bg-warning text-dark">{{ matches.first.division.league.enviroment.leagueABestof }}</span></td>
+                            <td><span class="badge bg-warning text-dark">{{ matches.first.division.league.enviroment.leagueBBestof }}</span></td>
+                            <td><span class="badge bg-warning text-dark">{{ matches.first.division.league.enviroment.leagueCBestof }}</span></td>
+                            <td><span class="badge bg-warning text-dark">{{ matches.first.division.league.enviroment.leagueOthersBestof }}</span></td>
                         </tr>
                         <tr>
                             <th scope="row">First To (legs)</th>
-                            <td><span class="badge bg-warning text-dark">{{
-                                    matches.first.division.league.enviroment.leagueAFirstTo }}</span></td>
-                            <td><span class="badge bg-warning text-dark">{{
-                                    matches.first.division.league.enviroment.leagueBFirstTo }}</span></td>
-                            <td><span class="badge bg-warning text-dark">{{
-                                    matches.first.division.league.enviroment.leagueCFirstTo }}</span></td>
-                            <td><span class="badge bg-warning text-dark">{{
-                                    matches.first.division.league.enviroment.leagueOthersFirstTo }}</span></td>
+                            <td><span class="badge bg-warning text-dark">{{ matches.first.division.league.enviroment.leagueAFirstTo }}</span></td>
+                            <td><span class="badge bg-warning text-dark">{{ matches.first.division.league.enviroment.leagueBFirstTo }}</span></td>
+                            <td><span class="badge bg-warning text-dark">{{ matches.first.division.league.enviroment.leagueCFirstTo }}</span></td>
+                            <td><span class="badge bg-warning text-dark">{{ matches.first.division.league.enviroment.leagueOthersFirstTo }}</span></td>
                         </tr>
                         </tr>
                     </tbody>

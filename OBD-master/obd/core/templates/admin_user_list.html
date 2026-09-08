@@ -28,14 +28,12 @@
       <tr>
          {% for player in players %}
          <td style="text-align: center; vertical-align: middle;">{{ forloop.counter }}</td>
-         <th style="text-align: center; vertical-align: middle;">{{ player.first_name }} {{ player.last_name }} #{{
-            player.id }}</th>
+         <th style="text-align: center; vertical-align: middle;">{{ player.first_name }} {{ player.last_name }} #{{ player.id }}</th>
          <td style="text-align: center; vertical-align: middle;">{{ player.username }}</td>
          <td style="text-align: center; vertical-align: middle;">{{ player.email }}</td>
          <td style="text-align: center; vertical-align: middle;">{{ player.stat.get_bcmDiv_display }}</td>
          <td style="text-align: center; vertical-align: middle;">{{ player.profile.country }}</td>
-         <td style="text-align: center; vertical-align: middle;">{% if 'profiles.has_admin_role' in
-            player.get_user_permissions %}Admistrador{% else %}Jogador{% endif %}</td>
+         <td style="text-align: center; vertical-align: middle;">{% if 'profiles.has_admin_role' in player.get_user_permissions %}Admistrador{% else %}Jogador{% endif %}</td>
          <td style="text-align: center; vertical-align: middle;"></td>
       </tr>
       {% endfor %}

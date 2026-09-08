@@ -146,11 +146,9 @@
       <td><strong>{{ match.result_set.first.player.first_name }} {{ match.result_set.first.player.last_name }}</strong>
         <h6 style="font-size: smaller">({{ match.result_set.first.player.username }})</h6>
       </td>
-      <td><span class="badge bg-warning text-dark">{% if match.result_set.first.legs is None %} 0 {% else %} {{
-          match.result_set.first.legs }}{% endif %} </span></td>
+      <td><span class="badge bg-warning text-dark">{% if match.result_set.first.legs is None %} 0 {% else %} {{ match.result_set.first.legs }}{% endif %} </span></td>
       <td><strong>Vs.</strong></td>
-      <td><span class="badge bg-warning text-dark">{% if match.result_set.last.legs is None %} 0 {% else %} {{
-          match.result_set.last.legs }} {% endif %}</span></td>
+      <td><span class="badge bg-warning text-dark">{% if match.result_set.last.legs is None %} 0 {% else %} {{ match.result_set.last.legs }} {% endif %}</span></td>
       <td><strong>{{ match.result_set.last.player.first_name }} {{ match.result_set.last.player.last_name }}</strong>
         <h6 style="font-size: smaller">({{ match.result_set.last.player.username }})</h6>
       </td>

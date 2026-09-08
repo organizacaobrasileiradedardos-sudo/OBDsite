@@ -40,12 +40,11 @@
     <div class="col-12 col-md-10">
 
         <div class="card mb-3">
-            <img src="{% static '/media/logos/1230x200-banner-fundo-escuro.jpg' %}"
+            <img src="{% static 'media/logos/1230x200-banner-fundo-escuro.jpg' %}"
                 class="card-img figure-img img-fluid rounded" alt="...">
             <div class="card-body">
                 <p><br></p>
-                <h2><strong><i class="bi bi-file-earmark-text-fill"></i> Relatório de Partida #{{ game.id }} {{
-                        game.division.league.name }} | Divisão {{ game.division.get_formation_display }}</strong> | <a
+                <h2><strong><i class="bi bi-file-earmark-text-fill"></i> Relatório de Partida #{{ game.id }} {{ game.division.league.name }} | Divisão {{ game.division.get_formation_display }}</strong> | <a
                         class="btn btn-primary" href="{% url 'boadivisionview' slug=division.slug %}" role="button">Ver
                         Ranking</a></h2>
                 <p class="card-text"><small class="text-muted">A melhor liga online de Dardos do Brasil! </small></p>
@@ -73,11 +72,9 @@
             </thead>
             <tbody>
                 <tr>
-                    <th scope="row" style="text-align: center; vertical-align: middle;">{{ p1.player.first_name }} {{
-                        p1.player.last_name }}</th>
+                    <th scope="row" style="text-align: center; vertical-align: middle;">{{ p1.player.first_name }} {{ p1.player.last_name }}</th>
                     <td style="text-align: center; vertical-align: middle;">{{ p1.get_final_display }}</td>
-                    <td style="text-align: center; vertical-align: middle;">{% if p1.walkover %}Sim{% else %}Não{% endif
-                        %}</td>
+                    <td style="text-align: center; vertical-align: middle;">{% if p1.walkover %}Sim{% else %}Não{% endif %}</td>
                     <td style="text-align: center; vertical-align: middle;">{{ p1.sets }}</td>
                     <td style="text-align: center; vertical-align: middle;">{{ p1.legs }}</td>
                     <td style="text-align: center; vertical-align: middle;">{{ p1.average | floatformat:"2"}}</td>
@@ -89,11 +86,9 @@
                     <td style="text-align: center; vertical-align: middle;">{{ p1.ton80 }}</td>
                 </tr>
                 <tr>
-                    <th scope="row" style="text-align: center; vertical-align: middle;">{{ p2.player.first_name }} {{
-                        p2.player.last_name }}</th>
+                    <th scope="row" style="text-align: center; vertical-align: middle;">{{ p2.player.first_name }} {{ p2.player.last_name }}</th>
                     <td style="text-align: center; vertical-align: middle;">{{ p2.get_final_display }}</td>
-                    <td style="text-align: center; vertical-align: middle;">{% if p2.walkover %}Sim{% else %}Não{% endif
-                        %}</td>
+                    <td style="text-align: center; vertical-align: middle;">{% if p2.walkover %}Sim{% else %}Não{% endif %}</td>
                     <td style="text-align: center; vertical-align: middle;">{{ p2.sets }}</td>
                     <td style="text-align: center; vertical-align: middle;">{{ p2.legs }}</td>
                     <td style="text-align: center; vertical-align: middle;">{{ p2.average | floatformat:"2"}}</td>
@@ -111,10 +106,8 @@
         <p><br></p>
         <p>
             <strong><i class="bi bi-asterisk"></i> Servidor:</strong> {{ game.get_server_display }}<br>
-            <strong><i class="bi bi-asterisk"></i> Link:</strong> <a href="{{ game.link }}" target="_blank">{{ game.link
-                }}</a> <br>
-            <strong><i class="bi bi-asterisk"></i> Anexo:</strong> <a href="{{ game.photo }}" target="_blank">{{
-                game.photo }}</a><br>
+            <strong><i class="bi bi-asterisk"></i> Link:</strong> <a href="{{ game.link }}" target="_blank">{{ game.link }}</a> <br>
+            <strong><i class="bi bi-asterisk"></i> Anexo:</strong> <a href="{{ game.photo }}" target="_blank">{{ game.photo }}</a><br>
             <strong><i class="bi bi-asterisk"></i> Registrado por:</strong> {{ game.submited_by }}<br>
             <strong><i class="bi bi-asterisk"></i> Registrado em:</strong> {{ game.on_date }}<br>
             <strong><i class="bi bi-asterisk"></i> Comentários:</strong> {{ game.comment }}<br>

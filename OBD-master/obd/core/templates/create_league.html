@@ -51,13 +51,11 @@
     {% csrf_token %}
 
     <div class="row mb-3">
-        <label for="{{ form.start_date.id_for_label }}" class="col-sm-2 col-form-label">{{ form.start_date.label
-            }}</label>
+        <label for="{{ form.start_date.id_for_label }}" class="col-sm-2 col-form-label">{{ form.start_date.label }}</label>
         <div class="col-sm-4">
             <input class="datetime" type="date" id="{{ form.start_date.id_for_label }}"
                 name="{{ form.start_date.html_name}}" required {% if form.start_date.value is not None %}
-                value="{{ form.start_date.value}}" {% else %} value="{{ league.start_date | date:'Y-m-d' }}" {% endif
-                %}>
+                value="{{ form.start_date.value}}" {% else %} value="{{ league.start_date | date:'Y-m-d' }}" {% endif %}>
         </div>
     </div>
 
@@ -83,12 +81,10 @@
 
 
     <div class="row mb-3">
-        <label for="{{ form.description.id_for_label }}" class="col-sm-2 col-form-label">{{ form.description.label
-            }}</label>
+        <label for="{{ form.description.id_for_label }}" class="col-sm-2 col-form-label">{{ form.description.label }}</label>
         <div class="col-sm-8">
             <input class="form-control" type="text" id="{{ form.state.id_for_label }}"
-                name="{{ form.description.html_name }}" minlength="3" required {% if form.description.value is not None
-                %} value="{{ form.description.value }}" {% else %} value="{{ league.description}}" {% endif %}>
+                name="{{ form.description.html_name }}" minlength="3" required {% if form.description.value is not None %} value="{{ form.description.value }}" {% else %} value="{{ league.description}}" {% endif %}>
         </div>
     </div>
 
@@ -151,8 +147,7 @@
     <div class="row mb-3">
         <label for="{{ form.token.id_for_label }}" class="col-sm-2 col-form-label">{{ token }}</label>
         <div class="col-sm-3">
-            <input class="form-control" type="text" id="token_id" name="token" minlength="3" required {% if
-                form.token.value is not None %} value="{{ form.token.value }}" {% else %} value="" {% endif %}>
+            <input class="form-control" type="text" id="token_id" name="token" minlength="3" required {% if form.token.value is not None %} value="{{ form.token.value }}" {% else %} value="" {% endif %}>
         </div>
     </div>
 
@@ -178,22 +173,14 @@
 
                 <ul class="list-group">
                     <li class="list-group-item active" aria-current="true">Regras Gerais / Todas as divisões</li>
-                    <li class="list-group-item">Pontos por vitória: <span class="badge bg-warning text-dark">{{
-                            enviroment.matchWinPoints }}</span></li>
-                    <li class="list-group-item">Pontos por empate: <span class="badge bg-warning text-dark">{{
-                            enviroment.matchDrawPoints }}</span></li>
-                    <li class="list-group-item">Qtd. máx. jogadores: <span class="badge bg-warning text-dark">{{
-                            enviroment.leagueMaxPlayers }} jogadores</span></li>
-                    <li class="list-group-item">Qtd. min. jogadores: <span class="badge bg-warning text-dark">{{
-                            enviroment.leagueMinPlayers }} jogadores</span></li>
-                    <li class="list-group-item">Permitir auto bye (WO): <span class="badge bg-warning text-dark">{{
-                            enviroment.allowAutoBye }} ausência(s) máx</span></li>
-                    <li class="list-group-item">Promoção automática: <span class="badge bg-warning text-dark">{{
-                            enviroment.allowAutoPromo }} jogador(es)</span></li>
-                    <li class="list-group-item">Rebaixamento automático: <span class="badge bg-warning text-dark">{{
-                            enviroment.allowAutoDemo }} jogador(es)</span></li>
-                    <li class="list-group-item">Prazo para inscrição: <span class="badge bg-warning text-dark">{{
-                            enviroment.leagueSubscriptionsEnds }} dias</span></li>
+                    <li class="list-group-item">Pontos por vitória: <span class="badge bg-warning text-dark">{{ enviroment.matchWinPoints }}</span></li>
+                    <li class="list-group-item">Pontos por empate: <span class="badge bg-warning text-dark">{{ enviroment.matchDrawPoints }}</span></li>
+                    <li class="list-group-item">Qtd. máx. jogadores: <span class="badge bg-warning text-dark">{{ enviroment.leagueMaxPlayers }} jogadores</span></li>
+                    <li class="list-group-item">Qtd. min. jogadores: <span class="badge bg-warning text-dark">{{ enviroment.leagueMinPlayers }} jogadores</span></li>
+                    <li class="list-group-item">Permitir auto bye (WO): <span class="badge bg-warning text-dark">{{ enviroment.allowAutoBye }} ausência(s) máx</span></li>
+                    <li class="list-group-item">Promoção automática: <span class="badge bg-warning text-dark">{{ enviroment.allowAutoPromo }} jogador(es)</span></li>
+                    <li class="list-group-item">Rebaixamento automático: <span class="badge bg-warning text-dark">{{ enviroment.allowAutoDemo }} jogador(es)</span></li>
+                    <li class="list-group-item">Prazo para inscrição: <span class="badge bg-warning text-dark">{{ enviroment.leagueSubscriptionsEnds }} dias</span></li>
                 </ul>
                 <p><br></p>
                 <ul class="list-group">

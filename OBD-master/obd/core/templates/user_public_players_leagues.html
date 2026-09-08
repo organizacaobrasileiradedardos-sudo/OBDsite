@@ -40,7 +40,7 @@
     <div class="col-12 col-md-10">
 
         <div class="card mb-3">
-            <img src="{% static '/media/logos/1230x200-banner-fundo-escuro.jpg' %}"
+            <img src="{% static 'media/logos/1230x200-banner-fundo-escuro.jpg' %}"
                 class="card-img figure-img img-fluid rounded" alt="...">
             <div class="card-body">
                 <p><br></p>
@@ -149,18 +149,12 @@
 
                 <ul class="list-group">
                     <li class="list-group-item active" aria-current="true">Regras Gerais / Todas as divisões</li>
-                    <li class="list-group-item">Pontos por vitória: <span class="badge bg-warning text-dark">{{
-                            league.enviroment.matchWinPoints }}</span></li>
-                    <li class="list-group-item">Pontos por empate: <span class="badge bg-warning text-dark">{{
-                            league.enviroment.matchDrawPoints }}</span></li>
-                    <li class="list-group-item">Permitir auto bye (WO): <span class="badge bg-warning text-dark">{{
-                            league.enviroment.allowAutoBye }} ausência(s) máx</span></li>
-                    <li class="list-group-item">Promoção automática: <span class="badge bg-warning text-dark">{{
-                            league.enviroment.allowAutoPromo }} jogador(es)</span></li>
-                    <li class="list-group-item">Rebaixamento automático: <span class="badge bg-warning text-dark">{{
-                            league.enviroment.allowAutoDemo }} jogador(es)</span></li>
-                    <li class="list-group-item">Início da liga: <span class="badge bg-warning text-dark">{{
-                            league.start_date }}</span></li>
+                    <li class="list-group-item">Pontos por vitória: <span class="badge bg-warning text-dark">{{ league.enviroment.matchWinPoints }}</span></li>
+                    <li class="list-group-item">Pontos por empate: <span class="badge bg-warning text-dark">{{ league.enviroment.matchDrawPoints }}</span></li>
+                    <li class="list-group-item">Permitir auto bye (WO): <span class="badge bg-warning text-dark">{{ league.enviroment.allowAutoBye }} ausência(s) máx</span></li>
+                    <li class="list-group-item">Promoção automática: <span class="badge bg-warning text-dark">{{ league.enviroment.allowAutoPromo }} jogador(es)</span></li>
+                    <li class="list-group-item">Rebaixamento automático: <span class="badge bg-warning text-dark">{{ league.enviroment.allowAutoDemo }} jogador(es)</span></li>
+                    <li class="list-group-item">Início da liga: <span class="badge bg-warning text-dark">{{ league.start_date }}</span></li>
                     <li class="list-group-item">Data limite para completar jogos: <span
                             class="badge bg-warning text-dark">{{league.end_date }}</span></li>
 
@@ -190,8 +184,7 @@
                             </td>
                             <td><span class="badge bg-warning text-dark">{{ league.enviroment.leagueCMaxSet }}</span>
                             </td>
-                            <td><span class="badge bg-warning text-dark">{{ league.enviroment.leagueOthersMaxSet
-                                    }}</span></td>
+                            <td><span class="badge bg-warning text-dark">{{ league.enviroment.leagueOthersMaxSet }}</span></td>
                         </tr>
                         <tr>
                             <th scope="row">Best Of (legs)</th>
@@ -201,8 +194,7 @@
                             </td>
                             <td><span class="badge bg-warning text-dark">{{ league.enviroment.leagueCBestof }}</span>
                             </td>
-                            <td><span class="badge bg-warning text-dark">{{ league.enviroment.leagueOthersBestof
-                                    }}</span></td>
+                            <td><span class="badge bg-warning text-dark">{{ league.enviroment.leagueOthersBestof }}</span></td>
                         </tr>
                         <tr>
                             <th scope="row">First To (legs)</th>
@@ -212,8 +204,7 @@
                             </td>
                             <td><span class="badge bg-warning text-dark">{{ league.enviroment.leagueCFirstTo }}</span>
                             </td>
-                            <td><span class="badge bg-warning text-dark">{{ league.enviroment.leagueOthersFirstTo
-                                    }}</span></td>
+                            <td><span class="badge bg-warning text-dark">{{ league.enviroment.leagueOthersFirstTo }}</span></td>
                         </tr>
                         </tr>
                     </tbody>
