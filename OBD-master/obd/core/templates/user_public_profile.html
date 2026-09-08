@@ -30,8 +30,8 @@ Last update: Jul-03-2021
 
 <div class="container">
     <div class="row">
-        <div class="col-6 col-md-1"></div>
-        <div class="col-6 col-md-10">
+        <div class="d-none d-md-block col-md-1"></div>
+        <div class="col-12 col-md-10">
 
             <img src="{% static 'media/logos/1230x200-banner-fundo-escuro.jpg' %}"
                 class="card-img figure-img img-fluid rounded" alt="...">
@@ -48,8 +48,8 @@ Last update: Jul-03-2021
             <p></p>
 
             <div class="row">
-                <div class="col-1"></div>
-                <div class="col-10">
+                <div class="d-none d-md-block col-md-1"></div>
+                <div class="col-12 col-md-10">
                     <div class="card border-dark mb-3">
                         <div class="card-header bg-primary text-white">
                             <strong>OBD Member Card ***** {% now "Y" %}</strong>
@@ -135,7 +135,7 @@ Last update: Jul-03-2021
                     <p class="card-text">{{ profile.bio }}</p>
                     {% endif %}
                 </div>
-                <div class="col-1"></div>
+                <div class="d-none d-md-block col-md-1"></div>
             </div>
             <p></p>
 
@@ -249,7 +249,7 @@ Last update: Jul-03-2021
 
         </div>
     </div>
-    <div class="col-6 col-md-1"></div>
+    <div class="d-none d-md-block col-md-1"></div>
 </div>
 
 {% endblock %}

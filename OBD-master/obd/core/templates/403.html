@@ -18,8 +18,8 @@ Description: This is the page where players can log-in
 <div class="container">
     <div class="row">
 
-        <div class="col-4"></div>
-        <div class="col-4">
+        <div class="d-none d-md-block col-md-4"></div>
+        <div class="col-12 col-md-4">
             {% if user.is_authenticated %}
             <div class="alert alert-danger" role="alert" align="center">
                 <strong>Olá {{ user.first_name }}, somente os administradores da liga possuem acesso a esta
