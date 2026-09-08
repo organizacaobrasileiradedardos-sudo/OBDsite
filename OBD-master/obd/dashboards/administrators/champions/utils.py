@@ -15,10 +15,24 @@ from obd.dashboards.administrators.champions.models import Champion
 def get_or_create_player(name: str, pin: str) -> User:
     """Return a User (and Profile) for the given name and PIN.
 
+    Procura primeiro um cadastro existente pelo apelido do jogador no N01
+    (``Profile.nakka``) — é o campo que liga a conta do site à identidade dele
+    no n01: obrigatório no perfil e validado como único.
+
+    Sem essa busca, a única forma de reaproveitar uma conta era o ``username``
+    coincidir com o nome usado no n01, o que raramente acontece — e jogadores
+    já cadastrados acabavam duplicados a cada captura.
+
     If the user does not exist, it is created with a generated e‑mail address.
     The associated Profile is also created via the post_save signal, but we set the
     ``pin`` and ``nickname`` fields explicitly when the profile is newly created.
     """
+    nakka = name.strip()
+    if nakka:
+        registered = Profile.objects.filter(nakka__iexact=nakka).first()
+        if registered:
+            return registered.user
+
     first, *last = name.split()
     last_name = " ".join(last) if last else ""
     user, created = User.objects.get_or_create(
