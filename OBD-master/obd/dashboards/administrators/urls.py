@@ -28,8 +28,10 @@ urlpatterns = [
     path('dashboard/admin/scraping/andamento/<int:tournament_id>/', views.update_tournament_progress, name='update_tournament_progress'),
     path('dashboard/admin/order-of-merit/', views.order_of_merit_dashboard, name='order_of_merit_dashboard'),
     path('dashboard/admin/order-of-merit/import/', views.import_order_of_merit, name='import_order_of_merit'),
+    path('dashboard/admin/order-of-merit/import/confirmar/', views.confirm_order_of_merit, name='confirm_order_of_merit'),
     path('dashboard/admin/national-ranking/', views.national_ranking_dashboard, name='national_ranking_dashboard'),
     path('dashboard/admin/national-ranking/import/', views.import_national_ranking, name='import_national_ranking'),
+    path('dashboard/admin/national-ranking/import/confirmar/', views.confirm_national_ranking, name='confirm_national_ranking'),
     path('dashboard/admin/merge-players/', views.merge_players_dashboard, name='merge_players_dashboard'),
     path('dashboard/admin/merge-players/execute/', views.merge_players_execute, name='merge_players_execute'),
 ]

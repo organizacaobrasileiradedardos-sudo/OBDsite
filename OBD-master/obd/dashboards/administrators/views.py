@@ -147,34 +147,59 @@ def _strip_accents(text):
         if not unicodedata.combining(c)
     )
 
-@login_required
-@permission_required('profiles.has_admin_role', raise_exception=True)
-def import_order_of_merit(request):
-    if request.method != 'POST':
-        return redirect('administrators:order_of_merit_dashboard')
 
-    excel_file = request.FILES.get('file')
+# As duas importações (Order of Merit e Ranking Nacional) leem o mesmo formato de
+# planilha e só diferem no rótulo, na coluna de valor e no model gravado.
+IMPORT_KINDS = {
+    'merit': {
+        'noun': 'Etapa',
+        'title': 'Order of Merit',
+        'dashboard': 'administrators:order_of_merit_dashboard',
+        'confirm': 'administrators:confirm_order_of_merit',
+        'value_cols': ('valor', 'premia', 'r$'),
+        'value_label': 'Valor (R$)',
+        'strip_currency': True,
+        'model': OrderOfMeritEntry,
+        'value_field': 'value',
+        'scope': 2,
+    },
+    'ranking': {
+        'noun': 'Torneio',
+        'title': 'Ranking Nacional',
+        'dashboard': 'administrators:national_ranking_dashboard',
+        'confirm': 'administrators:confirm_national_ranking',
+        'value_cols': ('ponto',),
+        'value_label': 'Pontos',
+        'strip_currency': False,
+        'model': NationalRankingEntry,
+        'value_field': 'points',
+        'scope': 0,
+    },
+}
 
-    if not excel_file:
-        messages.error(request, "Selecione o arquivo antes de importar.")
-        return redirect('administrators:order_of_merit_dashboard')
 
+def _parse_import_sheet(excel_file, kind):
+    """Lê a planilha e devolve (nome, data, linhas, erro).
+
+    Cada linha é um dicionário com nome do jogador, valor e colocação. Não toca
+    no banco: serve tanto para a tela de conferência quanto para a gravação.
+    """
+    cfg = IMPORT_KINDS[kind]
     try:
         df_raw = pd.read_excel(excel_file, header=None)
     except Exception as e:
-        messages.error(request, f"Não foi possível ler o arquivo: {e}")
-        return redirect('administrators:order_of_merit_dashboard')
+        return None, None, None, f"Não foi possível ler o arquivo: {e}"
 
     try:
         etapa_name = str(df_raw.iloc[0, 1]).strip()
         raw_date = df_raw.iloc[1, 1]
     except (IndexError, KeyError):
-        messages.error(request, "Formato inválido: verifique as linhas de Etapa e Data no início do arquivo.")
-        return redirect('administrators:order_of_merit_dashboard')
+        return None, None, None, (
+            f"Formato inválido: verifique as linhas de {cfg['noun']} e Data no início do arquivo."
+        )
 
     if not etapa_name or etapa_name.lower() == 'nan':
-        messages.error(request, "Nome da etapa não encontrado na linha 1.")
-        return redirect('administrators:order_of_merit_dashboard')
+        return None, None, None, f"Nome d{'a etapa' if kind == 'merit' else 'o torneio'} não encontrado na linha 1."
 
     if isinstance(raw_date, (datetime.datetime, datetime.date)):
         etapa_date = raw_date.date() if isinstance(raw_date, datetime.datetime) else raw_date
@@ -182,54 +207,38 @@ def import_order_of_merit(request):
         try:
             etapa_date = datetime.datetime.strptime(str(raw_date).strip(), '%d/%m/%Y').date()
         except ValueError:
-            messages.error(request, f"Data inválida na linha 2: '{raw_date}'. Use o formato DD/MM/AAAA.")
-            return redirect('administrators:order_of_merit_dashboard')
+            return None, None, None, f"Data inválida na linha 2: '{raw_date}'. Use o formato DD/MM/AAAA."
 
-    # Etapa "geral" (sem divisão) - separada dos torneios por divisão da Captura de Torneios
-    slug = etapa_name.lower().replace(' ', '-')
-    league, created = League.objects.get_or_create(
-        name=etapa_name,
-        defaults={
-            'slug': slug,
-            'start_date': etapa_date,
-            'end_date': etapa_date,
-            'runoff': 1,
-            'phase': 4,
-            'scope': 2,
-            'status': True,
-        }
-    )
-
+    excel_file.seek(0)
     try:
         df = pd.read_excel(excel_file, skiprows=3)
     except Exception as e:
-        messages.error(request, f"Não foi possível ler a tabela de jogadores: {e}")
-        return redirect('administrators:order_of_merit_dashboard')
+        return None, None, None, f"Não foi possível ler a tabela de jogadores: {e}"
 
     df.columns = [str(c).strip().lower() for c in df.columns]
-
     col_pos = next((c for c in df.columns if 'pos' in c or 'coloca' in c), None)
     col_player = next((c for c in df.columns if 'jogador' in c or 'nome' in c), None)
-    col_value = next((c for c in df.columns if 'valor' in c or 'premia' in c or 'r$' in c), None)
+    col_value = next((c for c in df.columns if any(t in c for t in cfg['value_cols'])), None)
 
     if not col_player or not col_value:
-        messages.error(request, "Não foi possível identificar as colunas 'Jogador' e 'Valor' na tabela.")
-        return redirect('administrators:order_of_merit_dashboard')
+        return None, None, None, (
+            f"Não foi possível identificar as colunas 'Jogador' e '{cfg['value_label']}' na tabela."
+        )
 
-    matched = 0
-    not_found = []
-    created_provisional = []
-
+    linhas = []
     for _, row in df.iterrows():
         name = str(row[col_player]).strip()
         if not name or name.lower() == 'nan':
             continue
 
         raw_value = row[col_value]
+        texto = str(raw_value)
+        if cfg['strip_currency']:
+            texto = texto.replace('R$', '')
         try:
-            value = Decimal(str(raw_value).replace('R$', '').replace(',', '.').strip())
+            value = Decimal(texto.replace(',', '.').strip())
         except (InvalidOperation, ValueError):
-            not_found.append(f"{name} (valor inválido: {raw_value})")
+            linhas.append({'name': name, 'value': None, 'position': None, 'erro': f"valor inválido: {raw_value}"})
             continue
 
         position = None
@@ -239,47 +248,196 @@ def import_order_of_merit(request):
             except (ValueError, TypeError):
                 position = None
 
-        pin = name.replace(' ', '').lower()
-        # O apelido do N01 (Profile.nakka) é o vínculo explícito entre a planilha
-        # e a conta: obrigatório no perfil e validado como único. Tem prioridade
-        # sobre a busca por username, que falha se o jogador renomeou a conta e
-        # que, no palpite por prefixo mais abaixo, pode casar com a pessoa errada.
-        by_nakka = Profile.objects.filter(nakka__iexact=name.strip()).first()
-        user = by_nakka.user if by_nakka else User.objects.filter(username__iexact=pin).first()
+        linhas.append({'name': name, 'value': value, 'position': position, 'erro': None})
 
-        if not user:
-            candidates = list(User.objects.filter(username__istartswith=pin))
-            if not candidates:
-                pin_no_accent = _strip_accents(pin)
-                candidates = [
-                    u for u in User.objects.only('id', 'username')
-                    if _strip_accents(u.username.lower()).startswith(pin_no_accent)
-                ]
-            if len(candidates) == 1:
-                user = candidates[0]
-            elif len(candidates) > 1:
-                not_found.append(f"{name} (ambíguo: várias correspondências possíveis)")
+    return etapa_name, etapa_date, linhas, None
+
+
+def _classify_player(name):
+    """Como o nome da planilha se relaciona com as contas existentes.
+
+    Devolve (situacao, user, candidatos), onde situacao é:
+      'nakka'    - casou pelo apelido do N01 (vínculo explícito, confiável)
+      'username' - casou pelo nome de usuário exato
+      'palpite'  - só um candidato por prefixo; precisa de confirmação
+      'ambiguo'  - vários candidatos por prefixo
+      'novo'     - ninguém parecido
+    """
+    pin = name.replace(' ', '').lower()
+
+    by_nakka = Profile.objects.filter(nakka__iexact=name.strip()).first()
+    if by_nakka:
+        return 'nakka', by_nakka.user, []
+
+    exato = User.objects.filter(username__iexact=pin).first()
+    if exato:
+        return 'username', exato, []
+
+    candidatos = list(User.objects.filter(username__istartswith=pin))
+    if not candidatos:
+        sem_acento = _strip_accents(pin)
+        candidatos = [
+            u for u in User.objects.all()
+            if _strip_accents(u.username.lower()).startswith(sem_acento)
+        ]
+
+    if len(candidatos) == 1:
+        return 'palpite', candidatos[0], candidatos
+    if len(candidatos) > 1:
+        return 'ambiguo', None, candidatos
+    return 'novo', None, []
+
+
+def _save_nakka(user, name):
+    """Grava o nome da planilha como apelido do N01, se ainda não houver conflito.
+
+    É isso que torna a correção definitiva: na próxima importação o jogador já
+    casa sozinho, sem passar de novo pela tela de conferência.
+    """
+    nakka = name.strip()
+    profile = getattr(user, 'profile', None)
+    if not profile or profile.nakka.strip().lower() == nakka.lower():
+        return False
+    if Profile.objects.filter(nakka__iexact=nakka).exclude(pk=profile.pk).exists():
+        return False
+    profile.nakka = nakka
+    profile.save(update_fields=['nakka'])
+    return True
+
+
+def _import_review(request, kind):
+    """Passo 1: lê a planilha, classifica cada jogador e mostra para conferência."""
+    cfg = IMPORT_KINDS[kind]
+    if request.method != 'POST':
+        return redirect(cfg['dashboard'])
+
+    excel_file = request.FILES.get('file')
+    if not excel_file:
+        messages.error(request, "Selecione o arquivo antes de importar.")
+        return redirect(cfg['dashboard'])
+
+    etapa_name, etapa_date, linhas, erro = _parse_import_sheet(excel_file, kind)
+    if erro:
+        messages.error(request, erro)
+        return redirect(cfg['dashboard'])
+
+    reconhecidos, conferir, invalidos = [], [], []
+    for linha in linhas:
+        if linha['erro']:
+            invalidos.append(linha)
+            continue
+
+        situacao, user, candidatos = _classify_player(linha['name'])
+        item = {**linha, 'situacao': situacao, 'user': user, 'candidatos': candidatos}
+        (reconhecidos if situacao in ('nakka', 'username') else conferir).append(item)
+
+    if not reconhecidos and not conferir:
+        messages.error(request, "Nenhum jogador válido encontrado na planilha.")
+        return redirect(cfg['dashboard'])
+
+    return render(request, 'import_review.html', {
+        'kind': kind,
+        'cfg': cfg,
+        'confirm_url': cfg['confirm'],
+        'dashboard_url': cfg['dashboard'],
+        'etapa_name': etapa_name,
+        'etapa_date': etapa_date.isoformat(),
+        'etapa_date_display': etapa_date,
+        'reconhecidos': reconhecidos,
+        'conferir': conferir,
+        'invalidos': invalidos,
+        'jogadores': User.objects.filter(is_superuser=False).order_by('first_name', 'last_name'),
+    })
+
+
+def _import_confirm(request, kind):
+    """Passo 2: grava exatamente o que foi revisado na tela de conferência."""
+    cfg = IMPORT_KINDS[kind]
+    if request.method != 'POST':
+        return redirect(cfg['dashboard'])
+
+    etapa_name = request.POST.get('etapa_name', '').strip()
+    try:
+        etapa_date = datetime.date.fromisoformat(request.POST.get('etapa_date', ''))
+    except ValueError:
+        messages.error(request, "Dados da importação expiraram. Envie a planilha novamente.")
+        return redirect(cfg['dashboard'])
+
+    league, created = League.objects.get_or_create(
+        name=etapa_name,
+        defaults={
+            'slug': etapa_name.lower().replace(' ', '-'),
+            'start_date': etapa_date,
+            'end_date': etapa_date,
+            'runoff': 1,
+            'phase': 4,
+            'scope': cfg['scope'],
+            'status': True,
+        }
+    )
+
+    gravados, criados, pulados, vinculados = 0, [], [], []
+
+    for idx in request.POST.getlist('row'):
+        name = request.POST.get(f'name_{idx}', '').strip()
+        escolha = request.POST.get(f'choice_{idx}', 'skip')
+        if not name or escolha == 'skip':
+            if name:
+                pulados.append(name)
+            continue
+
+        try:
+            # aceita vírgula decimal, caso o campo venha formatado no padrão local
+            value = Decimal(request.POST.get(f'value_{idx}', '').replace(',', '.'))
+        except (InvalidOperation, ValueError):
+            pulados.append(name)
+            continue
+
+        posicao = request.POST.get(f'position_{idx}', '')
+        position = int(posicao) if posicao.isdigit() else None
+
+        if escolha == 'new':
+            user = get_or_create_player(name, name.replace(' ', '').lower())
+            criados.append(name)
+        else:
+            user = User.objects.filter(pk=escolha.removeprefix('u:')).first()
+            if not user:
+                pulados.append(name)
                 continue
+            if request.POST.get(f'save_nakka_{idx}') == 'on' and _save_nakka(user, name):
+                vinculados.append(f'{name} → {user.first_name} {user.last_name}')
 
-        if not user:
-            user = get_or_create_player(name, pin)
-            created_provisional.append(name)
-
-        OrderOfMeritEntry.objects.update_or_create(
+        cfg['model'].objects.update_or_create(
             player=user,
             league=league,
-            defaults={'value': value, 'position_in_stage': position}
+            defaults={cfg['value_field']: value, 'position_in_stage': position}
         )
-        matched += 1
+        gravados += 1
 
-    action = "criada" if created else "encontrada"
-    messages.success(request, f"Etapa '{etapa_name}' {action}. Importação concluída: {matched} jogadores atualizados.")
-    if created_provisional:
-        messages.info(request, f"{len(created_provisional)} cadastros provisórios criados: {', '.join(created_provisional)}")
-    if not_found:
-        messages.warning(request, f"{len(not_found)} nomes com problema: {', '.join(not_found)}")
+    acao = "criad" + ("a" if kind == 'merit' else "o")
+    encontrado = "encontrad" + ("a" if kind == 'merit' else "o")
+    messages.success(
+        request,
+        f"{cfg['noun']} '{etapa_name}' {acao if created else encontrado}. "
+        f"Importação concluída: {gravados} jogadores atualizados."
+    )
+    if criados:
+        messages.info(request, f"{len(criados)} cadastros provisórios criados: {', '.join(criados)}")
+    if vinculados:
+        messages.info(
+            request,
+            f"{len(vinculados)} apelido(s) do N01 gravados — nas próximas importações "
+            f"esses jogadores serão reconhecidos sozinhos: {', '.join(vinculados)}"
+        )
+    if pulados:
+        messages.warning(request, f"{len(pulados)} linha(s) ignorada(s): {', '.join(pulados)}")
 
-    return redirect('administrators:order_of_merit_dashboard')
+    return redirect(cfg['dashboard'])
+
+@login_required
+@permission_required('profiles.has_admin_role', raise_exception=True)
+def import_order_of_merit(request):
+    return _import_review(request, 'merit')
 
 
 @login_required
@@ -292,141 +450,20 @@ def national_ranking_dashboard(request):
 @login_required
 @permission_required('profiles.has_admin_role', raise_exception=True)
 def import_national_ranking(request):
-    if request.method != 'POST':
-        return redirect('administrators:national_ranking_dashboard')
+    return _import_review(request, 'ranking')
 
-    excel_file = request.FILES.get('file')
 
-    if not excel_file:
-        messages.error(request, "Selecione o arquivo antes de importar.")
-        return redirect('administrators:national_ranking_dashboard')
 
-    try:
-        df_raw = pd.read_excel(excel_file, header=None)
-    except Exception as e:
-        messages.error(request, f"Não foi possível ler o arquivo: {e}")
-        return redirect('administrators:national_ranking_dashboard')
+@login_required
+@permission_required('profiles.has_admin_role', raise_exception=True)
+def confirm_order_of_merit(request):
+    return _import_confirm(request, 'merit')
 
-    # Linha 1 (índice 0): Torneio | Nome
-    # Linha 2 (índice 1): Data | Data
-    # Linha 4 (índice 3): Colocação | Jogador | Pontos
-    try:
-        tournament_name = str(df_raw.iloc[0, 1]).strip()
-        raw_date = df_raw.iloc[1, 1]
-    except (IndexError, KeyError):
-        messages.error(request, "Formato inválido: verifique as linhas de Torneio e Data no início do arquivo.")
-        return redirect('administrators:national_ranking_dashboard')
 
-    if not tournament_name or tournament_name.lower() == 'nan':
-        messages.error(request, "Nome do torneio não encontrado na linha 1.")
-        return redirect('administrators:national_ranking_dashboard')
-
-    if isinstance(raw_date, (datetime.datetime, datetime.date)):
-        tournament_date = raw_date.date() if isinstance(raw_date, datetime.datetime) else raw_date
-    else:
-        try:
-            tournament_date = datetime.datetime.strptime(str(raw_date).strip(), '%d/%m/%Y').date()
-        except ValueError:
-            messages.error(request, f"Data inválida na linha 2: '{raw_date}'. Use o formato DD/MM/AAAA.")
-            return redirect('administrators:national_ranking_dashboard')
-
-    # Get or create the League (torneio)
-    slug = tournament_name.lower().replace(' ', '-')
-    league, created = League.objects.get_or_create(
-        name=tournament_name,
-        defaults={
-            'slug': slug,
-            'start_date': tournament_date,
-            'end_date': tournament_date,
-            'runoff': 1,
-            'phase': 4,
-            'scope': 0,
-            'status': True,
-        }
-    )
-
-    # Linha 4 (índice 3) em diante = tabela de jogadores
-    try:
-        df = pd.read_excel(excel_file, skiprows=3)
-    except Exception as e:
-        messages.error(request, f"Não foi possível ler a tabela de jogadores: {e}")
-        return redirect('administrators:national_ranking_dashboard')
-
-    df.columns = [str(c).strip().lower() for c in df.columns]
-
-    col_pos = next((c for c in df.columns if 'pos' in c or 'coloca' in c), None)
-    col_player = next((c for c in df.columns if 'jogador' in c or 'nome' in c), None)
-    col_points = next((c for c in df.columns if 'ponto' in c), None)
-
-    if not col_player or not col_points:
-        messages.error(request, "Não foi possível identificar as colunas 'Jogador' e 'Pontos' na tabela.")
-        return redirect('administrators:national_ranking_dashboard')
-
-    matched = 0
-    not_found = []
-    created_provisional = []
-
-    for _, row in df.iterrows():
-        name = str(row[col_player]).strip()
-        if not name or name.lower() == 'nan':
-            continue
-
-        raw_points = row[col_points]
-        try:
-            points = Decimal(str(raw_points).replace(',', '.').strip())
-        except (InvalidOperation, ValueError):
-            not_found.append(f"{name} (valor inválido: {raw_points})")
-            continue
-
-        position = None
-        if col_pos:
-            try:
-                position = int(row[col_pos])
-            except (ValueError, TypeError):
-                position = None
-
-        pin = name.replace(' ', '').lower()
-        # O apelido do N01 (Profile.nakka) é o vínculo explícito entre a planilha
-        # e a conta: obrigatório no perfil e validado como único. Tem prioridade
-        # sobre a busca por username, que falha se o jogador renomeou a conta e
-        # que, no palpite por prefixo mais abaixo, pode casar com a pessoa errada.
-        by_nakka = Profile.objects.filter(nakka__iexact=name.strip()).first()
-        user = by_nakka.user if by_nakka else User.objects.filter(username__iexact=pin).first()
-
-        if not user:
-            candidates = list(User.objects.filter(username__istartswith=pin))
-            if not candidates:
-                pin_no_accent = _strip_accents(pin)
-                candidates = [
-                    u for u in User.objects.only('id', 'username')
-                    if _strip_accents(u.username.lower()).startswith(pin_no_accent)
-                ]
-            if len(candidates) == 1:
-                user = candidates[0]
-            elif len(candidates) > 1:
-                not_found.append(f"{name} (ambíguo: várias correspondências possíveis)")
-                continue
-
-        if not user:
-            # Cria cadastro provisório (não verificado), igual à Captura de Torneios
-            user = get_or_create_player(name, pin)
-            created_provisional.append(name)
-
-        NationalRankingEntry.objects.update_or_create(
-            player=user,
-            league=league,
-            defaults={'points': points, 'position_in_stage': position}
-        )
-        matched += 1
-
-    action = "criado" if created else "encontrado"
-    messages.success(request, f"Torneio '{tournament_name}' {action}. Importação concluída: {matched} jogadores atualizados.")
-    if created_provisional:
-        messages.info(request, f"{len(created_provisional)} cadastros provisórios criados (aguardando reivindicação): {', '.join(created_provisional)}")
-    if not_found:
-        messages.warning(request, f"{len(not_found)} nomes com problema: {', '.join(not_found)}")
-
-    return redirect('administrators:national_ranking_dashboard')
+@login_required
+@permission_required('profiles.has_admin_role', raise_exception=True)
+def confirm_national_ranking(request):
+    return _import_confirm(request, 'ranking')
 
 
 def _player_summary(user):

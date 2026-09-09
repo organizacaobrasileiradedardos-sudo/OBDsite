@@ -1,0 +1,170 @@
+<!--
+Project name: OBD - Organização Brasileira de Dardos
+Property: Organização Brasileira de Dardos
+Developers: Guilherme Altomar by IA
+Page name: import_review.html (Conferência antes de gravar a importação de planilha)
+Description: Passo intermediário das importações de Order of Merit e Ranking Nacional.
+-->
+{% extends 'baseadmin.html' %}
+{% load l10n %}
+
+{% block title %} Conferência da Importação {% endblock %}
+{% block page %}{{ cfg.title }} - Conferência{% endblock %}
+{% block boauser %} Administrador {% endblock %}
+
+{% block content %}
+
+<div class="alert alert-info">
+    <strong><i class="bi bi-info-circle"></i> Nada foi gravado ainda.</strong>
+    Confira abaixo e clique em "Confirmar e gravar" no final da página.
+</div>
+
+<div class="card bg-dark text-white mb-4">
+    <div class="card-body">
+        <strong>{{ cfg.noun }}:</strong> {{ etapa_name }}
+        &nbsp;&nbsp;<strong>Data:</strong> {{ etapa_date_display|date:"d/m/Y" }}
+    </div>
+</div>
+
+<form method="post" action="{% url confirm_url %}">
+    {% csrf_token %}
+    <input type="hidden" name="etapa_name" value="{{ etapa_name }}">
+    <input type="hidden" name="etapa_date" value="{{ etapa_date }}">
+
+    {% if conferir %}
+    <div class="card border-warning mb-4">
+        <div class="card-header bg-warning text-dark">
+            <strong><i class="bi bi-exclamation-triangle-fill"></i>
+                Precisam da sua conferência ({{ conferir|length }})</strong>
+        </div>
+        <div class="card-body">
+            <p class="text-muted small">
+                Para cada um, escolha a quem pertence o resultado. Ao vincular a um jogador existente,
+                marque "gravar apelido" para que nas próximas importações ele seja reconhecido sozinho.
+            </p>
+            <div class="table-responsive">
+                <table class="table table-striped align-middle">
+                    <thead>
+                        <tr>
+                            <th>Nome na planilha</th>
+                            <th>{{ cfg.value_label }}</th>
+                            <th>Situação</th>
+                            <th style="min-width: 260px;">O que fazer</th>
+                            <th>Gravar apelido</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in conferir %}
+                        <tr>
+                            <td>
+                                <strong>{{ item.name }}</strong>
+                                <input type="hidden" name="row" value="c{{ forloop.counter }}">
+                                <input type="hidden" name="name_c{{ forloop.counter }}" value="{{ item.name }}">
+                                <input type="hidden" name="value_c{{ forloop.counter }}" value="{{ item.value|unlocalize }}">
+                                <input type="hidden" name="position_c{{ forloop.counter }}" value="{{ item.position|default_if_none:'' }}">
+                            </td>
+                            <td>{{ item.value }}</td>
+                            <td>
+                                {% if item.situacao == 'palpite' %}
+                                <span class="badge bg-warning text-dark">palpite pelo nome de usuário</span>
+                                {% elif item.situacao == 'ambiguo' %}
+                                <span class="badge bg-danger">vários parecidos</span>
+                                {% else %}
+                                <span class="badge bg-secondary">não encontrado</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <select name="choice_c{{ forloop.counter }}" class="form-select form-select-sm">
+                                    <option value="new">➕ Criar cadastro novo</option>
+                                    <option value="skip">⨯ Ignorar esta linha</option>
+                                    <optgroup label="Vincular a um jogador existente">
+                                        {% for jogador in jogadores %}
+                                        <option value="u:{{ jogador.id }}"
+                                            {% if item.user and item.user.id == jogador.id %}selected{% endif %}>
+                                            {{ jogador.first_name }} {{ jogador.last_name }} ({{ jogador.username }})
+                                        </option>
+                                        {% endfor %}
+                                    </optgroup>
+                                </select>
+                            </td>
+                            <td class="text-center">
+                                <input type="checkbox" class="form-check-input"
+                                    name="save_nakka_c{{ forloop.counter }}" checked
+                                    title="Grava '{{ item.name }}' como apelido do N01 do jogador escolhido">
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    {% if reconhecidos %}
+    <div class="card border-success mb-4">
+        <div class="card-header bg-success text-white">
+            <strong><i class="bi bi-check-circle-fill"></i>
+                Reconhecidos com certeza ({{ reconhecidos|length }})</strong>
+        </div>
+        <div class="card-body">
+            <p class="text-muted small">Serão gravados como estão. Nenhuma ação necessária.</p>
+            <div class="table-responsive">
+                <table class="table table-sm table-striped align-middle">
+                    <thead>
+                        <tr>
+                            <th>Nome na planilha</th>
+                            <th>{{ cfg.value_label }}</th>
+                            <th>Jogador</th>
+                            <th>Reconhecido por</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in reconhecidos %}
+                        <tr>
+                            <td>
+                                {{ item.name }}
+                                <input type="hidden" name="row" value="r{{ forloop.counter }}">
+                                <input type="hidden" name="name_r{{ forloop.counter }}" value="{{ item.name }}">
+                                <input type="hidden" name="value_r{{ forloop.counter }}" value="{{ item.value|unlocalize }}">
+                                <input type="hidden" name="position_r{{ forloop.counter }}" value="{{ item.position|default_if_none:'' }}">
+                                <input type="hidden" name="choice_r{{ forloop.counter }}" value="u:{{ item.user.id }}">
+                            </td>
+                            <td>{{ item.value }}</td>
+                            <td>{{ item.user.first_name }} {{ item.user.last_name }} ({{ item.user.username }})</td>
+                            <td>
+                                {% if item.situacao == 'nakka' %}
+                                <span class="badge bg-success">apelido do N01</span>
+                                {% else %}
+                                <span class="badge bg-primary">nome de usuário</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    {% if invalidos %}
+    <div class="alert alert-danger">
+        <strong>{{ invalidos|length }} linha(s) com problema na planilha, serão ignoradas:</strong>
+        <ul class="mb-0 mt-2">
+            {% for item in invalidos %}
+            <li>{{ item.name }} — {{ item.erro }}</li>
+            {% endfor %}
+        </ul>
+    </div>
+    {% endif %}
+
+    <div class="mb-5">
+        <button type="submit" class="btn btn-primary">
+            <i class="bi bi-check-lg"></i> Confirmar e gravar
+        </button>
+        <a href="{% url dashboard_url %}" class="btn btn-outline-secondary">Cancelar</a>
+    </div>
+</form>
+
+{% endblock %}
