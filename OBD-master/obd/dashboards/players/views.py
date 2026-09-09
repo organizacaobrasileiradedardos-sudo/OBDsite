@@ -217,10 +217,10 @@ def recoverypassword(request):
         return render(request, 'login.html', {'form': form, 'token': token})
 
     email = form.cleaned_data['email']
-    try:
-        u = User.objects.get(email__iexact=email)
-    except User.DoesNotExist:
-        u = None
+    # O e-mail não é único no banco (contas criadas pelo robô de captura podem
+    # repetir), então filter().first() em vez de get(), que estouraria com
+    # MultipleObjectsReturned. Prioriza a conta ativa e usada mais recentemente.
+    u = User.objects.filter(email__iexact=email).order_by('-is_active', '-last_login', 'id').first()
 
     # Só envia o e-mail se o cadastro existir, mas a mensagem exibida é sempre
     # a mesma (evita revelar se um e-mail está ou não cadastrado no OBD).
