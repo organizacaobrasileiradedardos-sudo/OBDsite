@@ -240,7 +240,12 @@ def import_order_of_merit(request):
                 position = None
 
         pin = name.replace(' ', '').lower()
-        user = User.objects.filter(username__iexact=pin).first()
+        # O apelido do N01 (Profile.nakka) é o vínculo explícito entre a planilha
+        # e a conta: obrigatório no perfil e validado como único. Tem prioridade
+        # sobre a busca por username, que falha se o jogador renomeou a conta e
+        # que, no palpite por prefixo mais abaixo, pode casar com a pessoa errada.
+        by_nakka = Profile.objects.filter(nakka__iexact=name.strip()).first()
+        user = by_nakka.user if by_nakka else User.objects.filter(username__iexact=pin).first()
 
         if not user:
             candidates = list(User.objects.filter(username__istartswith=pin))
@@ -381,7 +386,12 @@ def import_national_ranking(request):
                 position = None
 
         pin = name.replace(' ', '').lower()
-        user = User.objects.filter(username__iexact=pin).first()
+        # O apelido do N01 (Profile.nakka) é o vínculo explícito entre a planilha
+        # e a conta: obrigatório no perfil e validado como único. Tem prioridade
+        # sobre a busca por username, que falha se o jogador renomeou a conta e
+        # que, no palpite por prefixo mais abaixo, pode casar com a pessoa errada.
+        by_nakka = Profile.objects.filter(nakka__iexact=name.strip()).first()
+        user = by_nakka.user if by_nakka else User.objects.filter(username__iexact=pin).first()
 
         if not user:
             candidates = list(User.objects.filter(username__istartswith=pin))
