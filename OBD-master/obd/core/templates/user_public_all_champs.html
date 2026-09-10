@@ -72,21 +72,21 @@ Description: Campeões separados por tipo de torneio, cada tipo expandindo ao se
         letter-spacing: 1px;
         text-transform: uppercase;
         padding: 16px 18px;
-        border-left: 5px solid var(--dartboard-gold);
+        border-left: 5px solid var(--cat-cor);
     }
 
     .champ-cat .accordion-button:not(.collapsed) {
-        background-color: #fdf6e3;
+        background-color: var(--cat-fundo);
         color: var(--dartboard-black);
         box-shadow: none;
     }
 
     .champ-cat .accordion-button:focus {
-        box-shadow: 0 0 0 .2rem rgba(212, 175, 55, .35);
+        box-shadow: 0 0 0 .2rem var(--cat-foco);
     }
 
     .champ-cat-icone {
-        color: var(--dartboard-gold);
+        color: var(--cat-cor);
         margin-right: 10px;
         flex-shrink: 0;
     }
@@ -94,8 +94,8 @@ Description: Campeões separados por tipo de torneio, cada tipo expandindo ao se
     .champ-cat-contagem {
         margin-left: auto;
         margin-right: 12px;
-        background-color: var(--dartboard-black);
-        color: #fff;
+        background-color: var(--cat-cor);
+        color: var(--cat-texto-contagem);
         font-family: var(--font-heading);
         font-size: 0.72rem;
         letter-spacing: 0;
@@ -103,6 +103,40 @@ Description: Campeões separados por tipo de torneio, cada tipo expandindo ao se
         border-radius: 999px;
         white-space: nowrap;
         flex-shrink: 0;
+    }
+
+    /* Uma cor por tipo de torneio, usando as quatro variantes que o tema do site
+       já define. Cada bloco só troca as variáveis; as regras acima são as mesmas. */
+    .cat-gold {
+        --cat-cor: var(--dartboard-gold-dark);
+        --cat-fundo: #FEF3E2;
+        --cat-foco: rgba(245, 158, 11, .35);
+        --cat-texto-contagem: var(--dartboard-black);
+    }
+
+    .cat-green {
+        --cat-cor: var(--dartboard-green-dark);
+        --cat-fundo: #E7F6F0;
+        --cat-foco: rgba(5, 150, 105, .3);
+        --cat-texto-contagem: #fff;
+    }
+
+    .cat-red {
+        --cat-cor: var(--dartboard-red-dark);
+        --cat-fundo: #FDECEC;
+        --cat-foco: rgba(220, 38, 38, .3);
+        --cat-texto-contagem: #fff;
+    }
+
+    .cat-black {
+        --cat-cor: var(--dartboard-gray-dark);
+        --cat-fundo: #EDEFF2;
+        --cat-foco: rgba(31, 41, 55, .3);
+        --cat-texto-contagem: #fff;
+    }
+
+    .champ-year-badge-cat {
+        border-left-color: var(--cat-cor);
     }
 
     .champ-cat-vazia {
@@ -148,7 +182,7 @@ Description: Campeões separados por tipo de torneio, cada tipo expandindo ao se
             {% if total_geral %}
             <div class="accordion champ-cat" id="hall-categorias">
                 {% for categoria in categorias %}
-                <div class="accordion-item">
+                <div class="accordion-item cat-{{ categoria.cor }}">
                     <h2 class="accordion-header" id="cabecalho-{{ categoria.slug }}">
                         <button class="accordion-button {% if not categoria.aberta %}collapsed{% endif %}" type="button"
                             data-bs-toggle="collapse" data-bs-target="#categoria-{{ categoria.slug }}"
@@ -174,21 +208,21 @@ Description: Campeões separados por tipo de torneio, cada tipo expandindo ao se
                             {% for bloco in categoria.anos %}
                             <div class="mb-5">
                                 <div class="mb-3">
-                                    <span class="champ-year-badge">{{ bloco.ano|default:"Sem data" }}</span>
+                                    <span class="champ-year-badge champ-year-badge-cat">{{ bloco.ano|default:"Sem data" }}</span>
                                 </div>
 
                                 <div class="row g-4">
                                     {% for champ in bloco.campeoes %}
                                     <div class="col-12 col-sm-6 col-lg-4">
                                         <div class="card card-dartboard h-100">
-                                            <div class="card-header-dartboard gold text-center py-2">
+                                            <div class="card-header-dartboard {{ categoria.cor }} text-center py-2">
                                                 <div style="font-size: 0.7rem; text-transform: uppercase; opacity: 0.85;">
                                                     Divisão {{ champ.division.get_formation_display }} &middot; {{ champ.get_mode_display }}
                                                 </div>
                                                 <div>{{ champ.league.name }}</div>
                                             </div>
                                             <div class="card-body text-center py-4 bg-white">
-                                                <i class="bi bi-trophy-fill" style="font-size: 2.5rem; color: var(--dartboard-gold);"></i>
+                                                <i class="bi bi-trophy-fill" style="font-size: 2.5rem; color: var(--cat-cor);"></i>
                                                 <h4 class="fw-bold mt-2 mb-0">{{ champ.p1.first_name }} {{ champ.p1.last_name }}</h4>
                                                 <div class="text-muted small">Campeão</div>
                                             </div>

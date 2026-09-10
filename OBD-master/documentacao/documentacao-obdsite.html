@@ -850,15 +850,22 @@ already_past   = Q(end_date__isnull=False, end_date__lt=now)  | Q(end_date__isnu
 
       <div class="tbl">
         <table>
-          <thead><tr><th>Categoria</th><th>Palpite inicial quando o nome contém</th></tr></thead>
+          <thead><tr><th>Categoria</th><th>Cor</th><th>Palpite inicial quando o nome contém</th></tr></thead>
           <tbody>
-            <tr><td>Liga Nacional OBD</td><td><code>liga nacional</code></td></tr>
-            <tr><td>Tour OBD</td><td>a palavra <code>tour</code> isolada</td></tr>
-            <tr><td>Circuito Nacional OBD</td><td><code>circuito nacional</code></td></tr>
-            <tr><td>Outros Torneios</td><td>nenhum dos anteriores</td></tr>
+            <tr><td>Liga Nacional OBD</td><td>dourado</td><td><code>liga nacional</code></td></tr>
+            <tr><td>Tour OBD</td><td>verde</td><td>a palavra <code>tour</code> isolada</td></tr>
+            <tr><td>Circuito Nacional OBD</td><td>vermelho</td><td><code>circuito nacional</code></td></tr>
+            <tr><td>Outros Torneios</td><td>preto</td><td>nenhum dos anteriores</td></tr>
           </tbody>
         </table>
       </div>
+
+      <p>Cada categoria tem uma cor, usada no cabeçalho do bloco, no ícone, na contagem, na tarja do
+        ano e no cabeçalho de cada card de campeão. São as <strong>quatro variantes de
+        <code>.card-header-dartboard</code> que o tema do site já define</strong> — nenhuma cor foi
+        inventada. A troca é feita por variáveis CSS (<code>--cat-cor</code>,
+        <code>--cat-fundo</code>), então as regras de estilo são as mesmas para todas as categorias;
+        só os valores mudam.</p>
 
       <p>O palpite ignora maiúsculas e acentos, e testa <code>liga nacional</code> e
         <code>circuito nacional</code> <strong>antes</strong> de <code>tour</code>, por serem mais

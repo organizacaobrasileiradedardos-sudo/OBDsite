@@ -1,79 +1,164 @@
+<!--
+Project name: OBD - Organização Brasileira de Dardos
+Property: Organização Brasileira de Dardos
+Developers: Guilherme Altomar by IA
+Page name: obd_organization.html (Sobre a OBD)
+Description: Diretoria e sócios fundadores da Organização Brasileira de Dardos.
+-->
 {% extends 'base.html' %}
 {% load static %}
 
 {% block title %}OBD - Organização Brasileira de Dardos{% endblock %}
 
-{% block content %}
-<div class="container mt-5">
-    <div class="row justify-content-center">
-        <div class="col-md-10">
-            <div class="card shadow-lg border-0">
-                <div class="card-header bg-dark text-white text-center py-4">
-                    <h2 class="mb-0" style="color: #FFD700; font-family: 'Playfair Display', serif;">Organização
-                        Brasileira de Dardos</h2>
-                </div>
-                <div class="card-body p-5" style="background-color: #f8f9fa;">
+{% block styles %}
+<style>
+    .obd-titulo {
+        font-family: var(--font-heading);
+        font-weight: 700;
+        font-size: clamp(1.5rem, 5vw, 2.4rem);
+        letter-spacing: 2px;
+        color: var(--dartboard-gold);
+        text-transform: uppercase;
+        margin: 0;
+    }
 
-                    <!-- Diretoria -->
-                    <div class="mb-5">
-                        <h3 class="text-center mb-4 text-uppercase"
-                            style="color: #006400; border-bottom: 2px solid #b91d47; display: inline-block; padding-bottom: 10px;">
-                            Diretoria</h3>
-                        <div class="row mt-4">
-                            <div class="col-md-6 mb-3">
-                                <div class="p-3 bg-white rounded shadow-sm h-100 border-start border-4 border-warning">
-                                    <h5 class="text-muted mb-1">PRESIDENTE</h5>
-                                    <p class="h4 fw-bold text-dark">Erick Vinicius Barbosa Moser</p>
-                                </div>
+    .obd-secao {
+        font-family: var(--font-heading);
+        font-weight: 700;
+        font-size: clamp(1.1rem, 3.6vw, 1.4rem);
+        letter-spacing: 2px;
+        text-transform: uppercase;
+        color: var(--dartboard-black);
+        display: inline-block;
+        padding-bottom: 8px;
+        border-bottom: 3px solid var(--dartboard-red);
+    }
+
+    .obd-cargo {
+        background-color: #fff;
+        border: 1px solid var(--dartboard-gray-lighter);
+        border-left: 5px solid var(--dartboard-gold);
+        border-radius: var(--radius-lg);
+        padding: 16px 20px;
+        height: 100%;
+    }
+
+    .obd-cargo-nome {
+        font-family: var(--font-heading);
+        font-weight: 700;
+        font-size: 0.75rem;
+        letter-spacing: 2px;
+        text-transform: uppercase;
+        color: var(--dartboard-gray);
+        margin: 0 0 4px;
+    }
+
+    .obd-cargo-pessoa {
+        font-weight: 700;
+        font-size: clamp(1rem, 3.2vw, 1.2rem);
+        color: var(--dartboard-black);
+        margin: 0;
+        overflow-wrap: anywhere;
+    }
+
+    .obd-fundador {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        background-color: #fff;
+        border: 1px solid var(--dartboard-gray-lighter);
+        border-left: 5px solid var(--dartboard-green);
+        border-radius: var(--radius-lg);
+        padding: 14px 18px;
+        height: 100%;
+        font-weight: 600;
+        color: var(--dartboard-black);
+        overflow-wrap: anywhere;
+    }
+
+    .obd-fundador i {
+        color: var(--dartboard-green);
+        font-size: 1.3rem;
+        flex-shrink: 0;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="row justify-content-center">
+        <div class="col-12 col-lg-10">
+
+            <div class="card border-0 shadow-sm">
+                <div class="card-header text-center py-4"
+                    style="background: linear-gradient(135deg, var(--dartboard-black) 0%, var(--dartboard-gray-dark) 100%);">
+                    <h1 class="obd-titulo">Organização Brasileira de Dardos</h1>
+                </div>
+
+                <div class="card-body p-4 p-md-5" style="background-color: var(--dartboard-off-white);">
+
+                    <div class="text-center mb-4">
+                        <h2 class="obd-secao">Diretoria</h2>
+                    </div>
+
+                    <div class="row g-3 mb-5">
+                        <div class="col-12 col-md-6">
+                            <div class="obd-cargo">
+                                <p class="obd-cargo-nome">Presidente</p>
+                                <p class="obd-cargo-pessoa">Erick Vinicius Barbosa Moser</p>
                             </div>
-                            <div class="col-md-6 mb-3">
-                                <div class="p-3 bg-white rounded shadow-sm h-100 border-start border-4 border-warning">
-                                    <h5 class="text-muted mb-1">Vice-Presidente</h5>
-                                    <p class="h4 fw-bold text-dark">Guilherme Altomar</p>
-                                </div>
+                        </div>
+                        <div class="col-12 col-md-6">
+                            <div class="obd-cargo">
+                                <p class="obd-cargo-nome">Vice-Presidente</p>
+                                <p class="obd-cargo-pessoa">Guilherme Altomar</p>
                             </div>
-                            <div class="col-md-6 mb-3">
-                                <div class="p-3 bg-white rounded shadow-sm h-100 border-start border-4 border-warning">
-                                    <h5 class="text-muted mb-1">Secretário Geral</h5>
-                                    <p class="h4 fw-bold text-dark">Claudio Eduardo Barbosa Domingues</p>
-                                </div>
+                        </div>
+                        <div class="col-12 col-md-6">
+                            <div class="obd-cargo">
+                                <p class="obd-cargo-nome">Secretário Geral</p>
+                                <p class="obd-cargo-pessoa">Claudio Eduardo Barbosa Domingues</p>
                             </div>
-                            <div class="col-md-6 mb-3">
-                                <div class="p-3 bg-white rounded shadow-sm h-100 border-start border-4 border-warning">
-                                    <h5 class="text-muted mb-1">Diretor Técnico</h5>
-                                    <p class="h4 fw-bold text-dark">Ivan Trevisan Wippel</p>
-                                </div>
+                        </div>
+                        <div class="col-12 col-md-6">
+                            <div class="obd-cargo">
+                                <p class="obd-cargo-nome">Diretor Técnico</p>
+                                <p class="obd-cargo-pessoa">Ivan Trevisan Wippel</p>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Sócios Fundadores -->
-                    <div class="mt-5">
-                        <h3 class="text-center mb-4 text-uppercase"
-                            style="color: #006400; border-bottom: 2px solid #b91d47; display: inline-block; padding-bottom: 10px;">
-                            Sócios Fundadores</h3>
-                        <p class="text-center text-muted fst-italic mb-4">Nos termos do art. 5º do Estatuto</p>
+                    <div class="text-center mb-2">
+                        <h2 class="obd-secao">Sócios Fundadores</h2>
+                    </div>
+                    <p class="text-center text-muted fst-italic mb-4">Nos termos do art. 5º do Estatuto</p>
 
-                        <div class="row justify-content-center">
-                            <div class="col-md-8">
-                                <ul class="list-group list-group-flush bg-transparent">
-                                    <li class="list-group-item bg-transparent text-center fs-5 py-3 border-bottom"><i
-                                            class="bi bi-person-badge me-2 text-success"></i> David de Oliveira Luppi
-                                    </li>
-                                    <li class="list-group-item bg-transparent text-center fs-5 py-3 border-bottom"><i
-                                            class="bi bi-person-badge me-2 text-success"></i> Mauricio Pedrassi</li>
-                                    <li class="list-group-item bg-transparent text-center fs-5 py-3 border-bottom"><i
-                                            class="bi bi-person-badge me-2 text-success"></i> Alex Sávio Santos Sá</li>
-                                    <li class="list-group-item bg-transparent text-center fs-5 py-3"><i
-                                            class="bi bi-person-badge me-2 text-success"></i> Roger Lee Freitas Costa
-                                    </li>
-                                </ul>
+                    <div class="row g-3">
+                        <div class="col-12 col-md-6">
+                            <div class="obd-fundador">
+                                <i class="bi bi-person-badge"></i> Alex Sávio Santos Sá
+                            </div>
+                        </div>
+                        <div class="col-12 col-md-6">
+                            <div class="obd-fundador">
+                                <i class="bi bi-person-badge"></i> David de Oliveira Luppi
+                            </div>
+                        </div>
+                        <div class="col-12 col-md-6">
+                            <div class="obd-fundador">
+                                <i class="bi bi-person-badge"></i> Maurício Pedrassi
+                            </div>
+                        </div>
+                        <div class="col-12 col-md-6">
+                            <div class="obd-fundador">
+                                <i class="bi bi-person-badge"></i> Roger Lee Freitas Costa
                             </div>
                         </div>
                     </div>
 
                 </div>
             </div>
+
         </div>
     </div>
 </div>

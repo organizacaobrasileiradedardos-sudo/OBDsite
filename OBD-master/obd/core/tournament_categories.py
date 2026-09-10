@@ -18,31 +18,37 @@ TOUR = 'tour'
 CIRCUITO_NACIONAL = 'circuito-nacional'
 OUTROS = 'outros'
 
-# A ordem deste dicionário é a ordem em que as categorias aparecem no Hall dos Campeões.
+# A ordem deste dicionário é a ordem em que as categorias aparecem no Hall dos Campeões, e
+# `cor` escolhe qual das variantes de cabeçalho do tema cada uma usa (vermelho, verde,
+# dourado e preto — as quatro que já existem em dartboard-theme.css).
 # `prioridade` só é usada pelo palpite: define qual padrão vence quando um nome casa com
 # mais de um. "liga nacional" e "circuito nacional" ganham de "tour" por serem mais
 # específicas.
 CATEGORIAS = OrderedDict([
     (LIGA_NACIONAL, {
         'label': 'Liga Nacional OBD',
+        'cor': 'gold',
         'icone': 'bi-trophy-fill',
         'padrao': re.compile(r'liga\s+nacional'),
         'prioridade': 1,
     }),
     (TOUR, {
         'label': 'Tour OBD',
+        'cor': 'green',
         'icone': 'bi-globe2',
         'padrao': re.compile(r'\btour\b'),
         'prioridade': 3,
     }),
     (CIRCUITO_NACIONAL, {
         'label': 'Circuito Nacional OBD',
+        'cor': 'red',
         'icone': 'bi-geo-alt-fill',
         'padrao': re.compile(r'circuito\s+nacional'),
         'prioridade': 2,
     }),
     (OUTROS, {
         'label': 'Outros Torneios',
+        'cor': 'black',
         'icone': 'bi-star-fill',
         'padrao': None,  # é o destino de quem não casa com nenhum padrão
         'prioridade': 99,

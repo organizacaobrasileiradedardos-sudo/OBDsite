@@ -29,7 +29,7 @@ def champions(request):
     champs = base.filter(league__start_date__year=selected_year) if selected_year else base
 
     grupos = OrderedDict(
-        (slug, {'slug': slug, 'label': cfg['label'], 'icone': cfg['icone'],
+        (slug, {'slug': slug, 'label': cfg['label'], 'icone': cfg['icone'], 'cor': cfg['cor'],
                 'anos': OrderedDict(), 'total': 0, 'torneios': set()})
         for slug, cfg in CATEGORIAS.items()
     )

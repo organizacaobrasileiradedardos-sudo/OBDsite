@@ -316,6 +316,10 @@ h6 {
     border: none;
 }
 
+.card-header-dartboard.red {
+    background: linear-gradient(135deg, var(--dartboard-red) 0%, var(--dartboard-red-dark) 100%);
+}
+
 .card-header-dartboard.green {
     background: linear-gradient(135deg, var(--dartboard-green) 0%, var(--dartboard-green-dark) 100%);
 }

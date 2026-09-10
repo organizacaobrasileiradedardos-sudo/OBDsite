@@ -396,12 +396,18 @@ O palpite pelo nome existe, mas só como **valor inicial**: quando um torneio é
 pela primeira vez, e na migração que preencheu os torneios que já existiam. Depois disso,
 quem manda é o campo.
 
-| Categoria | Palpite inicial quando o nome contém |
-|---|---|
-| Liga Nacional OBD | `liga nacional` |
-| Tour OBD | a palavra `tour` isolada |
-| Circuito Nacional OBD | `circuito nacional` |
-| Outros Torneios | nenhum dos anteriores |
+| Categoria | Cor | Palpite inicial quando o nome contém |
+|---|---|---|
+| Liga Nacional OBD | dourado | `liga nacional` |
+| Tour OBD | verde | a palavra `tour` isolada |
+| Circuito Nacional OBD | vermelho | `circuito nacional` |
+| Outros Torneios | preto | nenhum dos anteriores |
+
+Cada categoria tem uma cor, usada no cabeçalho do bloco, no ícone, na contagem, na tarja
+do ano e no cabeçalho de cada card de campeão. São as **quatro variantes de
+`.card-header-dartboard` que o tema do site já define** — nenhuma cor foi inventada. A
+troca é feita por variáveis CSS (`--cat-cor`, `--cat-fundo`), então as regras de estilo
+são as mesmas para todas as categorias; só os valores mudam.
 
 O palpite ignora maiúsculas e acentos, e testa `liga nacional` e `circuito nacional`
 **antes** de `tour`, por serem mais específicas. Uma recaptura **não** mexe no tipo — se
