@@ -101,7 +101,7 @@ pertencem a outras áreas. Não há subpastas por app.
 | `/profile/claim/<pin>/` | `profiles.claim_account` | `claim_account.html` | "É você? Reivindique" — assume um cadastro provisório |
 | `/dashboard/public/obd/merit/ranking/view` | `leagues.orderofmerit` | `user_public_order_of_merit.html` | Order of Merit (premiação em R$) |
 | `/dashboard/public/obd/national/ranking/view` | `leagues.national_ranking` | `user_public_national_ranking.html` | Ranking Nacional (pontos) |
-| `/obd/league/all/champions` | `champions.champions` | `user_public_all_champs.html` | Hall dos Campeões |
+| `/obd/league/all/champions` | `champions.champions` | `user_public_all_champs.html` | Hall dos Campeões, separado por tipo de torneio (ver 5.7) |
 | `/eventos/` | `events_list` | `events.html` | Calendário de eventos |
 | `/noticias/` | `news_list` | `news.html` | Lista de notícias |
 | `/noticias/<pk>/` | `news_detail` | `news_detail.html` | Notícia completa com galeria |
@@ -340,6 +340,42 @@ dois eventos no mesmo dia sejam distinguíveis. Não há ícones no calendário.
 
 `News.is_active = False` **esconde a notícia do site** sem apagá-la. É o jeito de tirar
 algo do ar preservando o registro.
+
+### 5.7 Categorias do Hall dos Campeões
+
+O Hall dos Campeões separa os títulos em três categorias, cada uma expandindo ao ser
+clicada:
+
+- **Liga Nacional OBD**
+- **Tour OBD**
+- **Circuito Nacional OBD**
+
+**A classificação sai do nome da liga** (`Champion.league.name`), porque é o único vínculo
+que um campeão tem com o torneio de origem — não existe campo de tipo no banco. A
+comparação ignora maiúsculas e acentos, então `3ª ETAPA LIGA NACIONAL OBD 2026`,
+`Liga Nacional OBD 2025` e `LIGA NACIONAL` caem todos no mesmo lugar.
+
+| Categoria | Reconhecida quando o nome contém |
+|---|---|
+| Liga Nacional OBD | `liga nacional` |
+| Tour OBD | a palavra `tour` isolada |
+| Circuito Nacional OBD | `circuito nacional` |
+
+`liga nacional` e `circuito nacional` são testadas **antes** de `tour`, por serem mais
+específicas: um nome que trouxesse as duas expressões cai na categoria mais precisa.
+
+> **Existe uma quarta categoria, "Outros Torneios".** Ela recolhe tudo que não casa com
+> nenhum dos três padrões — Opens, campeonatos avulsos, torneios comemorativos — para que
+> nenhum campeão desapareça da tela. Ela só aparece quando tem alguém dentro. As três
+> categorias da OBD aparecem sempre, mesmo vazias, para a tela ter estrutura previsível.
+
+As três categorias são declaradas em `CATEGORIAS_CAMPEOES`, em
+`obd/dashboards/administrators/champions/views.py`. Acrescentar uma quarta categoria
+nomeada é acrescentar uma entrada nesse dicionário; nada mais precisa mudar.
+
+Dentro de cada categoria, os títulos continuam agrupados por ano, do mais recente para o
+mais antigo, e o filtro de temporada no topo da página vale para todas elas ao mesmo
+tempo.
 
 ---
 

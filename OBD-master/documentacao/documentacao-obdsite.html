@@ -528,7 +528,7 @@
             <tr><td><code>/profile/claim/&lt;pin&gt;/</code></td><td><code>claim_account</code></td><td><code>claim_account.html</code></td><td>“É você? Reivindique” — assume um cadastro provisório</td></tr>
             <tr><td><code>…/obd/merit/ranking/view</code></td><td><code>orderofmerit</code></td><td><code>user_public_order_of_merit.html</code></td><td>Order of Merit (premiação em R$)</td></tr>
             <tr><td><code>…/obd/national/ranking/view</code></td><td><code>national_ranking</code></td><td><code>user_public_national_ranking.html</code></td><td>Ranking Nacional (pontos)</td></tr>
-            <tr><td><code>/obd/league/all/champions</code></td><td><code>champions</code></td><td><code>user_public_all_champs.html</code></td><td>Hall dos Campeões</td></tr>
+            <tr><td><code>/obd/league/all/champions</code></td><td><code>champions</code></td><td><code>user_public_all_champs.html</code></td><td>Hall dos Campeões, separado por tipo de torneio (ver 5.7)</td></tr>
             <tr><td><code>/eventos/</code></td><td><code>events_list</code></td><td><code>events.html</code></td><td>Calendário de eventos</td></tr>
             <tr><td><code>/noticias/</code></td><td><code>news_list</code></td><td><code>news.html</code></td><td>Lista de notícias</td></tr>
             <tr><td><code>/noticias/&lt;pk&gt;/</code></td><td><code>news_detail</code></td><td><code>news_detail.html</code></td><td>Notícia completa com galeria</td></tr>
@@ -784,6 +784,48 @@ already_past   = Q(end_date__isnull=False, end_date__lt=now)  | Q(end_date__isnu
 
       <p><code>News.is_active = False</code> <strong>esconde a notícia do site</strong> sem apagá-la.
         É o jeito de tirar algo do ar preservando o registro.</p>
+
+      <h3><span class="n">5.7</span>Categorias do Hall dos Campeões</h3>
+
+      <p>O Hall dos Campeões separa os títulos em três categorias, cada uma expandindo ao ser
+        clicada: <strong>Liga Nacional OBD</strong>, <strong>Tour OBD</strong> e
+        <strong>Circuito Nacional OBD</strong>.</p>
+
+      <p><strong>A classificação sai do nome da liga</strong> (<code>Champion.league.name</code>),
+        porque é o único vínculo que um campeão tem com o torneio de origem — não existe campo de
+        tipo no banco. A comparação ignora maiúsculas e acentos, então
+        <code>3ª ETAPA LIGA NACIONAL OBD 2026</code>, <code>Liga Nacional OBD 2025</code> e
+        <code>LIGA NACIONAL</code> caem todos no mesmo lugar.</p>
+
+      <div class="tbl">
+        <table>
+          <thead><tr><th>Categoria</th><th>Reconhecida quando o nome contém</th></tr></thead>
+          <tbody>
+            <tr><td>Liga Nacional OBD</td><td><code>liga nacional</code></td></tr>
+            <tr><td>Tour OBD</td><td>a palavra <code>tour</code> isolada</td></tr>
+            <tr><td>Circuito Nacional OBD</td><td><code>circuito nacional</code></td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <p><code>liga nacional</code> e <code>circuito nacional</code> são testadas
+        <strong>antes</strong> de <code>tour</code>, por serem mais específicas: um nome que
+        trouxesse as duas expressões cai na categoria mais precisa.</p>
+
+      <div class="nota">
+        <span class="tarja-rot">Quarta categoria</span>
+        <p>Existe uma categoria <strong>“Outros Torneios”</strong> que recolhe tudo que não casa com
+          nenhum dos três padrões — Opens, campeonatos avulsos, torneios comemorativos — para que
+          nenhum campeão desapareça da tela. Ela só aparece quando tem alguém dentro. As três
+          categorias da OBD aparecem sempre, mesmo vazias, para a tela ter estrutura previsível.</p>
+      </div>
+
+      <p>As três categorias são declaradas em <code>CATEGORIAS_CAMPEOES</code>, em
+        <code>champions/views.py</code>. Acrescentar uma quarta categoria nomeada é acrescentar uma
+        entrada nesse dicionário; nada mais precisa mudar.</p>
+
+      <p>Dentro de cada categoria, os títulos continuam agrupados por ano, do mais recente para o
+        mais antigo, e o filtro de temporada no topo da página vale para todas elas ao mesmo tempo.</p>
     </section>
 
     <!-- ============ 6 ============ -->

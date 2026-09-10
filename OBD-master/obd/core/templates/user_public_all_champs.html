@@ -4,8 +4,8 @@ Property: Organização Brasileira de Dardos
 Developers: Guilherme Altomar by IA
 Page name: Hall dos Campeões *Público*
 Start date of this page: Jul-03-2021
-Last update: Aug-20-2026
-Description: This is the page where all league/division champions are showcased.
+Last update: Set-10-2026
+Description: Campeões separados por tipo de torneio, cada tipo expandindo ao ser clicado.
 -->
 {% extends 'base.html' %}
 {% load static %}
@@ -20,7 +20,7 @@ Description: This is the page where all league/division champions are showcased.
         color: var(--dartboard-white);
         font-family: var(--font-heading);
         font-weight: 700;
-        font-size: 1.5rem;
+        font-size: clamp(1.05rem, 4vw, 1.5rem);
         letter-spacing: 1px;
         padding: 6px 24px;
         border-radius: var(--radius-lg);
@@ -33,6 +33,7 @@ Description: This is the page where all league/division champions are showcased.
         align-items: center;
         font-size: 0.85rem;
         padding: 4px 0;
+        gap: 10px;
     }
 
     .champ-podium-row + .champ-podium-row {
@@ -44,6 +45,70 @@ Description: This is the page where all league/division champions are showcased.
         align-items: center;
         gap: 6px;
         color: var(--dartboard-gray);
+        flex-shrink: 0;
+    }
+
+    .champ-podium-row strong {
+        text-align: right;
+        overflow-wrap: anywhere;
+    }
+
+    /* --- Categorias de torneio --- */
+
+    .champ-cat .accordion-item {
+        border: 1px solid var(--dartboard-gray-lighter);
+        border-radius: var(--radius-lg);
+        overflow: hidden;
+        margin-bottom: 14px;
+        background-color: #fff;
+    }
+
+    .champ-cat .accordion-button {
+        background-color: #fff;
+        color: var(--dartboard-black);
+        font-family: var(--font-heading);
+        font-weight: 700;
+        font-size: clamp(0.95rem, 3.4vw, 1.15rem);
+        letter-spacing: 1px;
+        text-transform: uppercase;
+        padding: 16px 18px;
+        border-left: 5px solid var(--dartboard-gold);
+    }
+
+    .champ-cat .accordion-button:not(.collapsed) {
+        background-color: #fdf6e3;
+        color: var(--dartboard-black);
+        box-shadow: none;
+    }
+
+    .champ-cat .accordion-button:focus {
+        box-shadow: 0 0 0 .2rem rgba(212, 175, 55, .35);
+    }
+
+    .champ-cat-icone {
+        color: var(--dartboard-gold);
+        margin-right: 10px;
+        flex-shrink: 0;
+    }
+
+    .champ-cat-contagem {
+        margin-left: auto;
+        margin-right: 12px;
+        background-color: var(--dartboard-black);
+        color: #fff;
+        font-family: var(--font-heading);
+        font-size: 0.72rem;
+        letter-spacing: 0;
+        padding: 3px 10px;
+        border-radius: 999px;
+        white-space: nowrap;
+        flex-shrink: 0;
+    }
+
+    .champ-cat-vazia {
+        color: var(--dartboard-gray);
+        font-style: italic;
+        margin: 0;
     }
 </style>
 {% endblock %}
@@ -80,60 +145,99 @@ Description: This is the page where all league/division champions are showcased.
             </div>
             {% endif %}
 
-            {% regroup champions by league.start_date.year as year_groups %}
+            {% if total_geral %}
+            <div class="accordion champ-cat" id="hall-categorias">
+                {% for categoria in categorias %}
+                <div class="accordion-item">
+                    <h2 class="accordion-header" id="cabecalho-{{ categoria.slug }}">
+                        <button class="accordion-button {% if not categoria.aberta %}collapsed{% endif %}" type="button"
+                            data-bs-toggle="collapse" data-bs-target="#categoria-{{ categoria.slug }}"
+                            aria-expanded="{% if categoria.aberta %}true{% else %}false{% endif %}"
+                            aria-controls="categoria-{{ categoria.slug }}">
+                            <i class="bi {{ categoria.icone }} champ-cat-icone"></i>
+                            <span>{{ categoria.label }}</span>
+                            <span class="champ-cat-contagem">
+                                {% if categoria.total %}{{ categoria.total }} título{{ categoria.total|pluralize }}{% else %}—{% endif %}
+                            </span>
+                        </button>
+                    </h2>
 
-            {% if year_groups %}
-            {% for year_group in year_groups %}
-            <div class="mb-5">
-                <div class="mb-3">
-                    <span class="champ-year-badge">{{ year_group.grouper }}</span>
-                </div>
+                    <div id="categoria-{{ categoria.slug }}"
+                        class="accordion-collapse collapse {% if categoria.aberta %}show{% endif %}"
+                        aria-labelledby="cabecalho-{{ categoria.slug }}">
+                        <div class="accordion-body">
 
-                <div class="row g-4">
-                    {% for champ in year_group.list %}
-                    <div class="col-md-4 col-sm-6">
-                        <div class="card card-dartboard h-100">
-                            <div class="card-header-dartboard gold text-center py-2">
-                                <div style="font-size: 0.7rem; text-transform: uppercase; opacity: 0.85;">
-                                    Divisão {{ champ.division.get_formation_display }} &middot; {{ champ.get_mode_display }}
+                            {% if categoria.total %}
+                            {% for bloco in categoria.anos %}
+                            <div class="mb-5">
+                                <div class="mb-3">
+                                    <span class="champ-year-badge">{{ bloco.ano|default:"Sem data" }}</span>
                                 </div>
-                                <div>{{ champ.league.name }}</div>
+
+                                <div class="row g-4">
+                                    {% for champ in bloco.campeoes %}
+                                    <div class="col-12 col-sm-6 col-lg-4">
+                                        <div class="card card-dartboard h-100">
+                                            <div class="card-header-dartboard gold text-center py-2">
+                                                <div style="font-size: 0.7rem; text-transform: uppercase; opacity: 0.85;">
+                                                    Divisão {{ champ.division.get_formation_display }} &middot; {{ champ.get_mode_display }}
+                                                </div>
+                                                <div>{{ champ.league.name }}</div>
+                                            </div>
+                                            <div class="card-body text-center py-4 bg-white">
+                                                <i class="bi bi-trophy-fill" style="font-size: 2.5rem; color: var(--dartboard-gold);"></i>
+                                                <h4 class="fw-bold mt-2 mb-0">{{ champ.p1.first_name }} {{ champ.p1.last_name }}</h4>
+                                                <div class="text-muted small">Campeão</div>
+                                            </div>
+                                            {% if champ.p2 or champ.p3 or champ.p4 %}
+                                            <div class="card-footer-dartboard">
+                                                {% if champ.p2 %}
+                                                <div class="champ-podium-row">
+                                                    <span class="champ-podium-place"><i class="bi bi-award-fill" style="color: #C0C0C0;"></i> 2º lugar</span>
+                                                    <strong>{{ champ.p2.first_name }} {{ champ.p2.last_name }}</strong>
+                                                </div>
+                                                {% endif %}
+                                                {% if champ.p3 %}
+                                                <div class="champ-podium-row">
+                                                    <span class="champ-podium-place"><i class="bi bi-award-fill" style="color: #CD7F32;"></i> 3º lugar</span>
+                                                    <strong>{{ champ.p3.first_name }} {{ champ.p3.last_name }}</strong>
+                                                </div>
+                                                {% endif %}
+                                                {% if champ.p4 %}
+                                                <div class="champ-podium-row">
+                                                    <span class="champ-podium-place">4º lugar</span>
+                                                    <strong>{{ champ.p4.first_name }} {{ champ.p4.last_name }}</strong>
+                                                </div>
+                                                {% endif %}
+                                            </div>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                    {% endfor %}
+                                </div>
                             </div>
-                            <div class="card-body text-center py-4 bg-white">
-                                <i class="bi bi-trophy-fill" style="font-size: 2.5rem; color: var(--dartboard-gold);"></i>
-                                <h4 class="fw-bold mt-2 mb-0">{{ champ.p1.first_name }} {{ champ.p1.last_name }}</h4>
-                                <div class="text-muted small">Campeão</div>
-                            </div>
-                            {% if champ.p2 or champ.p3 or champ.p4 %}
-                            <div class="card-footer-dartboard">
-                                {% if champ.p2 %}
-                                <div class="champ-podium-row">
-                                    <span class="champ-podium-place"><i class="bi bi-award-fill" style="color: #C0C0C0;"></i> 2º lugar</span>
-                                    <strong>{{ champ.p2.first_name }} {{ champ.p2.last_name }}</strong>
-                                </div>
-                                {% endif %}
-                                {% if champ.p3 %}
-                                <div class="champ-podium-row">
-                                    <span class="champ-podium-place"><i class="bi bi-award-fill" style="color: #CD7F32;"></i> 3º lugar</span>
-                                    <strong>{{ champ.p3.first_name }} {{ champ.p3.last_name }}</strong>
-                                </div>
-                                {% endif %}
-                                {% if champ.p4 %}
-                                <div class="champ-podium-row">
-                                    <span class="champ-podium-place">4º lugar</span>
-                                    <strong>{{ champ.p4.first_name }} {{ champ.p4.last_name }}</strong>
-                                </div>
-                                {% endif %}
-                            </div>
+                            {% endfor %}
+
+                            {% else %}
+                            <p class="champ-cat-vazia">
+                                Nenhum campeão registrado nesta categoria{% if selected_year %} em {{ selected_year }}{% endif %}.
+                            </p>
                             {% endif %}
+
                         </div>
                     </div>
-                    {% endfor %}
                 </div>
+                {% endfor %}
             </div>
-            {% endfor %}
+
             {% else %}
-            <p class="text-center text-muted">Ainda não há campeões registrados no OBD.</p>
+            <p class="text-center text-muted">
+                {% if selected_year %}
+                Nenhum campeão registrado em {{ selected_year }}.
+                {% else %}
+                Ainda não há campeões registrados no OBD.
+                {% endif %}
+            </p>
             {% endif %}
 
         </div>
