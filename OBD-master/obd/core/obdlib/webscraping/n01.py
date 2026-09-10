@@ -6,6 +6,13 @@ import re
 import json
 from obd.dashboards.administrators.champions.utils import get_or_create_player, get_or_create_league, register_champion
 
+
+def tournament_id_from_url(url):
+    """Extrai o id do torneio da URL (ex: .../t_stats.html?id=t_ehLY_1878 -> t_ehLY_1878)."""
+    match = re.search(r'id=([^&]+)', url or '')
+    return match.group(1) if match else None
+
+
 class N01TournamentScraper:
     def __init__(self, url, in_progress=None):
         # in_progress=None significa "não mexer no status": é o caso das
@@ -21,9 +28,24 @@ class N01TournamentScraper:
         })
 
     def get_tournament_id(self):
-        # Extract ID from URL (e.g., id=t_pllv_2222)
-        match = re.search(r'id=([^&]+)', self.url)
-        return match.group(1) if match else None
+        return tournament_id_from_url(self.url)
+
+    def find_existing_tournament(self):
+        """Procura uma captura anterior do mesmo torneio, mesmo que por outra URL.
+
+        O N01 serve o mesmo torneio em páginas diferentes (comp.php e
+        t_stats.html, por exemplo). Se procurássemos pelo texto da URL, colar o
+        outro endereço criaria uma captura duplicada em vez de atualizar a que
+        já existe.
+        """
+        tid = self.get_tournament_id()
+        if not tid:
+            return None
+        candidatos = TournamentResult.objects.filter(source_url__contains=tid).order_by('created_at')
+        for candidato in candidatos:
+            if tournament_id_from_url(candidato.source_url) == tid:
+                return candidato
+        return None
 
     def fetch_html(self):
         try:
@@ -129,10 +151,17 @@ class N01TournamentScraper:
         if self.in_progress is not None:
             defaults['in_progress'] = self.in_progress
 
-        tournament, created = TournamentResult.objects.update_or_create(
-            source_url=self.url,
-            defaults=defaults,
-        )
+        tournament = self.find_existing_tournament()
+        if tournament:
+            created = False
+            for campo, valor in defaults.items():
+                setattr(tournament, campo, valor)
+            tournament.save()
+        else:
+            tournament, created = TournamentResult.objects.update_or_create(
+                source_url=self.url,
+                defaults=defaults,
+            )
 
         PlayerTournamentStat.objects.filter(tournament=tournament).delete()
         champion_user = None  # rank 1

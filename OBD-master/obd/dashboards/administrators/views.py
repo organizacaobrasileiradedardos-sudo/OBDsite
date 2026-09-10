@@ -107,6 +107,28 @@ def update_tournament_prize(request, tournament_id):
 
 @login_required
 @permission_required('profiles.has_admin_role', raise_exception=True)
+def delete_tournament(request, tournament_id):
+    """Apaga uma captura do histórico.
+
+    Serve principalmente para desfazer uma captura duplicada. As estatísticas
+    dos jogadores daquele torneio saem junto, por causa do on_delete=CASCADE.
+    """
+    tournament = get_object_or_404(TournamentResult, id=tournament_id)
+    if request.method != 'POST':
+        return redirect('administrators:scraping_dashboard')
+
+    nome = tournament.name
+    quantidade = tournament.stats.count()
+    tournament.delete()
+    messages.success(
+        request,
+        f'Captura de "{nome}" excluída, junto com {quantidade} estatística(s) de jogadores.'
+    )
+    return redirect('administrators:scraping_dashboard')
+
+
+@login_required
+@permission_required('profiles.has_admin_role', raise_exception=True)
 def update_tournament_progress(request, tournament_id):
     tournament = get_object_or_404(TournamentResult, id=tournament_id)
     if request.method != 'POST':

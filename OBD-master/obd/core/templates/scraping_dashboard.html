@@ -99,9 +99,18 @@
                         </form>
                     </td>
                     <td>
-                        <a href="{{ tournament.source_url }}" target="_blank" class="btn btn-sm btn-outline-light" title="Ver Fonte">
-                            <i class="bi bi-link-45deg"></i>
-                        </a>
+                        <div class="d-flex gap-1">
+                            <a href="{{ tournament.source_url }}" target="_blank" class="btn btn-sm btn-outline-light" title="Ver Fonte">
+                                <i class="bi bi-link-45deg"></i>
+                            </a>
+                            <form method="post" action="{% url 'administrators:delete_tournament' tournament.id %}"
+                                onsubmit="return confirm('Excluir a captura de {{ tournament.name|escapejs }}? As estatísticas dos jogadores deste torneio serão apagadas junto. Não tem como desfazer.');">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-sm btn-outline-danger" title="Excluir esta captura">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                            </form>
+                        </div>
                     </td>
                 </tr>
                 {% empty %}
