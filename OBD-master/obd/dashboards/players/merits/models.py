@@ -1,29 +1,7 @@
-from django.contrib.auth.models import User
-from django.db import models
-from obd.dashboards.administrators.fixtures.models import Fixture
+"""Sem modelos.
 
-
-class Merit(models.Model):
-
-    TYPE = [
-        (0, 'DERROTA'),
-        (1, 'EMPATE'),
-        (2, 'VITORIA'),
-        (3, 'CAMPEAO'),
-        (4, 'VICE'),
-        (5, 'TERCEIRO'),
-        (6, 'AUTO'),
-        ]
-
-    player = models.ForeignKey(User, on_delete=models.CASCADE)
-    match = models.ForeignKey(Fixture, on_delete=models.CASCADE)
-    points = models.IntegerField(default=0, blank=True, null=False)
-    type = models.IntegerField(default=6, choices=TYPE, blank=True, null=False)
-    enabled = models.BooleanField(default=False)
-    comment = models.CharField(max_length=200, blank=True, null=False)
-    created_at = models.DateTimeField('Created at', auto_now_add=True)
-
-    class Meta:
-        verbose_name_plural = "merits"
-        verbose_name = "merit"
-        ordering = ('-created_at',)
+O modelo Merit (pontos por partida na liga online) foi removido junto com o fluxo de liga
+online, que estava aposentado. Nada a ver com o Order of Merit dos rankings, que vive em
+leagues/models.py como OrderOfMeritEntry. O app continua no INSTALLED_APPS porque a
+migração que apaga a tabela precisa dele para rodar.
+"""

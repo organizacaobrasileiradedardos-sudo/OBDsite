@@ -1070,12 +1070,25 @@ torneio : 'Open São Roque 2026 - OBD 21.02.2026'</code></pre>
           usava havia muito tempo. Todo o código de tela foi removido (seção 3.5).</p>
       </div>
 
-      <h3>O que continua no banco</h3>
+      <h3>O que saiu do banco</h3>
 
-      <p>As <strong>tabelas</strong> de <code>Fixture</code>, <code>Result</code>,
-        <code>Merit</code> e <code>Validation</code> continuam existindo, assim como o registro delas
-        no admin do Django. Só o código que montava as telas saiu. Apagar as tabelas é um passo
-        separado e irreversível, que exige antes conferir que estão mesmo vazias.</p>
+      <p>Conferidas as contagens em produção — <code>Fixture</code>, <code>Result</code> e
+        <code>Merit</code> estavam com <strong>zero registros</strong> —, os três modelos foram
+        removidos e suas tabelas apagadas por migração. Os registros no admin do Django saíram
+        junto.</p>
+
+      <div class="alerta">
+        <span class="tarja-rot">Um caso à parte</span>
+        <p><code>Validation</code> tinha modelo, mas o app <strong>nunca esteve no
+          <code>INSTALLED_APPS</code></strong> e não tinha migração nenhuma — a tabela
+          <code>players_validation</code> jamais chegou a existir, e consultá-la dava erro de tabela
+          inexistente. O app inteiro foi apagado, sem precisar de migração.</p>
+      </div>
+
+      <p>Os três apps (<code>fixtures</code>, <code>results</code>, <code>merits</code>) continuam no
+        <code>INSTALLED_APPS</code> com um <code>models.py</code> vazio: a migração que apaga a
+        tabela só roda se o app estiver instalado. Removê-los de vez é um passo posterior, depois que
+        a migração tiver sido aplicada.</p>
 
       <p>Dois modelos desse conjunto <strong>continuam em uso ativo</strong> e não podem ser
         removidos:</p>
@@ -1184,10 +1197,9 @@ torneio : 'Open São Roque 2026 - OBD 21.02.2026'</code></pre>
         <li><strong>Cabeçalhos de segurança HTTPS ausentes</strong>, incluindo
           <code>SECURE_PROXY_SSL_HEADER</code>.</li>
         <li><strong>Bootstrap não unificado</strong> (seção 9.2).</li>
-        <li><strong>Tabelas do modelo antigo de liga</strong> (seção 8) — <code>Fixture</code>,
-          <code>Result</code>, <code>Merit</code> e <code>Validation</code> continuam no banco sem
-          nenhum código que as use. Apagá-las é irreversível e exige conferir antes que estejam
-          vazias.</li>
+        <li><strong>Apps vazios</strong> — <code>fixtures</code>, <code>results</code> e
+          <code>merits</code> continuam no <code>INSTALLED_APPS</code> só para as migrações de
+          exclusão rodarem. Podem ser removidos num deploy seguinte.</li>
       </ol>
     </section>
 

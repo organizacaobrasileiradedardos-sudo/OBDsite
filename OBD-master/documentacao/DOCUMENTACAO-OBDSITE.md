@@ -593,12 +593,19 @@ próprio usuário, validação pelo administrador, playoffs e finais.
 confrontos: ninguém usava havia muito tempo. Todo o código de tela foi removido
 (seção 3.5).
 
-### O que continua no banco
+### O que saiu do banco
 
-As **tabelas** de `Fixture`, `Result`, `Merit` e `Validation` continuam existindo, assim
-como o registro delas no admin do Django. Só o código que montava as telas saiu. Apagar as
-tabelas é um passo separado e irreversível, que exige antes conferir que estão mesmo
-vazias.
+Conferidas as contagens em produção — `Fixture`, `Result` e `Merit` estavam com **zero
+registros** —, os três modelos foram removidos e suas tabelas apagadas por migração. Os
+registros no admin do Django saíram junto.
+
+`Validation` era um caso à parte: o app **nunca esteve no `INSTALLED_APPS`** e não tinha
+migração nenhuma, então a tabela `players_validation` jamais chegou a existir. Consultá-la
+dava erro de tabela inexistente. O app inteiro foi apagado, sem precisar de migração.
+
+Os três apps (`fixtures`, `results`, `merits`) continuam no `INSTALLED_APPS` com um
+`models.py` vazio: a migração que apaga a tabela só roda se o app estiver instalado.
+Removê-los de vez é um passo posterior, depois que a migração tiver sido aplicada.
 
 Dois modelos desse conjunto **continuam em uso ativo** e não podem ser removidos:
 
@@ -684,9 +691,8 @@ Levantados ao longo do desenvolvimento e ainda não resolvidos:
 3. **Sem limitação de tentativas** na tela de login dos jogadores.
 4. **Cabeçalhos de segurança HTTPS ausentes**, incluindo `SECURE_PROXY_SSL_HEADER`.
 5. **Bootstrap não unificado** (seção 9.2).
-6. **Tabelas do modelo antigo de liga** (seção 8) — `Fixture`, `Result`, `Merit` e
-   `Validation` continuam no banco sem nenhum código que as use. Apagá-las é irreversível
-   e exige conferir antes que estejam vazias.
+6. **Apps vazios** — `fixtures`, `results` e `merits` continuam no `INSTALLED_APPS` só
+   para as migrações de exclusão rodarem. Podem ser removidos num deploy seguinte.
 
 ---
 
