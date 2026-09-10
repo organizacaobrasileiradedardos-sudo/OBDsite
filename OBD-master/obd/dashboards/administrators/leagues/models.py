@@ -1,6 +1,8 @@
 from django.contrib.auth.models import User
 from django.db import models
 
+from obd.core import tournament_categories
+
 
 class League(models.Model):
 
@@ -39,6 +41,15 @@ class League(models.Model):
     phase = models.IntegerField(choices=LEAGUE_PHASE, default=0)
     scope = models.IntegerField(choices=LEAGUE_SCOPE, default=0)
     status = models.BooleanField(default=True)
+    category = models.CharField(
+        'Tipo de Torneio',
+        max_length=20,
+        choices=tournament_categories.CHOICES,
+        default=tournament_categories.OUTROS,
+        help_text='Define em qual bloco do Hall dos Campeões os campeões desta liga aparecem. '
+                  'Normalmente vem preenchido do torneio capturado; edite aqui quando o nome da '
+                  'liga não for igual ao do torneio.',
+    )
     created_at = models.DateTimeField('Created at', auto_now_add=True)
 
     def __str__(self):

@@ -636,7 +636,9 @@
 
       <p><strong><code>League</code></strong> — no uso atual, <strong>uma etapa de ranking</strong>,
         não uma liga. Cada cabeçalho de planilha importada vira uma <code>League</code>. O campo
-        <code>scope</code> distingue Order of Merit de Ranking Nacional.</p>
+        <code>scope</code> distingue Order of Merit de Ranking Nacional, e o campo
+        <code>category</code> guarda o tipo de torneio, que é o que manda no Hall dos Campeões
+        (ver 5.7).</p>
 
       <p><strong><code>OrderOfMeritEntry</code></strong> e
         <strong><code>NationalRankingEntry</code></strong> — o valor em R$ e os pontos de um jogador
@@ -802,9 +804,14 @@ already_past   = Q(end_date__isnull=False, end_date__lt=now)  | Q(end_date__isnu
         clicada: <strong>Liga Nacional OBD</strong>, <strong>Tour OBD</strong> e
         <strong>Circuito Nacional OBD</strong>.</p>
 
-      <p><strong>O tipo é um campo de verdade no banco</strong>,
-        <code>TournamentResult.category</code>, escolhido pelo administrador na coluna
-        <em>Tipo de Torneio</em> do painel de captura. Não é deduzido do nome na hora de exibir.</p>
+      <p><strong>O tipo é um campo de verdade no banco, e mora em dois lugares.</strong>
+        <code>TournamentResult.category</code> é onde o administrador escolhe, na coluna
+        <em>Tipo de Torneio</em> do painel de captura. <code>League.category</code> é o que o Hall
+        dos Campeões realmente lê, porque <code>Champion</code> aponta para <code>League</code> e não
+        para o torneio.</p>
+
+      <p>Ao salvar o tipo no painel de captura, o valor é repassado para a liga de mesmo nome. E
+        quando um campeão é registrado, a liga nasce já com o tipo do torneio.</p>
 
       <p>O palpite pelo nome existe, mas só como <strong>valor inicial</strong>: quando um torneio é
         capturado pela primeira vez, e na migração que preencheu os torneios que já existiam. Depois
@@ -840,11 +847,31 @@ already_past   = Q(end_date__isnull=False, end_date__lt=now)  | Q(end_date__isnu
         categoria nova é acrescentar uma entrada nesse dicionário e gerar a migração do novo valor de
         <code>choices</code>.</p>
 
-      <p><strong>O Hall encontra o tipo do campeão pelo nome</strong>, porque <code>Champion</code>
-        aponta para <code>League</code> e não para <code>TournamentResult</code>. A liga criada a
-        partir de uma captura leva exatamente o nome do torneio
-        (<code>get_or_create_league</code>), então os dois se encontram por aí. Se não houver torneio
-        com aquele nome, o palpite pelo nome entra como rede de segurança.</p>
+      <h3><span class="n">5.8</span>Por que o tipo mora na liga, e não só no torneio</h3>
+
+      <p>Esta é a parte que já deu problema na prática, e vale entender.</p>
+
+      <p><strong>O robô reescreve o nome do torneio a cada captura.</strong> Se o organizador muda o
+        título no N01, <code>TournamentResult.name</code> muda junto — mas a liga continua com o nome
+        antigo, porque ela foi criada lá atrás. Aconteceu com o Open São Roque:</p>
+
+      <pre><code>liga    : 'Open São Roque (SP) 2026'
+torneio : 'Open São Roque 2026 - OBD 21.02.2026'</code></pre>
+
+      <p>Enquanto o Hall procurava o tipo pelo nome do torneio, esse campeão ficava órfão e caía em
+        “Outros Torneios”, <strong>mesmo com o tipo certo gravado no torneio</strong>. Nenhuma
+        tolerância a maiúsculas ou acentos resolveria: não são grafias diferentes, são nomes
+        diferentes.</p>
+
+      <p>Guardando o tipo na própria liga, a classificação passa a não depender de nome nenhum. Uma
+        vez gravada, ela sobrevive a qualquer renomeação futura.</p>
+
+      <div class="nota">
+        <span class="tarja-rot">Quando o nome já divergiu</span>
+        <p>O repasse do painel de captura não encontra a liga, e o site avisa na tela. A correção é
+          feita uma vez em <code>/admin/</code> → <strong>Ligas</strong>, no campo
+          <em>Tipo de Torneio</em>, editável direto na listagem.</p>
+      </div>
 
       <p>Dentro de cada categoria, os títulos continuam agrupados por ano, do mais recente para o
         mais antigo, e o filtro de temporada no topo da página vale para todas elas ao mesmo tempo.</p>

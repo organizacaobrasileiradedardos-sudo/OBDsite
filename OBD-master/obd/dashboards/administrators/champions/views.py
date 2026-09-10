@@ -15,9 +15,6 @@ def champions(request):
         'league', 'division', 'p1', 'p2', 'p3', 'p4'
     ).order_by('-league__start_date', 'league__name', 'division__formation')
 
-    # A liga criada a partir de uma captura leva exatamente o nome do torneio
-    # (get_or_create_league), então é por aí que campeão e torneio se encontram.
-    torneios = dict(TournamentResult.objects.values_list('name', 'category'))
     em_andamento = TournamentResult.objects.filter(in_progress=True).values_list('name', flat=True)
 
     # Etapa em disputa não tem campeão, só líder do momento.
@@ -37,20 +34,24 @@ def champions(request):
         for slug, cfg in CATEGORIAS.items()
     )
 
-    def categoria_de(nome_liga):
-        """O tipo gravado no torneio. O palpite pelo nome é só uma rede de segurança
-        para o caso de não existir torneio com aquele nome (ou de o valor no banco ser
-        de uma categoria que não existe mais)."""
-        slug = torneios.get(nome_liga)
+    def categoria_de(league):
+        """O tipo gravado na própria liga.
+
+        Guardar na liga, e não no torneio, é o que torna a classificação imune a
+        renomeações: o robô reescreve o nome do torneio a cada captura, e a liga
+        continua com o nome antigo. O palpite pelo nome só entra se o valor do banco
+        for de uma categoria que não existe mais.
+        """
+        slug = getattr(league, 'category', None)
         if slug in grupos:
             return slug
-        return adivinhar_categoria(nome_liga)
+        return adivinhar_categoria(league.name if league else '')
 
     # A consulta já vem ordenada por data decrescente, então os anos entram em ordem
     # dentro de cada categoria sem precisar reordenar depois.
     for champ in champs:
         nome_liga = champ.league.name if champ.league else ''
-        grupo = grupos[categoria_de(nome_liga)]
+        grupo = grupos[categoria_de(champ.league)]
         ano = champ.league.start_date.year if champ.league and champ.league.start_date else None
         grupo['anos'].setdefault(ano, []).append(champ)
         grupo['total'] += 1

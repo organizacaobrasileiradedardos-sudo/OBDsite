@@ -128,6 +128,22 @@ def update_tournament_category(request, tournament_id):
     tournament.category = escolha
     tournament.save(update_fields=['category'])
     messages.success(request, f'"{tournament.name}" agora aparece em {label(escolha)}.')
+
+    # Quem manda no Hall dos Campeões é o tipo gravado na liga. Normalmente a liga tem
+    # o mesmo nome do torneio, então dá para repassar. Quando não tem — porque o
+    # torneio foi renomeado no N01 depois de o campeão ser registrado — é preciso
+    # avisar, senão o Hall continuaria mostrando a categoria antiga sem explicação.
+    from obd.dashboards.administrators.leagues.models import League
+    ligas = League.objects.filter(name=tournament.name)
+    if ligas.update(category=escolha) == 0 and tournament.stats.filter(rank=1).exists():
+        messages.warning(
+            request,
+            f'Nenhuma liga com o nome "{tournament.name}" foi encontrada. Se o campeão deste '
+            'torneio já estiver no Hall dos Campeões, ele continua na categoria antiga: '
+            'o nome do torneio mudou depois que o campeão foi registrado. Corrija o tipo da '
+            'liga em /admin/ → Ligas.'
+        )
+
     return redirect('administrators:scraping_dashboard')
 
 

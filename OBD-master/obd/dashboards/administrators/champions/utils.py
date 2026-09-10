@@ -84,25 +84,29 @@ def merge_player_accounts(source_user, target_user):
 
     return moved, skipped
 
-def get_or_create_league(name: str, start_date: datetime.date) -> tuple[League, Division]:
+def get_or_create_league(name: str, start_date: datetime.date, category: str = None) -> tuple[League, Division]:
     """Return a League and its principal Division.
 
     The function creates the League (and Division) if they do not already exist.
     Minimal required fields are provided; optional fields use sensible defaults.
+
+    ``category`` é o tipo de torneio, usado só quando a liga é criada. Numa liga que
+    já existe ele não é tocado, porque o administrador pode ter corrigido o tipo à mão.
     """
     slug = name.lower().replace(" ", "-")
-    league, _ = League.objects.get_or_create(
-        name=name,
-        defaults={
-            "slug": slug,
-            "start_date": start_date,
-            "end_date": start_date + datetime.timedelta(days=30),  # provisional
-            "runoff": 1,
-            "phase": 0,
-            "scope": 2,  # Nacional (reasonable default)
-            "status": True,
-        },
-    )
+    defaults = {
+        "slug": slug,
+        "start_date": start_date,
+        "end_date": start_date + datetime.timedelta(days=30),  # provisional
+        "runoff": 1,
+        "phase": 0,
+        "scope": 2,  # Nacional (reasonable default)
+        "status": True,
+    }
+    if category:
+        defaults["category"] = category
+
+    league, _ = League.objects.get_or_create(name=name, defaults=defaults)
     # Ensure a principal division exists (name "Principal - League Name")
     # We must properly handle the unique constraints on 'name' and 'slug'
     from django.utils.text import slugify
@@ -176,7 +180,7 @@ def register_champion_from_tournament(tournament):
     if not champion_user:
         return None
 
-    league, division = get_or_create_league(tournament.name, tournament.date)
+    league, division = get_or_create_league(tournament.name, tournament.date, tournament.category)
     return register_champion(
         league, division, champion_user,
         p2_user=player_at(2),

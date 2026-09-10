@@ -193,7 +193,8 @@ médias, contagens de 100+/140+/170+/180, melhor leg, maior fechamento.
 
 **`League`** — no uso atual, **uma etapa de ranking**, não uma liga. Cada linha de
 cabeçalho de planilha importada vira uma `League`. Campo `scope` distingue Order of Merit
-de Ranking Nacional.
+de Ranking Nacional. O campo `category` guarda o tipo de torneio e é o que manda no Hall
+dos Campeões (ver 5.7).
 
 **`OrderOfMeritEntry`** — valor em R$ de um jogador numa etapa.
 `unique_together = ('player', 'league')`.
@@ -361,9 +362,13 @@ clicada:
 - **Tour OBD**
 - **Circuito Nacional OBD**
 
-**O tipo é um campo de verdade no banco**, `TournamentResult.category`, escolhido pelo
-administrador na coluna *Tipo de Torneio* do painel de captura. Não é deduzido do nome na
-hora de exibir.
+**O tipo é um campo de verdade no banco, e mora em dois lugares.** `TournamentResult.category`
+é onde o administrador escolhe, na coluna *Tipo de Torneio* do painel de captura.
+`League.category` é o que o Hall dos Campeões realmente lê, porque `Champion` aponta para
+`League` e não para o torneio.
+
+Ao salvar o tipo no painel de captura, o valor é repassado para a liga de mesmo nome. E
+quando um campeão é registrado, a liga nasce já com o tipo do torneio.
 
 O palpite pelo nome existe, mas só como **valor inicial**: quando um torneio é capturado
 pela primeira vez, e na migração que preencheu os torneios que já existiam. Depois disso,
@@ -390,10 +395,29 @@ categorias, os ícones, os padrões do palpite e a ordem de exibição. Acrescen
 categoria nova é acrescentar uma entrada nesse dicionário e gerar a migração do novo
 valor de `choices`.
 
-**O Hall encontra o tipo do campeão pelo nome**, porque `Champion` aponta para `League` e
-não para `TournamentResult`. A liga criada a partir de uma captura leva exatamente o nome
-do torneio (`get_or_create_league`), então os dois se encontram por aí. Se não houver
-torneio com aquele nome, o palpite pelo nome entra como rede de segurança.
+### Por que o tipo mora na liga, e não só no torneio
+
+Esta é a parte que já deu problema na prática, e vale entender.
+
+**O robô reescreve o nome do torneio a cada captura.** Se o organizador muda o título no
+N01, `TournamentResult.name` muda junto — mas a liga continua com o nome antigo, porque
+ela foi criada lá atrás. Aconteceu com o Open São Roque:
+
+```
+liga    : 'Open São Roque (SP) 2026'
+torneio : 'Open São Roque 2026 - OBD 21.02.2026'
+```
+
+Enquanto o Hall procurava o tipo pelo nome do torneio, esse campeão ficava órfão e caía em
+"Outros Torneios", **mesmo com o tipo certo gravado no torneio**. Nenhuma tolerância a
+maiúsculas ou acentos resolveria: não são grafias diferentes, são nomes diferentes.
+
+Guardando o tipo na própria liga, a classificação passa a não depender de nome nenhum.
+Uma vez gravada, ela sobrevive a qualquer renomeação futura.
+
+**Quando o nome da liga já divergiu**, o repasse do painel de captura não encontra a liga.
+Nesse caso o site avisa na tela, e a correção é feita uma vez em `/admin/` → **Ligas**, no
+campo *Tipo de Torneio*, editável direto na listagem.
 
 Dentro de cada categoria, os títulos continuam agrupados por ano, do mais recente para o
 mais antigo, e o filtro de temporada no topo da página vale para todas elas ao mesmo

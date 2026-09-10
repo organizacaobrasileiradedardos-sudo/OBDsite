@@ -307,7 +307,7 @@ class N01TournamentScraper:
         # Etapa em andamento não tem campeão: o rank 1 é só quem lidera agora.
         # O registro acontece quando a etapa for marcada como finalizada.
         if champion_user and not tournament.in_progress:
-            league, division = get_or_create_league(tournament_name, timezone.now().date())
+            league, division = get_or_create_league(tournament_name, timezone.now().date(), tournament.category)
             register_champion(league, division, champion_user, p2_user=runner_up_user, p3_user=third_place_user)
         return True, f"Successfully captured {count} player stats for '{tournament_name}'"
 
