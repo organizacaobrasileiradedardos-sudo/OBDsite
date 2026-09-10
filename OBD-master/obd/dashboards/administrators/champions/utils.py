@@ -144,6 +144,23 @@ def register_champion(league: League, division: Division, champion_user: User, p
     return champion
 
 
+def remove_champion_from_tournament(tournament):
+    """Apaga o campeão registrado para um torneio que voltou a ficar em andamento.
+
+    Enquanto a etapa está em disputa, quem está em 1º é apenas o líder do momento —
+    não é campeão, e não pode aparecer no Hall dos Campeões. Como o registro do
+    campeão é feito com get_or_create e nada o apagava, um campeão gravado antes de
+    a etapa ser marcada como em andamento ficava lá para sempre.
+
+    Devolve quantos registros foram removidos.
+    """
+    league = League.objects.filter(name=tournament.name).first()
+    if not league:
+        return 0
+    removidos, _ = Champion.objects.filter(league=league).delete()
+    return removidos
+
+
 def register_champion_from_tournament(tournament):
     """Registra o campeão de um torneio já capturado, usando os dados do banco.
 

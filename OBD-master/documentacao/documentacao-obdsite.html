@@ -768,6 +768,15 @@ pending  = max(possible - played, 0)</code></pre>
       <pre><code>if was_in_progress:
     champion = register_champion_from_tournament(tournament)</code></pre>
 
+      <p>E o caminho inverso também limpa: <strong>marcar uma etapa como em andamento apaga o
+        campeão que estivesse registrado para ela</strong>. Isso importa porque o registro do campeão
+        é feito com <code>get_or_create</code> e, antes, nada o apagava — bastava a etapa ter sido
+        capturada uma vez sem a marcação para o campeão ficar no Hall para sempre, mesmo depois de a
+        etapa voltar a ficar em disputa.</p>
+
+      <p>Como reforço, o Hall dos Campeões também <strong>exclui da tela</strong> os campeões de
+        qualquer etapa que esteja em andamento, mesmo que o registro ainda exista no banco.</p>
+
       <h3><span class="n">5.5</span>Eventos em andamento no calendário</h3>
 
       <p>Um evento que começou no passado e ainda não terminou é um evento <strong>futuro</strong>,
@@ -826,6 +835,15 @@ already_past   = Q(end_date__isnull=False, end_date__lt=now)  | Q(end_date__isnu
 
       <p>Dentro de cada categoria, os títulos continuam agrupados por ano, do mais recente para o
         mais antigo, e o filtro de temporada no topo da página vale para todas elas ao mesmo tempo.</p>
+
+      <div class="alerta">
+        <span class="tarja-rot">Os dois números não batem, e não deveriam</span>
+        <p>A contagem no cabeçalho diz “N títulos em M torneios”. Na Liga Nacional cada divisão tem
+          seu próprio campeão, então uma etapa com quatro divisões rende quatro títulos num único
+          torneio. E esse número não bate com “Torneios Realizados” da tela inicial: a home conta
+          eventos distintos do ano corrente com as divisões agrupadas (ver 5.2), enquanto o Hall
+          conta títulos de todos os anos. São medidas diferentes da mesma realidade.</p>
+      </div>
     </section>
 
     <!-- ============ 6 ============ -->

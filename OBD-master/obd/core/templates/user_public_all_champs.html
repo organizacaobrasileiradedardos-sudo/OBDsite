@@ -157,7 +157,10 @@ Description: Campeões separados por tipo de torneio, cada tipo expandindo ao se
                             <i class="bi {{ categoria.icone }} champ-cat-icone"></i>
                             <span>{{ categoria.label }}</span>
                             <span class="champ-cat-contagem">
-                                {% if categoria.total %}{{ categoria.total }} título{{ categoria.total|pluralize }}{% else %}—{% endif %}
+                                {% if categoria.total %}
+                                {{ categoria.total }} título{{ categoria.total|pluralize }}
+                                em {{ categoria.torneios }} torneio{{ categoria.torneios|pluralize }}
+                                {% else %}—{% endif %}
                             </span>
                         </button>
                     </h2>

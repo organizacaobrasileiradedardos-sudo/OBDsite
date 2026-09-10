@@ -56,9 +56,19 @@ def categorizar_liga(nome_liga):
 
 
 def champions(request):
+    # Importado aqui dentro para não criar dependência circular: o robô de captura,
+    # em core/, já importa os utilitários de campeão.
+    from obd.core.models import TournamentResult
+
     base = Champion.objects.select_related(
         'league', 'division', 'p1', 'p2', 'p3', 'p4'
     ).order_by('-league__start_date', 'league__name', 'division__formation')
+
+    # Etapa em disputa não tem campeão, só líder do momento. A liga criada a partir de
+    # uma captura leva exatamente o nome do torneio (get_or_create_league), então é por
+    # aí que as duas coisas se encontram.
+    em_andamento = TournamentResult.objects.filter(in_progress=True).values_list('name', flat=True)
+    base = base.exclude(league__name__in=list(em_andamento))
 
     available_years = sorted(
         {c.league.start_date.year for c in base if c.league and c.league.start_date},
@@ -69,7 +79,8 @@ def champions(request):
     champs = base.filter(league__start_date__year=selected_year) if selected_year else base
 
     grupos = OrderedDict(
-        (slug, {'slug': slug, 'label': cfg['label'], 'icone': cfg['icone'], 'anos': OrderedDict(), 'total': 0})
+        (slug, {'slug': slug, 'label': cfg['label'], 'icone': cfg['icone'],
+         'anos': OrderedDict(), 'total': 0, 'torneios': set()})
         for slug, cfg in CATEGORIAS_CAMPEOES.items()
     )
     grupos[CATEGORIA_OUTROS] = {
@@ -78,6 +89,7 @@ def champions(request):
         'icone': 'bi-star-fill',
         'anos': OrderedDict(),
         'total': 0,
+        'torneios': set(),
     }
 
     # A consulta já vem ordenada por data decrescente, então os anos entram em ordem
@@ -87,9 +99,14 @@ def champions(request):
         ano = champ.league.start_date.year if champ.league and champ.league.start_date else None
         grupo['anos'].setdefault(ano, []).append(champ)
         grupo['total'] += 1
+        # Na Liga Nacional cada divisão tem seu campeão, então um mesmo torneio rende
+        # vários títulos. Guardar os dois números evita ler "títulos" como "torneios".
+        grupo['torneios'].add(champ.league.name if champ.league else '')
 
     categorias = [
-        {**grupo, 'anos': [{'ano': ano, 'campeoes': lista} for ano, lista in grupo['anos'].items()]}
+        {**grupo,
+         'torneios': len(grupo['torneios']),
+         'anos': [{'ano': ano, 'campeoes': lista} for ano, lista in grupo['anos'].items()]}
         for slug, grupo in grupos.items()
         # As três categorias da OBD aparecem sempre, mesmo vazias, para a tela ter uma
         # estrutura previsível. "Outros" só aparece quando há algo nela.

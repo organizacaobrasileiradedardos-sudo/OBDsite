@@ -140,6 +140,13 @@ def update_tournament_progress(request, tournament_id):
 
     if tournament.in_progress:
         messages.success(request, f"\"{tournament.name}\" marcada como etapa em andamento.")
+
+        # Enquanto a etapa está em disputa não existe campeão, só líder do momento.
+        # Se um campeão já tinha sido gravado, ele sai do Hall dos Campeões agora.
+        from obd.dashboards.administrators.champions.utils import remove_champion_from_tournament
+        if remove_champion_from_tournament(tournament):
+            messages.info(request, "O campeão que estava registrado para esta etapa foi removido do Hall dos Campeões.")
+
         return redirect('administrators:scraping_dashboard')
 
     messages.success(request, f"\"{tournament.name}\" marcada como finalizada.")
