@@ -1,0 +1,1067 @@
+<title>OBDsite por Dentro</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;600;800&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+  :root {
+    --ground: #F1F4F2;
+    --surface: #FBFCFB;
+    --surface-2: #E6EBE8;
+    --ink: #14201C;
+    --ink-soft: #4B5A54;
+    --ink-faint: #6B7B75;
+    --rule: #CFD8D3;
+    --rule-soft: #E1E8E4;
+    --accent: #B91D47;
+    --accent-ink: #8E1436;
+    --good: #047857;
+    --gold: #A47B2A;
+    --code-bg: #17211E;
+    --code-ink: #DCE6E1;
+    --code-dim: #7E948B;
+    --shadow: 0 1px 2px rgba(20, 32, 28, .06);
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --ground: #0E1614;
+      --surface: #16211E;
+      --surface-2: #1E2B27;
+      --ink: #E4EBE7;
+      --ink-soft: #A8B8B1;
+      --ink-faint: #7E8F88;
+      --rule: #2C3B36;
+      --rule-soft: #223029;
+      --accent: #F2708F;
+      --accent-ink: #F8A3B7;
+      --good: #34B48A;
+      --gold: #D2A653;
+      --code-bg: #0A100E;
+      --code-ink: #D6E2DC;
+      --code-dim: #6F857C;
+      --shadow: 0 1px 2px rgba(0, 0, 0, .3);
+    }
+  }
+
+  :root[data-theme="dark"] {
+    --ground: #0E1614;
+    --surface: #16211E;
+    --surface-2: #1E2B27;
+    --ink: #E4EBE7;
+    --ink-soft: #A8B8B1;
+    --ink-faint: #7E8F88;
+    --rule: #2C3B36;
+    --rule-soft: #223029;
+    --accent: #F2708F;
+    --accent-ink: #F8A3B7;
+    --good: #34B48A;
+    --gold: #D2A653;
+    --code-bg: #0A100E;
+    --code-ink: #D6E2DC;
+    --code-dim: #6F857C;
+    --shadow: 0 1px 2px rgba(0, 0, 0, .3);
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    background: var(--ground);
+    color: var(--ink);
+    font-family: "Source Serif 4", Georgia, "Times New Roman", serif;
+    font-size: 17px;
+    line-height: 1.65;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .shell {
+    display: grid;
+    grid-template-columns: 260px minmax(0, 1fr);
+    gap: 0;
+    max-width: 1240px;
+    margin: 0 auto;
+    align-items: start;
+  }
+
+  /* ---------- barra lateral ---------- */
+
+  .rail {
+    position: sticky;
+    top: 0;
+    max-height: 100vh;
+    overflow-y: auto;
+    padding: 42px 28px 42px 32px;
+    border-right: 1px solid var(--rule);
+  }
+
+  .rail-mark {
+    font-family: Archivo, "Helvetica Neue", Arial, sans-serif;
+    font-weight: 800;
+    font-size: .82rem;
+    letter-spacing: .16em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin: 0 0 4px;
+  }
+
+  .rail-sub {
+    font-size: .82rem;
+    line-height: 1.45;
+    color: var(--ink-faint);
+    margin: 0 0 26px;
+  }
+
+  .rail nav ol {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+  }
+
+  .rail nav a {
+    display: grid;
+    grid-template-columns: 1.9em 1fr;
+    gap: 8px;
+    align-items: baseline;
+    padding: 5px 8px 5px 4px;
+    border-radius: 3px;
+    text-decoration: none;
+    color: var(--ink-soft);
+    font-family: Archivo, "Helvetica Neue", Arial, sans-serif;
+    font-size: .84rem;
+    line-height: 1.35;
+  }
+
+  .rail nav a:hover { background: var(--surface-2); color: var(--ink); }
+  .rail nav a:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+
+  .rail nav .n {
+    font-family: "JetBrains Mono", ui-monospace, Menlo, monospace;
+    font-variant-numeric: tabular-nums;
+    font-size: .74rem;
+    color: var(--gold);
+  }
+
+  /* ---------- corpo ---------- */
+
+  main {
+    padding: 42px 40px 96px;
+    min-width: 0;
+  }
+
+  .measure { max-width: 68ch; }
+
+  header.top {
+    max-width: 68ch;
+    padding-bottom: 26px;
+    margin-bottom: 34px;
+    border-bottom: 2px solid var(--ink);
+  }
+
+  .eyebrow {
+    font-family: Archivo, "Helvetica Neue", Arial, sans-serif;
+    font-weight: 600;
+    font-size: .72rem;
+    letter-spacing: .18em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+    margin: 0 0 14px;
+  }
+
+  h1 {
+    font-family: Archivo, "Helvetica Neue", Arial, sans-serif;
+    font-weight: 800;
+    font-size: clamp(2rem, 5.2vw, 3.1rem);
+    line-height: 1.02;
+    letter-spacing: -.022em;
+    text-wrap: balance;
+    margin: 0 0 16px;
+  }
+
+  .standfirst {
+    font-size: 1.12rem;
+    line-height: 1.55;
+    color: var(--ink-soft);
+    margin: 0 0 22px;
+  }
+
+  .meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px 22px;
+    font-family: "JetBrains Mono", ui-monospace, Menlo, monospace;
+    font-size: .74rem;
+    color: var(--ink-faint);
+  }
+
+  .meta b { color: var(--ink-soft); font-weight: 600; }
+
+  section { margin-bottom: 60px; scroll-margin-top: 20px; }
+
+  h2 {
+    font-family: Archivo, "Helvetica Neue", Arial, sans-serif;
+    font-weight: 800;
+    font-size: 1.62rem;
+    line-height: 1.15;
+    letter-spacing: -.014em;
+    text-wrap: balance;
+    margin: 0 0 6px;
+    padding-top: 14px;
+    border-top: 1px solid var(--rule);
+    display: grid;
+    grid-template-columns: 2.1em 1fr;
+    gap: 10px;
+    align-items: baseline;
+    max-width: 68ch;
+  }
+
+  h2 .n {
+    font-family: "JetBrains Mono", ui-monospace, Menlo, monospace;
+    font-weight: 400;
+    font-size: .82rem;
+    font-variant-numeric: tabular-nums;
+    color: var(--accent);
+  }
+
+  h3 {
+    font-family: Archivo, "Helvetica Neue", Arial, sans-serif;
+    font-weight: 600;
+    font-size: 1.06rem;
+    letter-spacing: -.004em;
+    text-wrap: balance;
+    margin: 32px 0 8px;
+    max-width: 68ch;
+  }
+
+  h3 .n {
+    font-family: "JetBrains Mono", ui-monospace, Menlo, monospace;
+    font-weight: 400;
+    font-size: .78rem;
+    font-variant-numeric: tabular-nums;
+    color: var(--ink-faint);
+    margin-right: .5em;
+  }
+
+  p { margin: 0 0 14px; max-width: 68ch; }
+
+  ul, ol { max-width: 68ch; margin: 0 0 16px; padding-left: 1.3em; }
+  li { margin-bottom: 6px; }
+
+  a { color: var(--accent-ink); }
+
+  strong { font-weight: 600; }
+
+  code {
+    font-family: "JetBrains Mono", ui-monospace, Menlo, monospace;
+    font-size: .84em;
+    background: var(--surface-2);
+    padding: .1em .34em;
+    border-radius: 3px;
+    word-break: break-word;
+  }
+
+  pre {
+    background: var(--code-bg);
+    color: var(--code-ink);
+    padding: 16px 18px;
+    border-radius: 4px;
+    overflow-x: auto;
+    margin: 0 0 18px;
+    max-width: 68ch;
+    box-shadow: var(--shadow);
+  }
+
+  pre code {
+    background: none;
+    padding: 0;
+    font-size: .78rem;
+    line-height: 1.6;
+    word-break: normal;
+  }
+
+  pre .c { color: var(--code-dim); }
+
+  /* ---------- tabelas ---------- */
+
+  .tbl {
+    overflow-x: auto;
+    margin: 0 0 20px;
+    border: 1px solid var(--rule);
+    border-radius: 4px;
+    background: var(--surface);
+    max-width: 100%;
+  }
+
+  table {
+    border-collapse: collapse;
+    width: 100%;
+    font-family: Archivo, "Helvetica Neue", Arial, sans-serif;
+    font-size: .84rem;
+    line-height: 1.45;
+  }
+
+  th {
+    text-align: left;
+    font-weight: 600;
+    color: var(--ink);
+    background: var(--surface-2);
+    padding: 9px 13px;
+    white-space: nowrap;
+    border-bottom: 1px solid var(--rule);
+  }
+
+  td {
+    padding: 9px 13px;
+    border-bottom: 1px solid var(--rule-soft);
+    color: var(--ink-soft);
+    vertical-align: top;
+  }
+
+  tr:last-child td { border-bottom: none; }
+  td strong, td b { color: var(--ink); }
+  td code { font-size: .8em; background: var(--surface-2); }
+
+  /* ---------- tarjas ---------- */
+
+  .nota, .alerta, .regra {
+    border-left: 3px solid var(--good);
+    padding: 2px 0 2px 16px;
+    margin: 0 0 20px;
+    max-width: 68ch;
+  }
+
+  .alerta { border-left-color: var(--accent); }
+  .regra { border-left-color: var(--gold); }
+
+  .nota p:last-child, .alerta p:last-child, .regra p:last-child { margin-bottom: 0; }
+
+  .tarja-rot {
+    font-family: Archivo, "Helvetica Neue", Arial, sans-serif;
+    font-weight: 600;
+    font-size: .68rem;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+    color: var(--good);
+    display: block;
+    margin-bottom: 4px;
+  }
+
+  .alerta .tarja-rot { color: var(--accent); }
+  .regra .tarja-rot { color: var(--gold); }
+
+  /* ---------- diagrama ---------- */
+
+  .arvore {
+    background: var(--surface);
+    border: 1px solid var(--rule);
+    border-radius: 4px;
+    padding: 16px 18px;
+    overflow-x: auto;
+    margin: 0 0 20px;
+    font-family: "JetBrains Mono", ui-monospace, Menlo, monospace;
+    font-size: .76rem;
+    line-height: 1.7;
+    color: var(--ink-soft);
+    white-space: pre;
+  }
+
+  .arvore b { color: var(--ink); font-weight: 600; }
+  .arvore .c { color: var(--ink-faint); }
+
+  @media (max-width: 900px) {
+    body { font-size: 16px; }
+    .shell { grid-template-columns: 1fr; }
+    .rail {
+      position: static;
+      max-height: none;
+      border-right: none;
+      border-bottom: 1px solid var(--rule);
+      padding: 30px 22px 24px;
+    }
+    .rail nav ol {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+      gap: 2px 10px;
+    }
+    main { padding: 30px 22px 70px; }
+    h2 { grid-template-columns: 1.9em 1fr; font-size: 1.4rem; }
+  }
+</style>
+
+<div class="shell">
+
+  <aside class="rail">
+    <p class="rail-mark">OBD · Documentação</p>
+    <p class="rail-sub">Organização Brasileira de Dardos<br>obdardos.com.br</p>
+    <nav aria-label="Seções">
+      <ol>
+        <li><a href="#s1"><span class="n">01</span><span>Visão geral</span></a></li>
+        <li><a href="#s2"><span class="n">02</span><span>Estrutura do projeto</span></a></li>
+        <li><a href="#s3"><span class="n">03</span><span>Mapa de telas</span></a></li>
+        <li><a href="#s4"><span class="n">04</span><span>Modelo de dados</span></a></li>
+        <li><a href="#s5"><span class="n">05</span><span>Regras de negócio</span></a></li>
+        <li><a href="#s6"><span class="n">06</span><span>Identidade do jogador</span></a></li>
+        <li><a href="#s7"><span class="n">07</span><span>Rotinas operacionais</span></a></li>
+        <li><a href="#s8"><span class="n">08</span><span>Módulo legado</span></a></li>
+        <li><a href="#s9"><span class="n">09</span><span>Armadilhas conhecidas</span></a></li>
+        <li><a href="#s10"><span class="n">10</span><span>Pontos em aberto</span></a></li>
+        <li><a href="#s11"><span class="n">11</span><span>Glossário</span></a></li>
+      </ol>
+    </nav>
+  </aside>
+
+  <main>
+
+    <header class="top">
+      <p class="eyebrow">Documentação técnica</p>
+      <h1>OBDsite por Dentro</h1>
+      <p class="standfirst">Como o site da Organização Brasileira de Dardos funciona: quais telas
+        existem, de onde vêm os números que elas mostram e quais regras estão embutidas no código.</p>
+      <div class="meta">
+        <span><b>Revisão</b> 10 · set · 2026</span>
+        <span><b>Stack</b> Django 4.2 · PostgreSQL · Railway</span>
+        <span><b>Telas</b> 47 templates</span>
+      </div>
+    </header>
+
+    <!-- ============ 1 ============ -->
+    <section id="s1">
+      <h2><span class="n">01</span><span>Visão geral</span></h2>
+
+      <p>O site é uma aplicação <strong>Django 4.2</strong> em Python, hospedada no
+        <strong>Railway</strong>, com banco <strong>PostgreSQL</strong>. Ele tem três finalidades:</p>
+
+      <ol>
+        <li><strong>Vitrine pública</strong> — notícias, eventos, documentos, rankings, hall dos
+          campeões e perfis de jogadores, tudo acessível sem login.</li>
+        <li><strong>Área do jogador</strong> — perfil, foto, histórico de torneios, senha.</li>
+        <li><strong>Área administrativa</strong> — captura automática de estatísticas do N01 Darts,
+          importação de planilhas de ranking e gestão de ligas.</li>
+      </ol>
+
+      <p>O ponto que mais distingue este site de um site institucional comum é que <strong>os dados
+        esportivos não são digitados à mão</strong>. Eles são raspados da plataforma N01 Darts por um
+        robô, ou importados de planilhas Excel. Boa parte da complexidade do sistema existe para
+        resolver um único problema difícil: descobrir se o “Bruno Amaro” que apareceu no N01 é o mesmo
+        “Bruno Amaro” que já tem conta no site. A seção 6 trata disso em detalhe.</p>
+
+      <h3>Tecnologias</h3>
+
+      <div class="tbl">
+        <table>
+          <thead><tr><th>Camada</th><th>Escolha</th></tr></thead>
+          <tbody>
+            <tr><td>Framework</td><td>Django 4.2.11, Python 3.9</td></tr>
+            <tr><td>Banco</td><td>PostgreSQL (Railway)</td></tr>
+            <tr><td>Servidor</td><td>gunicorn</td></tr>
+            <tr><td>Arquivos estáticos</td><td>whitenoise (<code>CompressedManifestStaticFilesStorage</code>)</td></tr>
+            <tr><td>Imagens enviadas</td><td>Cloudinary</td></tr>
+            <tr><td>E-mail</td><td>Resend</td></tr>
+            <tr><td>Front-end</td><td>Bootstrap 5 + Bootstrap Icons, CSS próprio</td></tr>
+            <tr><td>Calendário</td><td>FullCalendar 5.11.3</td></tr>
+            <tr><td>Raspagem</td><td>requests + BeautifulSoup</td></tr>
+            <tr><td>Planilhas</td><td>pandas + openpyxl</td></tr>
+            <tr><td>Analytics</td><td>Umami (auto-hospedado no Railway)</td></tr>
+            <tr><td>Monitoramento</td><td>Scout APM</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>Por que Cloudinary</h3>
+
+      <p>O sistema de arquivos do Railway é <strong>efêmero</strong>: tudo que for gravado em disco
+        desaparece no próximo deploy. Por isso nenhuma imagem enviada por formulário pode ser guardada
+        localmente. Toda foto de notícia, de galeria e de perfil vai para o Cloudinary, e o banco
+        guarda apenas a referência. Isso não é uma preferência estética — é uma necessidade da
+        hospedagem.</p>
+    </section>
+
+    <!-- ============ 2 ============ -->
+    <section id="s2">
+      <h2><span class="n">02</span><span>Estrutura do projeto</span></h2>
+
+      <div class="arvore"><b>obd/</b>
+├── settings.py, urls.py, wsgi.py      <span class="c">configuração e rotas raiz</span>
+├── <b>core/</b>                              <span class="c">o site público</span>
+│   ├── models.py                      <span class="c">Event, News, NewsImage, Document,</span>
+│   │                                  <span class="c">TournamentResult, PlayerTournamentStat</span>
+│   ├── views.py                       <span class="c">home, rankings, notícias, documentos,</span>
+│   │                                  <span class="c">eventos, painel Liga Nacional</span>
+│   ├── obdlib/webscraping/n01.py      <span class="c">o robô de captura do N01</span>
+│   ├── management/commands/           <span class="c">tarefas de agendamento</span>
+│   └── templates/                     <span class="c">os 47 templates do site inteiro</span>
+├── <b>dashboards/</b>
+│   ├── administrators/                <span class="c">área do administrador</span>
+│   │   ├── views.py                   <span class="c">captura, importações, mesclagem</span>
+│   │   ├── leagues/                   <span class="c">League, OrderOfMeritEntry,</span>
+│   │   │                              <span class="c">NationalRankingEntry</span>
+│   │   ├── divisions/, fixtures/,
+│   │   │   results/, champions/       <span class="c">modelo antigo de liga online</span>
+│   │   └── enviroments/
+│   └── players/                       <span class="c">área do jogador</span>
+│       ├── views.py                   <span class="c">login, senha, painel</span>
+│       ├── profiles/                  <span class="c">Profile (inclui o campo nakka)</span>
+│       └── stats/, merits/, validations/
+├── <b>subscriptions/</b>                     <span class="c">cadastro de novo usuário</span>
+└── <b>updates/</b></div>
+
+      <div class="nota">
+        <span class="tarja-rot">Convenção</span>
+        <p>Todos os 47 templates ficam numa <strong>única pasta</strong>,
+          <code>obd/core/templates/</code>, mesmo os que pertencem a outras áreas. Não há subpastas
+          por app.</p>
+      </div>
+    </section>
+
+    <!-- ============ 3 ============ -->
+    <section id="s3">
+      <h2><span class="n">03</span><span>Mapa de telas</span></h2>
+
+      <h3><span class="n">3.1</span>Área pública, sem login</h3>
+
+      <div class="tbl">
+        <table>
+          <thead><tr><th>URL</th><th>View</th><th>Template</th><th>O que faz</th></tr></thead>
+          <tbody>
+            <tr><td><code>/</code></td><td><code>index</code></td><td><code>index.html</code></td><td>Home: estatísticas gerais, campeões da etapa, notícias e documentos recentes</td></tr>
+            <tr><td><code>/obd/players/</code></td><td><code>public_players</code></td><td><code>user_public_players.html</code></td><td>Lista de jogadores; o card inteiro é clicável</td></tr>
+            <tr><td><code>/profile/public/&lt;pin&gt;/show/…</code></td><td><code>publicprofile</code></td><td><code>user_public_profile.html</code></td><td>Perfil público do jogador</td></tr>
+            <tr><td><code>/profile/claim/&lt;pin&gt;/</code></td><td><code>claim_account</code></td><td><code>claim_account.html</code></td><td>“É você? Reivindique” — assume um cadastro provisório</td></tr>
+            <tr><td><code>…/obd/merit/ranking/view</code></td><td><code>orderofmerit</code></td><td><code>user_public_order_of_merit.html</code></td><td>Order of Merit (premiação em R$)</td></tr>
+            <tr><td><code>…/obd/national/ranking/view</code></td><td><code>national_ranking</code></td><td><code>user_public_national_ranking.html</code></td><td>Ranking Nacional (pontos)</td></tr>
+            <tr><td><code>/obd/league/all/champions</code></td><td><code>champions</code></td><td><code>user_public_all_champs.html</code></td><td>Hall dos Campeões</td></tr>
+            <tr><td><code>/eventos/</code></td><td><code>events_list</code></td><td><code>events.html</code></td><td>Calendário de eventos</td></tr>
+            <tr><td><code>/noticias/</code></td><td><code>news_list</code></td><td><code>news.html</code></td><td>Lista de notícias</td></tr>
+            <tr><td><code>/noticias/&lt;pk&gt;/</code></td><td><code>news_detail</code></td><td><code>news_detail.html</code></td><td>Notícia completa com galeria</td></tr>
+            <tr><td><code>/documentos/</code></td><td><code>documents_list</code></td><td><code>documents.html</code></td><td>Regras, estatuto e outros PDFs</td></tr>
+            <tr><td><code>/obd/</code></td><td><code>obd_organization</code></td><td><code>obd_organization.html</code></td><td>Página institucional</td></tr>
+            <tr><td><code>/subscribe/</code></td><td><code>subscribe</code></td><td><code>subscription.html</code></td><td>Cadastro de novo usuário</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3><span class="n">3.2</span>Restrito a quem tem login</h3>
+
+      <p>Uma única tela pública exige login: <code>/obd/leagues/</code>, o <strong>painel da Liga
+        Nacional</strong> (<code>user_public_leagues.html</code>). Quem não estiver logado é levado
+        para a tela de login com a mensagem <em>“Página de acesso exclusivo para usuários logados.
+        Crie seu login ou faça o login”</em>. O comportamento da tela está na seção 5.3.</p>
+
+      <h3><span class="n">3.3</span>Área do jogador</h3>
+
+      <div class="tbl">
+        <table>
+          <thead><tr><th>URL</th><th>View</th><th>Template</th></tr></thead>
+          <tbody>
+            <tr><td><code>…/dashboard/player/login</code></td><td><code>loginuser</code></td><td><code>login.html</code></td></tr>
+            <tr><td><code>…/login/recovery/password</code></td><td><code>recoverypassword</code></td><td><code>login.html</code></td></tr>
+            <tr><td><code>…/recovery/password/confirm/…</code></td><td><code>password_reset_confirm</code></td><td><code>password_reset_confirm.html</code></td></tr>
+            <tr><td><code>…/dashboard/player/</code></td><td><code>dashboard</code></td><td><code>dashuser.html</code></td></tr>
+            <tr><td><code>…/player/profile/view/</code></td><td><code>config</code></td><td><code>profile_view.html</code></td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3><span class="n">3.4</span>Área do administrador</h3>
+
+      <div class="tbl">
+        <table>
+          <thead><tr><th>URL</th><th>View</th><th>O que faz</th></tr></thead>
+          <tbody>
+            <tr><td><code>…/dashboard/admin/</code></td><td><code>dashboard</code></td><td>Painel inicial</td></tr>
+            <tr><td><code>…/admin/players/view</code></td><td><code>members</code></td><td>Lista de associados</td></tr>
+            <tr><td><code>…/admin/scraping/</code></td><td><code>scraping_dashboard</code></td><td><strong>Captura de dados N01</strong></td></tr>
+            <tr><td><code>…/scraping/run/</code></td><td><code>run_capture</code></td><td>Executa uma captura</td></tr>
+            <tr><td><code>…/scraping/prize/&lt;id&gt;/</code></td><td><code>update_tournament_prize</code></td><td>Grava a premiação de torneio avulso</td></tr>
+            <tr><td><code>…/scraping/andamento/&lt;id&gt;/</code></td><td><code>update_tournament_progress</code></td><td>Liga e desliga “em andamento”</td></tr>
+            <tr><td><code>…/scraping/excluir/&lt;id&gt;/</code></td><td><code>delete_tournament</code></td><td>Apaga uma captura</td></tr>
+            <tr><td><code>…/order-of-merit/</code></td><td><code>order_of_merit_dashboard</code></td><td>Importar Order of Merit</td></tr>
+            <tr><td><code>…/order-of-merit/import/</code></td><td><code>import_order_of_merit</code></td><td>Tela de conferência</td></tr>
+            <tr><td><code>…/import/confirmar/</code></td><td><code>confirm_order_of_merit</code></td><td>Grava o que foi conferido</td></tr>
+            <tr><td><code>…/national-ranking/…</code></td><td>idem</td><td>Mesmo fluxo, para pontos</td></tr>
+            <tr><td><code>…/merge-players/</code></td><td><code>merge_players_dashboard</code></td><td>Mesclar cadastros duplicados</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <p>O acesso a tudo aqui é controlado por dois decoradores empilhados:</p>
+
+      <pre><code>@login_required
+@permission_required('profiles.has_admin_role', raise_exception=True)</code></pre>
+
+      <p><code>has_admin_role</code> é uma permissão personalizada declarada no <code>Meta</code> do
+        modelo <code>Profile</code>. Não basta ser <code>is_staff</code> do Django.</p>
+
+      <h3><span class="n">3.5</span>Páginas órfãs</h3>
+
+      <div class="alerta">
+        <span class="tarja-rot">Precisa de decisão</span>
+        <p>Três telas funcionam, mas <strong>nenhum link no site aponta para elas</strong>. Só se
+          chega por URL digitada: <code>create_league.html</code> (criar liga),
+          <code>user_public_ranking_show.html</code> (ranking público de uma divisão) e
+          <code>user_public_match_result.html</code> (relatório de partida). São resquícios do modelo
+          antigo de liga online, tratado na seção 8.</p>
+      </div>
+    </section>
+
+    <!-- ============ 4 ============ -->
+    <section id="s4">
+      <h2><span class="n">04</span><span>Modelo de dados</span></h2>
+
+      <h3><span class="n">4.1</span>Os modelos que importam hoje</h3>
+
+      <p><strong><code>TournamentResult</code></strong> — um torneio capturado do N01.
+        <strong>Atenção:</strong> na Liga Nacional, cada divisão é um <code>TournamentResult</code>
+        separado. Uma etapa com 4 divisões gera 4 registros.</p>
+
+      <div class="tbl">
+        <table>
+          <thead><tr><th>Campo</th><th>Observação</th></tr></thead>
+          <tbody>
+            <tr><td><code>name</code></td><td>Ex: <code>3ª ETAPA LIGA NACIONAL OBD 2026 - DIVISÃO A</code></td></tr>
+            <tr><td><code>source_url</code></td><td>URL do N01 de onde veio</td></tr>
+            <tr><td><code>date</code></td><td><strong>Regravado com “hoje” a cada recaptura</strong> — não serve para ordenar</td></tr>
+            <tr><td><code>created_at</code></td><td>Primeira captura; nunca muda. É o campo confiável para ordenar</td></tr>
+            <tr><td><code>prize_value</code></td><td>Só para torneios avulsos (ver 5.2)</td></tr>
+            <tr><td><code>in_progress</code></td><td>Etapa ainda em disputa (ver 5.4)</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <p><strong><code>PlayerTournamentStat</code></strong> — a linha de um jogador num torneio:
+        <code>rank</code>, partidas, legs, médias, contagens de 100+/140+/170+/180, melhor leg e
+        maior fechamento. <code>tournament</code> é <code>CASCADE</code>; <code>player</code> é
+        <code>SET_NULL</code>.</p>
+
+      <p><strong><code>League</code></strong> — no uso atual, <strong>uma etapa de ranking</strong>,
+        não uma liga. Cada cabeçalho de planilha importada vira uma <code>League</code>. O campo
+        <code>scope</code> distingue Order of Merit de Ranking Nacional.</p>
+
+      <p><strong><code>OrderOfMeritEntry</code></strong> e
+        <strong><code>NationalRankingEntry</code></strong> — o valor em R$ e os pontos de um jogador
+        numa etapa. Ambos com <code>unique_together = ('player', 'league')</code>.</p>
+
+      <p><strong><code>Profile</code></strong> — extensão do <code>User</code> do Django:</p>
+
+      <div class="tbl">
+        <table>
+          <thead><tr><th>Campo</th><th>Para que serve</th></tr></thead>
+          <tbody>
+            <tr><td><code>nakka</code></td><td><strong>O apelido do jogador no N01.</strong> A chave que liga a conta do site à identidade dele no N01. Obrigatório no formulário de perfil e validado como único</td></tr>
+            <tr><td><code>pin</code></td><td>Identificador usado nas URLs públicas</td></tr>
+            <tr><td><code>is_verified</code></td><td><code>False</code> = cadastro provisório criado por robô ou importação, ainda não reivindicado</td></tr>
+            <tr><td><code>photo</code></td><td>Foto do jogador</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <p><strong><code>News</code>, <code>NewsImage</code>, <code>Document</code>,
+        <code>Event</code></strong> — conteúdo editorial, alimentado pelo admin do Django.</p>
+
+      <h3><span class="n">4.2</span>Relações principais</h3>
+
+      <div class="arvore">User ──1:1── Profile  <span class="c">(nakka, pin, is_verified)</span>
+ │
+ ├──1:N── PlayerTournamentStat ──N:1── TournamentResult
+ ├──1:N── OrderOfMeritEntry     ──N:1── League
+ └──1:N── NationalRankingEntry  ──N:1── League
+
+News ──1:N── NewsImage</div>
+
+      <h3><span class="n">4.3</span>Cuidado: dois modelos chamados <code>Event</code></h3>
+
+      <div class="alerta">
+        <span class="tarja-rot">Armadilha</span>
+        <p>Existem <strong>dois</strong> modelos com esse nome.
+          <code>obd/core/models.py → Event</code> é <strong>o usado</strong>, e alimenta o calendário.
+          <code>obd/dashboards/administrators/events/models.py → Event</code> é legado e não é usado.
+          Ao mexer em eventos, confirme que está no <code>core</code>.</p>
+      </div>
+    </section>
+
+    <!-- ============ 5 ============ -->
+    <section id="s5">
+      <h2><span class="n">05</span><span>Regras de negócio</span></h2>
+
+      <p>Esta é a seção mais importante do documento. São as decisões que não dá para deduzir lendo o
+        código superficialmente.</p>
+
+      <h3><span class="n">5.1</span>Ranking Nacional: só os 8 melhores resultados</h3>
+
+      <p>Um jogador que participa de mais de 8 etapas <strong>não soma tudo</strong>. Apenas os 8
+        maiores resultados entram no total; os demais aparecem na tabela riscados em cinza.</p>
+
+      <pre><code>NATIONAL_RANKING_BEST_OF = 8
+
+counted_league_ids = {
+    league_id for league_id, _ in sorted(
+        values_by_league.items(), key=lambda item: item[1], reverse=True
+    )[:NATIONAL_RANKING_BEST_OF]
+}</code></pre>
+
+      <p><strong>O desempate é alfabético.</strong> Quando dois jogadores têm o mesmo total, a ordem
+        é pelo nome:</p>
+
+      <pre><code>ranking.sort(key=lambda x: (-x['total'],
+                            x['player'].first_name.lower(),
+                            x['player'].last_name.lower()))</code></pre>
+
+      <p>A colocação exibida respeita empates de verdade: 1º, 2º, 2º, 4º — não 1º, 2º, 3º, 4º.</p>
+
+      <h3><span class="n">5.2</span>Premiação distribuída: duas fontes que não podem somar duas vezes</h3>
+
+      <p>O número “Premiação Distribuída” da home vem de <strong>duas</strong> origens:
+        <code>OrderOfMeritEntry.value</code>, com os valores da Liga Nacional importados por planilha;
+        e <code>TournamentResult.prize_value</code>, preenchido à mão apenas para <strong>torneios
+        avulsos</strong> — o Tour Online, por exemplo, que distribuiu R$ 400,00 por etapa e não tem
+        Order of Merit.</p>
+
+      <pre><code>obd_numbers['prize_total'] = order_of_merit_prize_total + standalone_prize_total</code></pre>
+
+      <div class="regra">
+        <span class="tarja-rot">Regra operacional</span>
+        <p>Nunca preencha <code>prize_value</code> numa etapa da Liga Nacional. O valor dela já entra
+          pelo Order of Merit, e preencher os dois conta em dobro. O próprio campo avisa isso no
+          <code>help_text</code>.</p>
+      </div>
+
+      <h3><span class="n">5.3</span>Painel da Liga Nacional</h3>
+
+      <p>A tela <code>/obd/leagues/</code> mostra, por divisão: jogos realizados, 180's, maior
+        fechamento, melhor leg, e um banner de jogos pendentes.</p>
+
+      <p><strong>Qual etapa aparece</strong>, em ordem de prioridade: a etapa pedida na URL
+        (<code>?etapa=…</code>, vinda do combobox); senão, a etapa <strong>em andamento</strong>, se
+        houver; senão, a <strong>última concluída</strong>.</p>
+
+      <div class="alerta">
+        <span class="tarja-rot">Ordenação</span>
+        <p>A ordenação usa <code>created_at</code>, <strong>não</strong> <code>date</code>. O campo
+          <code>date</code> é reescrito com a data de hoje a cada recaptura, então depois que o
+          agendamento roda todas as etapas parecem ser de hoje. <code>created_at</code> é
+          <code>auto_now_add</code> e nunca muda.</p>
+      </div>
+
+      <p><strong>Jogos pendentes</strong> são calculados assumindo turno único, todos contra todos:</p>
+
+      <pre><code>possible = entrants * (entrants - 1) // 2
+played   = sum(s.matches_played for s in stats) // 2   <span class="c"># cada jogo conta 2x</span>
+pending  = max(possible - played, 0)</code></pre>
+
+      <div class="regra">
+        <span class="tarja-rot">Regra de negócio</span>
+        <p>O número de jogos pendentes <strong>não</strong> indica que a etapa acabou. Uma etapa da
+          Liga Nacional pode ser encerrada mesmo com jogos pendentes. Foi justamente por isso que o
+          campo <code>in_progress</code> foi criado — o fim de uma etapa é uma decisão do
+          administrador, não algo dedutível dos dados.</p>
+      </div>
+
+      <h3><span class="n">5.4</span>O sinalizador <code>in_progress</code></h3>
+
+      <p>Enquanto uma etapa está marcada como em andamento: o campeão <strong>não</strong> é
+        registrado no Hall dos Campeões (o rank 1 é só o líder do momento); a etapa
+        <strong>não</strong> aparece nos campeões da tela inicial; ela <strong>não</strong> conta em
+        “Torneios Realizados no ano”; e é ela que o agendamento recaptura.</p>
+
+      <p>Quando o administrador desmarca, o campeão é registrado <strong>naquele momento</strong>, a
+        partir dos dados já gravados — não é preciso recapturar:</p>
+
+      <pre><code>if was_in_progress:
+    champion = register_champion_from_tournament(tournament)</code></pre>
+
+      <h3><span class="n">5.5</span>Eventos em andamento no calendário</h3>
+
+      <p>Um evento que começou no passado e ainda não terminou é um evento <strong>futuro</strong>,
+        não passado. A lógica considera <code>end_date</code> quando ele existe:</p>
+
+      <pre><code>still_upcoming = Q(end_date__isnull=False, end_date__gte=now) | Q(end_date__isnull=True, event_date__gte=now)
+already_past   = Q(end_date__isnull=False, end_date__lt=now)  | Q(end_date__isnull=True, event_date__lt=now)</code></pre>
+
+      <p>Cada evento recebe uma cor distinta de uma paleta fixa
+        (<code>EVENT_COLOR_PALETTE</code>, oito cores), para que dois eventos no mesmo dia sejam
+        distinguíveis. Não há ícones no calendário.</p>
+
+      <h3><span class="n">5.6</span>O campo “Ativo” das notícias</h3>
+
+      <p><code>News.is_active = False</code> <strong>esconde a notícia do site</strong> sem apagá-la.
+        É o jeito de tirar algo do ar preservando o registro.</p>
+    </section>
+
+    <!-- ============ 6 ============ -->
+    <section id="s6">
+      <h2><span class="n">06</span><span>Identidade do jogador</span></h2>
+
+      <p>O mesmo ser humano pode aparecer de três formas: como <strong>conta do site</strong>, criada
+        por ele mesmo no cadastro; como <strong>nome no N01</strong>, que ele digitou na plataforma de
+        dardos; e como <strong>nome numa planilha</strong> de ranking, digitado por um organizador.</p>
+
+      <p>Esses três nomes raramente batem. “Douglas Giordani” no N01 pode ser “Douglas Gurgel” no
+        site. Se o sistema errar, cria uma conta duplicada e o jogador perde o histórico.</p>
+
+      <h3><span class="n">6.1</span>A chave correta: <code>Profile.nakka</code></h3>
+
+      <p>O campo <code>nakka</code> guarda o apelido do jogador no N01. É <strong>obrigatório</strong>
+        no formulário de perfil e validado como único. É por ele que a busca começa:</p>
+
+      <pre><code>def get_or_create_player(name: str, pin: str) -&gt; User:
+    nakka = name.strip()
+    if nakka:
+        registered = Profile.objects.filter(nakka__iexact=nakka).first()
+        if registered:
+            return registered.user
+    ...</code></pre>
+
+      <p>Antes dessa correção, a busca era por <code>username == nome_sem_espaços</code>, o que
+        falhava sempre que o apelido do N01 não era igual ao nome de usuário. Foi a causa das
+        duplicidades de Bruno Amaro, Douglas Giordani e Joubert Kozak.</p>
+
+      <h3><span class="n">6.2</span>Classificação na importação de planilhas</h3>
+
+      <div class="tbl">
+        <table>
+          <thead><tr><th>Situação</th><th>Significado</th><th>Vai para</th></tr></thead>
+          <tbody>
+            <tr><td><code>nakka</code></td><td>Achou pelo apelido do N01</td><td>Reconhecidos</td></tr>
+            <tr><td><code>username</code></td><td>Achou pelo nome de usuário exato</td><td>Reconhecidos</td></tr>
+            <tr><td><code>palpite</code></td><td>Achou um parecido, começando igual</td><td><strong>Conferir</strong></td></tr>
+            <tr><td><code>ambiguo</code></td><td>Achou vários parecidos</td><td><strong>Conferir</strong></td></tr>
+            <tr><td><code>novo</code></td><td>Não achou ninguém</td><td><strong>Conferir</strong></td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3><span class="n">6.3</span>Cadastro provisório e reivindicação</h3>
+
+      <p>Quando o sistema cria uma conta sozinho, ela nasce com <code>is_verified = False</code>. Nas
+        tabelas públicas ela aparece com o selo amarelo <strong>“Não Verificado”</strong> e o link
+        <strong>“(é você? reivindique)”</strong>, que leva a <code>claim_account</code>. Ali o jogador
+        assume o cadastro, e se ele já tiver outra conta os dados são mesclados.</p>
+
+      <h3><span class="n">6.4</span>Mesclagem manual</h3>
+
+      <p><code>merge_player_accounts(source_user, target_user)</code> migra estatísticas, entradas de
+        ranking e títulos de uma conta para outra e apaga a de origem. Registros que já existirem no
+        destino são descartados em vez de duplicados. Disponível em <em>Mesclar Cadastros</em> no
+        painel do administrador.</p>
+    </section>
+
+    <!-- ============ 7 ============ -->
+    <section id="s7">
+      <h2><span class="n">07</span><span>Rotinas operacionais</span></h2>
+
+      <h3><span class="n">7.1</span>Capturar um torneio do N01</h3>
+
+      <ol>
+        <li><em>Captura de Torneios</em> no menu do administrador.</li>
+        <li>Cole a URL do torneio no N01.</li>
+        <li>Marque <strong>“Etapa em andamento”</strong> se a etapa ainda está em disputa.</li>
+        <li><em>Capturar Dados</em>.</li>
+      </ol>
+
+      <p>O robô identifica o torneio pelo <strong><code>id=</code> da URL</strong>, não pelo texto da
+        URL inteira. O N01 serve o mesmo torneio em endereços diferentes (<code>comp.php</code> e
+        <code>t_stats.html</code>); colar qualquer um deles atualiza o mesmo registro, em vez de criar
+        uma duplicata.</p>
+
+      <p>Para apagar uma captura, use o botão de lixeira no histórico. As estatísticas dos jogadores
+        saem junto, por <code>on_delete=CASCADE</code>.</p>
+
+      <h3><span class="n">7.2</span>Atualização automática durante a etapa</h3>
+
+      <p>O comando <code>python manage.py scrape_liga</code> recaptura <strong>apenas as divisões da
+        etapa em andamento</strong>, usando as URLs já guardadas. Ele é executado por um serviço de
+        cron separado no Railway. Há também um botão <em>“Atualizar agora”</em> no painel da Liga
+        Nacional, visível só para administradores.</p>
+
+      <div class="nota">
+        <span class="tarja-rot">Detalhe importante</span>
+        <p>Nas recapturas, o construtor do robô recebe <code>in_progress=None</code>, que significa
+          “não mexa no status”. Uma recaptura nunca encerra nem reabre uma etapa por conta própria.</p>
+      </div>
+
+      <h3><span class="n">7.3</span>Importar planilha de ranking</h3>
+
+      <p>Formato esperado: célula <strong>B1</strong> com o nome da etapa, célula <strong>B2</strong>
+        com a data em DD/MM/AAAA, e da linha 4 em diante o cabeçalho e os dados, com colunas de
+        posição, jogador e valor ou pontos.</p>
+
+      <p>O fluxo tem <strong>dois passos</strong>:</p>
+
+      <ol>
+        <li><strong>Conferência</strong> — a planilha é lida e cada jogador classificado.
+          <em>Nada é gravado neste passo.</em> A tela mostra dois blocos: reconhecidos com certeza, e
+          os que precisam da sua conferência. Para cada duvidoso você escolhe: criar cadastro novo,
+          ignorar, ou vincular a um jogador existente. Marcando <em>“gravar apelido”</em>, o nome da
+          planilha é gravado como <code>nakka</code> do jogador, e nas próximas importações ele é
+          reconhecido sozinho.</li>
+        <li><strong>Confirmar e gravar</strong> — grava exatamente o que foi revisado.</li>
+      </ol>
+
+      <div class="alerta">
+        <span class="tarja-rot">Cuidado</span>
+        <p>A etapa é localizada por <code>League.objects.get_or_create(name=etapa_name)</code>,
+          <strong>comparando o nome exato</strong>. Um acento ou espaço diferente cria uma segunda
+          etapa e os pontos passam a contar duas vezes. Confira a célula B1 antes de confirmar.</p>
+      </div>
+
+      <p>Como as entradas usam <code>update_or_create(player, league)</code>, reimportar a mesma
+        planilha com o mesmo nome de etapa é inofensivo: reescreve as mesmas linhas com os mesmos
+        valores.</p>
+
+      <h3><span class="n">7.4</span>Publicar uma notícia</h3>
+
+      <p>Pelo admin do Django (<code>/admin/</code>), modelo <em>Notícias</em>. Campos: título,
+        resumo, conteúdo completo, imagem (upload direto, vai para o Cloudinary), link externo
+        opcional, fonte, data e destaque. Imagens adicionais entram como <code>NewsImage</code>.
+        Desmarcar <em>Ativo</em> tira do ar sem apagar.</p>
+
+      <h3><span class="n">7.5</span>Deploy</h3>
+
+      <p>Commit direto na <code>main</code> e <code>git push</code>. O Railway detecta e publica. O
+        <code>Procfile</code> roda:</p>
+
+      <pre><code>python manage.py collectstatic --noinput &amp;&amp; python manage.py migrate &amp;&amp; gunicorn obd.wsgi</code></pre>
+
+      <p>Ou seja, <strong>as migrações rodam sozinhas a cada deploy</strong>.</p>
+    </section>
+
+    <!-- ============ 8 ============ -->
+    <section id="s8">
+      <h2><span class="n">08</span><span>Módulo legado: a liga online</span></h2>
+
+      <p>Existe no código um sistema completo de liga online — <code>League</code> com fases,
+        <code>Division</code>, <code>Fixture</code> (partidas), <code>Result</code>, inscrição de
+        jogadores, lançamento de resultado pelo próprio usuário, validação pelo administrador,
+        playoffs e finais.</p>
+
+      <div class="alerta">
+        <span class="tarja-rot">Fora de uso</span>
+        <p>Esse fluxo não está mais em uso. Uma verificação no banco encontrou 18 divisões e
+          <strong>zero</strong> fixtures. O modelo <code>League</code> foi reaproveitado para outra
+          coisa: hoje ele representa uma <em>etapa de ranking</em> importada por planilha.</p>
+      </div>
+
+      <p>Isso importa por dois motivos: as telas órfãs da seção 3.5 pertencem a esse módulo, e o nome
+        <code>League</code> no código significa duas coisas diferentes dependendo do contexto.</p>
+    </section>
+
+    <!-- ============ 9 ============ -->
+    <section id="s9">
+      <h2><span class="n">09</span><span>Armadilhas conhecidas</span></h2>
+
+      <h3><span class="n">9.1</span>Duas folhas de estilo que se atropelam</h3>
+
+      <p><code>dartboard-theme.css</code> traz um visual claro, com cards brancos e títulos escuros.
+        <code>style.css</code> traz um tema escuro, com <code>--card-bg: #1e293b</code>. Quando as
+        duas se aplicam ao mesmo elemento, o resultado é <strong>texto escuro sobre fundo
+        escuro</strong>, praticamente invisível. Isso já apareceu em vários lugares.</p>
+
+      <div class="nota">
+        <span class="tarja-rot">Como corrigir</span>
+        <p>Escope a regra: <code>.card .card-title</code>, não <code>.card-title</code> solto — um
+          <code>&lt;h2 class="card-title"&gt;</code> fora de qualquer card ficaria branco sobre fundo
+          claro.</p>
+      </div>
+
+      <h3><span class="n">9.2</span>Versões diferentes de Bootstrap</h3>
+
+      <div class="tbl">
+        <table>
+          <thead><tr><th>Base</th><th>Bootstrap</th><th>Bootstrap Icons</th></tr></thead>
+          <tbody>
+            <tr><td><code>base.html</code> (público)</td><td>5.3.3</td><td>1.11.3</td></tr>
+            <tr><td><code>baseuser.html</code></td><td><strong>5.0.0-beta2</strong></td><td>1.11.3</td></tr>
+            <tr><td><code>baseadmin.html</code></td><td><strong>5.0.0-beta2</strong></td><td>1.11.3</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <p>Os ícones já foram unificados; <strong>o Bootstrap em si não</strong>. Componentes mais novos
+        podem se comportar de forma diferente nas telas internas. Unificar é um trabalho pendente e de
+        risco alto, porque afeta todas as telas administrativas de uma vez.</p>
+
+      <p><em>Sintoma típico da versão antiga:</em> um ícone que não existe naquela versão renderiza um
+        <code>&lt;i&gt;</code> vazio, e o botão aparece sem nada dentro — parecendo um problema de
+        cor.</p>
+
+      <h3><span class="n">9.3</span>Quebra de linha dentro de tag de template</h3>
+
+      <p>A expressão que o Django usa para reconhecer tags é compilada <strong>sem</strong>
+        <code>re.DOTALL</code>:</p>
+
+      <pre><code>tag_re = ({%.*?%}|{{.*?}}|{#.*?#})</code></pre>
+
+      <p>Consequência: <code>{% if algo %}</code> quebrado em duas linhas <strong>não é reconhecido
+        como tag</strong> — vira texto literal na página, ou derruba o template com erro 500. Um
+        “Format Document” do editor já inseriu quebras em 171 tags e derrubou 7 telas.</p>
+
+      <div class="alerta">
+        <span class="tarja-rot">Nunca faça</span>
+        <p>Não deixe um autoformatador de HTML rodar solto nos templates.</p>
+      </div>
+
+      <h3><span class="n">9.4</span><code>config()</code> e <code>os.getenv()</code> misturados</h3>
+
+      <p><code>settings.py</code> usa os dois. <code>config()</code> (python-decouple)
+        <strong>quebra a inicialização</strong> se a variável não existir e não tiver default;
+        <code>os.getenv()</code> devolve <code>None</code> silenciosamente. Ao rodar o projeto fora do
+        Railway é preciso fornecer todas as variáveis exigidas por <code>config()</code>.</p>
+
+      <h3><span class="n">9.5</span>Localização de números em campos ocultos</h3>
+
+      <p>Com <code>pt-br</code>, um <code>Decimal</code> renderizado em HTML vira <code>500,00</code>.
+        Ao voltar pelo formulário, <code>Decimal('500,00')</code> levanta exceção. Em campos ocultos
+        use <code>{% load l10n %}</code> e o filtro <code>|unlocalize</code>.</p>
+
+      <h3><span class="n">9.6</span><code>date</code> versus <code>created_at</code></h3>
+
+      <p>Já dito na seção 5.3, mas vale repetir porque é a armadilha mais fácil de cair:
+        <strong><code>TournamentResult.date</code> é reescrito a cada recaptura.</strong> Para
+        ordenação cronológica confiável, use <code>created_at</code>.</p>
+    </section>
+
+    <!-- ============ 10 ============ -->
+    <section id="s10">
+      <h2><span class="n">10</span><span>Pontos em aberto</span></h2>
+
+      <p>Levantados ao longo do desenvolvimento e ainda não resolvidos, do mais para o menos grave:</p>
+
+      <ol>
+        <li><strong>E-mail de recuperação de senha com cópia para a caixa da OBD.</strong> Qualquer
+          pessoa com acesso àquela caixa consegue redefinir a senha de qualquer jogador. É o item mais
+          sério da lista.</li>
+        <li><strong><code>/admin/</code> no caminho padrão</strong>, sem limite de tentativas de
+          login.</li>
+        <li><strong>Sem limitação de tentativas</strong> na tela de login dos jogadores.</li>
+        <li><strong>Cabeçalhos de segurança HTTPS ausentes</strong>, incluindo
+          <code>SECURE_PROXY_SSL_HEADER</code>.</li>
+        <li><strong>Páginas órfãs</strong> (seção 3.5) — decidir entre linká-las ou aposentá-las.</li>
+        <li><strong>Bootstrap não unificado</strong> (seção 9.2).</li>
+      </ol>
+    </section>
+
+    <!-- ============ 11 ============ -->
+    <section id="s11">
+      <h2><span class="n">11</span><span>Glossário</span></h2>
+
+      <div class="tbl">
+        <table>
+          <thead><tr><th>Termo</th><th>Significado</th></tr></thead>
+          <tbody>
+            <tr><td><strong>N01 / Nakka</strong></td><td>Plataforma online onde as partidas de dardos são jogadas e as estatísticas geradas</td></tr>
+            <tr><td><strong>nakka</strong> (campo)</td><td>O apelido do jogador no N01, guardado no perfil. A chave de ligação entre o site e o N01</td></tr>
+            <tr><td><strong>Etapa</strong></td><td>Uma rodada da Liga Nacional ou do circuito. No banco, uma <code>League</code></td></tr>
+            <tr><td><strong>Divisão</strong></td><td>Subdivisão de uma etapa (A, B, C, D). Cada uma é um <code>TournamentResult</code></td></tr>
+            <tr><td><strong>Order of Merit</strong></td><td>Ranking por premiação recebida em R$</td></tr>
+            <tr><td><strong>Ranking Nacional</strong></td><td>Ranking por pontos, considerando os 8 melhores resultados</td></tr>
+            <tr><td><strong>Leg</strong></td><td>Uma partida individual dentro de um set</td></tr>
+            <tr><td><strong>180</strong></td><td>Pontuação máxima com três dardos</td></tr>
+            <tr><td><strong>Fechamento</strong></td><td>Pontuação com que o jogador encerrou o leg (<em>checkout</em>)</td></tr>
+            <tr><td><strong>PIN</strong></td><td>Identificador do jogador usado nas URLs públicas</td></tr>
+            <tr><td><strong>Cadastro provisório</strong></td><td>Conta criada automaticamente, com <code>is_verified = False</code></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+  </main>
+</div>
