@@ -45,7 +45,7 @@
             <div class="card-body">
                 <p><br></p>
                 <h2><strong><i class="bi bi-file-earmark-text-fill"></i> Relatório de Partida #{{ game.id }} {{ game.division.league.name }} | Divisão {{ game.division.get_formation_display }}</strong> | <a
-                        class="btn btn-primary" href="{% url 'boadivisionview' slug=division.slug %}" role="button">Ver
+                        class="btn btn-primary" href="{% url 'results:ranking' slug=game.division.slug %}" role="button">Ver
                         Ranking</a></h2>
                 <p class="card-text"><small class="text-muted">A melhor liga online de Dardos do Brasil! </small></p>
             </div>

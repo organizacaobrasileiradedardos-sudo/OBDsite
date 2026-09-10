@@ -4,8 +4,6 @@ from . import views
 
 app_name = 'league'
 urlpatterns = [
-    path('dashboard/admin/league', views.index, name='index'),
-    path('dashboard/admin/league/create', views.index, name='create'),
     path('dashboard/admin/league/<slug:slug>/remove', views.deleteleague, name='remove'),
     path('dashboard/admin/league/<slug:slug>/setsubscription', views.setsubscription, name='setsubscription'),
     path('dashboard/admin/league/<slug:slug>/setformation', views.setformation, name='setformation'),

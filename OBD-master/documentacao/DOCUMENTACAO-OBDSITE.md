@@ -67,7 +67,7 @@ obd/
 │   │                                  documentos, eventos, painel Liga Nacional
 │   ├── obdlib/webscraping/n01.py      o robô de captura do N01
 │   ├── management/commands/           tarefas de linha de comando (agendamento)
-│   └── templates/                     os 47 templates do site inteiro
+│   └── templates/                     os 44 templates do site inteiro
 ├── dashboards/
 │   ├── administrators/                área do administrador
 │   │   ├── views.py                   captura, importações, mesclagem
@@ -84,7 +84,7 @@ obd/
 └── updates/
 ```
 
-**Todos os 47 templates ficam numa única pasta**, `obd/core/templates/`, mesmo os que
+**Todos os 44 templates ficam numa única pasta**, `obd/core/templates/`, mesmo os que
 pertencem a outras áreas. Não há subpastas por app.
 
 ---
@@ -156,17 +156,30 @@ O acesso a tudo aqui é controlado por dois decoradores empilhados:
 `has_admin_role` é uma permissão personalizada declarada no `Meta` do modelo `Profile`.
 Não basta ser `is_staff` do Django.
 
-### 3.5 Páginas órfãs
+### 3.5 Páginas órfãs (removidas)
 
-Três telas funcionam, mas **nenhum link no site aponta para elas**. Só se chega por URL
-digitada:
+Havia telas sem nenhum link apontando para elas, resquícios do modelo antigo de liga
+online (seção 8). Elas foram removidas do código:
 
-- `create_league.html` — criar liga
-- `user_public_ranking_show.html` — ranking público de uma divisão
-- `user_public_match_result.html` — relatório de uma partida
+| Removido | O que era |
+|---|---|
+| `create_league.html` + `index`, `createnewleague`, `createleaguepage` | Criar liga. Já estava quebrada: usava `Enviroment`, que nem sequer era importado no arquivo |
+| `user_public_ranking_show.html` + `public_division_view` | Ranking público de uma divisão |
+| `user_public_players_leagues.html` + `public_league_view` | Página pública de uma liga |
+| `leagues/forms.py` (`NewLeagueForm`) | Usado só pela tela de criar liga |
+| `core/bkp_views_2.py`, `leagues/bkp__views__.py` | Cópias de segurança antigas, mortas |
+| `public_audit` em `core/views.py` | Função vazia, sem rota |
 
-São resquícios do modelo antigo de liga online (seção 8). Precisam de decisão: entram em
-algum menu ou são aposentadas.
+Junto saíram as rotas `boaleagueview`, `boadivisionview`, `league:index`, `league:create`
+e os dois redirecionamentos `/boa/leagues/...` que apontavam para elas.
+
+> **`user_public_match_result.html` foi mantida**, e a documentação anterior errava ao
+> listá-la como órfã. Ela é o *Relatório de Partida*, e continua alcançável por dois
+> caminhos vivos: no admin, Gestão de Ligas → Jogadores da liga → Ranking; e na área do
+> jogador, Ligas ou Minhas Partidas → Ranking. Removê-la derrubaria
+> `admin_ranking_show.html` e `user_ranking_show.html` com erro 500. O botão
+> "Ver Ranking" dela, que apontava para a tela removida, passou a apontar para
+> `results:ranking`.
 
 ---
 
@@ -571,8 +584,12 @@ próprio usuário, validação pelo administrador, playoffs e finais.
 **zero** fixtures. O modelo `League` foi reaproveitado para outra coisa: hoje ele
 representa uma *etapa de ranking* importada por planilha.
 
-Isso importa por dois motivos: as telas órfãs da seção 3.5 pertencem a esse módulo, e o
-nome `League` no código significa duas coisas diferentes dependendo do contexto.
+As telas desse módulo que ninguém alcançava foram removidas (seção 3.5). O que sobrou
+continua alcançável pelo menu do administrador e pela área do jogador, e por isso não foi
+mexido — ainda que opere sobre dados que não existem mais.
+
+Uma consequência que continua valendo: o nome `League` no código significa duas coisas
+diferentes dependendo do contexto.
 
 ---
 
@@ -648,8 +665,10 @@ Levantados ao longo do desenvolvimento e ainda não resolvidos:
 2. **`/admin/` no caminho padrão**, sem limite de tentativas de login.
 3. **Sem limitação de tentativas** na tela de login dos jogadores.
 4. **Cabeçalhos de segurança HTTPS ausentes**, incluindo `SECURE_PROXY_SSL_HEADER`.
-5. **Páginas órfãs** (seção 3.5) — decidir entre linká-las ou aposentá-las.
-6. **Bootstrap não unificado** (seção 9.2).
+5. **Bootstrap não unificado** (seção 9.2).
+6. **O módulo legado de liga online** (seção 8) continua no código e alcançável pelos
+   menus, operando sobre dados que não existem mais. Aposentá-lo é uma decisão maior, que
+   afeta telas do administrador e do jogador.
 
 ---
 

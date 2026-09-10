@@ -419,7 +419,7 @@
       <div class="meta">
         <span><b>Revisão</b> 10 · set · 2026</span>
         <span><b>Stack</b> Django 4.2 · PostgreSQL · Railway</span>
-        <span><b>Telas</b> 47 templates</span>
+        <span><b>Telas</b> 44 templates</span>
       </div>
     </header>
 
@@ -488,7 +488,7 @@
 │   │                                  <span class="c">eventos, painel Liga Nacional</span>
 │   ├── obdlib/webscraping/n01.py      <span class="c">o robô de captura do N01</span>
 │   ├── management/commands/           <span class="c">tarefas de agendamento</span>
-│   └── templates/                     <span class="c">os 47 templates do site inteiro</span>
+│   └── templates/                     <span class="c">os 44 templates do site inteiro</span>
 ├── <b>dashboards/</b>
 │   ├── administrators/                <span class="c">área do administrador</span>
 │   │   ├── views.py                   <span class="c">captura, importações, mesclagem</span>
@@ -592,15 +592,38 @@
       <p><code>has_admin_role</code> é uma permissão personalizada declarada no <code>Meta</code> do
         modelo <code>Profile</code>. Não basta ser <code>is_staff</code> do Django.</p>
 
-      <h3><span class="n">3.5</span>Páginas órfãs</h3>
+      <h3><span class="n">3.5</span>Páginas órfãs (removidas)</h3>
+
+      <p>Havia telas sem nenhum link apontando para elas, resquícios do modelo antigo de liga online
+        (seção 8). Elas foram removidas do código:</p>
+
+      <div class="tbl">
+        <table>
+          <thead><tr><th>Removido</th><th>O que era</th></tr></thead>
+          <tbody>
+            <tr><td><code>create_league.html</code> + <code>index</code>, <code>createnewleague</code>, <code>createleaguepage</code></td><td>Criar liga. Já estava quebrada: usava <code>Enviroment</code>, que nem sequer era importado no arquivo</td></tr>
+            <tr><td><code>user_public_ranking_show.html</code> + <code>public_division_view</code></td><td>Ranking público de uma divisão</td></tr>
+            <tr><td><code>user_public_players_leagues.html</code> + <code>public_league_view</code></td><td>Página pública de uma liga</td></tr>
+            <tr><td><code>leagues/forms.py</code> (<code>NewLeagueForm</code>)</td><td>Usado só pela tela de criar liga</td></tr>
+            <tr><td><code>core/bkp_views_2.py</code>, <code>leagues/bkp__views__.py</code></td><td>Cópias de segurança antigas, mortas</td></tr>
+            <tr><td><code>public_audit</code> em <code>core/views.py</code></td><td>Função vazia, sem rota</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <p>Junto saíram as rotas <code>boaleagueview</code>, <code>boadivisionview</code>,
+        <code>league:index</code>, <code>league:create</code> e os dois redirecionamentos
+        <code>/boa/leagues/…</code> que apontavam para elas.</p>
 
       <div class="alerta">
-        <span class="tarja-rot">Precisa de decisão</span>
-        <p>Três telas funcionam, mas <strong>nenhum link no site aponta para elas</strong>. Só se
-          chega por URL digitada: <code>create_league.html</code> (criar liga),
-          <code>user_public_ranking_show.html</code> (ranking público de uma divisão) e
-          <code>user_public_match_result.html</code> (relatório de partida). São resquícios do modelo
-          antigo de liga online, tratado na seção 8.</p>
+        <span class="tarja-rot">Uma delas não era órfã</span>
+        <p><code>user_public_match_result.html</code> <strong>foi mantida</strong>, e a documentação
+          anterior errava ao listá-la como órfã. Ela é o <em>Relatório de Partida</em>, e continua
+          alcançável por dois caminhos vivos: no admin, Gestão de Ligas → Jogadores da liga →
+          Ranking; e na área do jogador, Ligas ou Minhas Partidas → Ranking. Removê-la derrubaria
+          <code>admin_ranking_show.html</code> e <code>user_ranking_show.html</code> com erro 500. O
+          botão “Ver Ranking” dela, que apontava para a tela removida, passou a apontar para
+          <code>results:ranking</code>.</p>
       </div>
     </section>
 
@@ -1040,8 +1063,12 @@ torneio : 'Open São Roque 2026 - OBD 21.02.2026'</code></pre>
           coisa: hoje ele representa uma <em>etapa de ranking</em> importada por planilha.</p>
       </div>
 
-      <p>Isso importa por dois motivos: as telas órfãs da seção 3.5 pertencem a esse módulo, e o nome
-        <code>League</code> no código significa duas coisas diferentes dependendo do contexto.</p>
+      <p>As telas desse módulo que ninguém alcançava foram removidas (seção 3.5). O que sobrou
+        continua alcançável pelo menu do administrador e pela área do jogador, e por isso não foi
+        mexido — ainda que opere sobre dados que não existem mais.</p>
+
+      <p>Uma consequência que continua valendo: o nome <code>League</code> no código significa duas
+        coisas diferentes dependendo do contexto.</p>
     </section>
 
     <!-- ============ 9 ============ -->
@@ -1134,8 +1161,10 @@ torneio : 'Open São Roque 2026 - OBD 21.02.2026'</code></pre>
         <li><strong>Sem limitação de tentativas</strong> na tela de login dos jogadores.</li>
         <li><strong>Cabeçalhos de segurança HTTPS ausentes</strong>, incluindo
           <code>SECURE_PROXY_SSL_HEADER</code>.</li>
-        <li><strong>Páginas órfãs</strong> (seção 3.5) — decidir entre linká-las ou aposentá-las.</li>
         <li><strong>Bootstrap não unificado</strong> (seção 9.2).</li>
+        <li><strong>O módulo legado de liga online</strong> (seção 8) continua no código e alcançável
+          pelos menus, operando sobre dados que não existem mais. Aposentá-lo é uma decisão maior,
+          que afeta telas do administrador e do jogador.</li>
       </ol>
     </section>
 

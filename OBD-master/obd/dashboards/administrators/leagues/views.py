@@ -5,11 +5,9 @@ from django.contrib.auth.models import User
 from django.db.models import Count, Avg, Sum, Q, Value
 from django.shortcuts import render, redirect
 from django.utils.text import slugify
-from obd.core.obdlib.standardsession import ObdSession
 from obd.core.obdlib.fixturing import Fixturing
 from obd.core.models import PlayerTournamentStat
 from obd.dashboards.administrators.divisions.models import Division
-from obd.dashboards.administrators.leagues.forms import NewLeagueForm
 from obd.dashboards.administrators.leagues.models import League
 from obd.dashboards.administrators.results.models import Result
 from obd.dashboards.players.profiles.models import Profile
@@ -20,15 +18,6 @@ from decimal import Decimal
 from obd.dashboards.players.stats.models import Stat
 from obd.dashboards.administrators.leagues.models import OrderOfMeritEntry
 from obd.dashboards.administrators.leagues.models import NationalRankingEntry
-
-@login_required()
-@permission_required('profiles.has_admin_role', raise_exception=True)
-def index(request):
-    if request.method == 'POST':
-        return createnewleague(request)
-    else:
-        return createleaguepage(request)
-
 
 @login_required()
 @permission_required('profiles.has_admin_role', raise_exception=True)
@@ -415,55 +404,6 @@ def setdivision(request, slug, pin, bcmDiv):
     player.user.stat.save()
     return redirect(f'/dashboard/admin/league/{slug}/players', alert='alert-success')
 
-
-@login_required()
-@permission_required('profiles.has_admin_role', raise_exception=True)
-def createnewleague(request):
-    form = NewLeagueForm(request.POST)
-    if not form.is_valid():
-        return render(request, 'create_league.html', {'form': form})
-
-    #Create new League if form is okay/clean
-    enviroment = Enviroment.objects.first()
-    league = League()
-    league.enviroment = enviroment
-    league.created_by = request.user
-    league.name = form.cleaned_data['name']
-    league.description = form.cleaned_data['description']
-    league.add_info = form.cleaned_data['add_info']
-    league.slug = slugify(form.cleaned_data['name'])
-    league.start_date = form.cleaned_data['start_date']
-    league.end_date = form.cleaned_data['end_date']
-    league.runoff = form.cleaned_data['runoff']
-    league.phase = form.cleaned_data['phase']
-    league.scope = form.cleaned_data['scope']
-    league.status = True
-    league.save()
-
-    # Creating auto formation DIV for LEAGUE to be used as base for new participants
-    formation = Division()
-    formation.league = league
-    formation.phase = 1
-    formation.name = 'Divisão de Formação ' + league.name
-    formation.description = 'Divisão criada automáticamente para cadastro de novos inscritos.'
-    formation.slug = slugify(formation.name)
-    formation.formation = 0
-    formation.status = True
-    formation.save()
-
-    messages.success(request, f'Liga {league.name} cadastrada com sucesso! Clique aqui para exibir os detalhes')
-    slug = league.slug
-    token = ObdSession().startSession()
-    return render(request, 'create_league.html', {'form': form, 'token': token, 'link': slug, 'alert': 'alert-success'})
-
-
-@login_required()
-@permission_required('profiles.has_admin_role', raise_exception=True)
-def createleaguepage(request):
-    form = NewLeagueForm()
-    token = ObdSession().startSession()
-    env = Enviroment.objects.first()
-    return render(request, 'create_league.html', {'form': form, 'token': token, 'enviroment': env})
 
 @login_required()
 @permission_required('profiles.has_admin_role', raise_exception=True)

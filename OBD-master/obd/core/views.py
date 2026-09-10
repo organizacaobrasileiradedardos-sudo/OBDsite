@@ -429,101 +429,6 @@ def refresh_league_stats(request):
     # Volta para a mesma etapa que estava sendo vista
     return redirect(f"{reverse('boaleagues')}?etapa={quote(stage['name'])}")
 
-def public_league_view(request, slug):
-    league = League.objects.get(slug=slug)
-    fixtures = Fixture.objects.filter(division__league=league)
-    results = Result.objects.filter(fixture__division__league=league, enabled=True, validation=1, walkover=False)
-
-    matches = Count('created_at')
-    completed = Count('created_at', filter=Q(status=1))
-    validated = Count('created_at', filter=Q(status=1, validation=1))
-    hold = Count('validation', filter=Q(status=1, validation=0))
-    pending = Count('created_at', filter=Q(status=0, validation=0))
-    avg = Coalesce(Avg('average', filter=Q(average__gt=0)), Value(0))
-
-    divisions = fixtures.values('division').annotate(
-        matches=matches,
-        completed=completed,
-        pending=pending,
-        validated=validated,
-        hold=hold
-    ).order_by('-division')
-
-    averages = results.values('fixture__division').annotate(
-        avg=avg
-    ).order_by('-fixture__division')
-
-    divisions = list(divisions)
-    averages = list(averages)
-    database = zip(divisions, averages)
-
-    context = {'league': league,
-               'total_divs': range(10),
-               'database': database}
-
-    return render(request, 'user_public_players_leagues.html', context)
-
-def public_division_view(request, slug):
-    # Collecting all results for "division".
-    division = Division.objects.get(slug=slug)
-    results = Result.objects.filter(fixture__division=division, validation=1, enabled=True)
-    finished = Fixture.objects.filter(division=division, validation=1).order_by('-on_date')
-    pending = Fixture.objects.filter(division=division, validation=0).order_by('-on_date')
-    playoffs = Fixture.objects.filter(division=division, type=4)
-    finals = Fixture.objects.filter(division=division, type=2)
-
-    # Set the Q queries to build the ranking player data for division(slug).
-    points = Coalesce(Sum('points'), Value(0))
-    difference = Coalesce(Sum('legs_diff'), Value(0))
-    legs = Coalesce(Sum('legs'), Value(0))
-    matches = Coalesce(Count('enabled'), Value(0))
-    wins = Coalesce(Count('final', filter=Q(final=1)), Value(0))
-    losses = Count('final', filter=Q(final=0))
-    walkover = Count('walkover', filter=Q(walkover=True))
-    draws = Count('final', filter=Q(final=2))
-    avg = Coalesce(Avg('average', filter=Q(average__gt=0)), Value(0))
-    best = Min('best_leg', filter=Q(best_leg__gt=0))
-    out = Max('highest_out')
-    ton = Sum('ton')
-    ton40 = Sum('ton40')
-    ton70 = Sum('ton70')
-    ton80 = Sum('ton80')
-
-    ranking = results.values('player').annotate(
-        matches=matches,
-        points=points,
-        difference=difference,
-        legs=legs,
-        wins=wins,
-        losses=losses,
-        draws=draws,
-        walkover=walkover,
-        average=avg,
-        best=best,
-        out=out,
-        ton=ton,
-        ton40=ton40,
-        ton70=ton70,
-        ton80=ton80
-    ).order_by('-points', '-difference', '-legs', '-wins', '-average')
-
-    indice = int(len(ranking))
-    for line in range(indice):
-        u = User.objects.get(id=ranking[line]['player'])
-        ranking[line]['player'] = u
-
-    database = list(ranking)
-
-    response = {'database': database,
-                'division': division,
-                'finished': finished,
-                'pending': pending,
-                'playoffs': playoffs,
-                'finals': finals}
-
-    return render(request, 'user_public_ranking_show.html', response)
-
-
 def public_result(request, slug, match):
 
     division = Division.objects.get(slug=slug)
@@ -537,10 +442,6 @@ def public_result(request, slug, match):
                 'p2': p2}
 
     return render(request, 'user_public_match_result.html', response)
-
-def public_audit(request):
-    pass
-
 
 # New views for Events, News, and Documents
 from .models import Event, News, Document

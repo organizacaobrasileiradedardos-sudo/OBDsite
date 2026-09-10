@@ -25,8 +25,6 @@ from obd.core.views import (  # Imports explícitos para clareza e evitar NameEr
     public_players, 
     public_leagues,
     refresh_league_stats,
-    public_league_view, 
-    public_division_view, 
     public_result,
     events_list,
     news_list,
@@ -61,13 +59,9 @@ urlpatterns = [
     path('obd/players/', public_players, name='boaplayers'),
     path('obd/leagues/', public_leagues, name='boaleagues'),
     path('obd/leagues/atualizar/', refresh_league_stats, name='refresh_league_stats'),
-    path('obd/leagues/<slug:slug>/details', public_league_view, name='boaleagueview'),
-    path('obd/leagues/divisions/<slug:slug>/details', public_division_view, name='boadivisionview'),
     # Compatibilidade: antigas URLs /boa/... redirecionam para /obd/...
     path('boa/players/', RedirectView.as_view(pattern_name='boaplayers', permanent=True)),
     path('boa/leagues/', RedirectView.as_view(pattern_name='boaleagues', permanent=True)),
-    path('boa/leagues/<slug:slug>/details', RedirectView.as_view(pattern_name='boaleagueview', permanent=True)),
-    path('boa/leagues/divisions/<slug:slug>/details', RedirectView.as_view(pattern_name='boadivisionview', permanent=True)),
     path('dashboard/public/result/<slug:slug>/match/<int:match>/view', public_result, name='result'),
     # New URLs for Events, News, and Documents
     path('eventos/', events_list, name='events'),
