@@ -136,6 +136,14 @@
         margin-top: 50px;
         font-style: italic;
     }
+
+    /* No celular a barra do calendário (setas, mês, botões) não cabe em uma
+       linha só e o nome do mês quebra no meio. Aqui ela fica mais compacta. */
+    @media (max-width: 767.98px) {
+        .fc .fc-toolbar-title { font-size: 1.1rem; }
+        .fc .fc-button { padding: 0.3em 0.55em; font-size: 0.85rem; }
+        .fc .fc-toolbar.fc-header-toolbar { margin-bottom: 0.8em; }
+    }
 </style>
 {% endblock %}
 
@@ -248,11 +256,20 @@
         var calendarEl = document.getElementById('calendar');
         var events = {{ calendar_events_json|safe }};
 
+    // No celular a grade do mês fica apertada demais e os nomes dos eventos
+    // aparecem cortados, então a tela abre na visão de Lista. O botão "Mês"
+    // continua ali para quem quiser a grade.
+    var noCelular = window.matchMedia('(max-width: 767.98px)').matches;
+
     var calendar = new FullCalendar.Calendar(calendarEl, {
-        initialView: 'dayGridMonth',
+        initialView: noCelular ? 'listMonth' : 'dayGridMonth',
         locale: 'pt-br',
         themeSystem: 'standard',
-        headerToolbar: {
+        headerToolbar: noCelular ? {
+            left: 'prev,next',
+            center: 'title',
+            right: 'dayGridMonth,listMonth'
+        } : {
             left: 'prev,next today',
             center: 'title',
             right: 'dayGridMonth,listMonth'
