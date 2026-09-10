@@ -25,7 +25,6 @@ from obd.core.views import (  # Imports explícitos para clareza e evitar NameEr
     public_players, 
     public_leagues,
     refresh_league_stats,
-    public_result,
     events_list,
     news_list,
     news_detail,
@@ -40,8 +39,6 @@ from obd.dashboards.administrators.enviroments import urls as enviroments_urls
 from obd.dashboards.administrators.leagues import urls as leagues_urls
 from obd.dashboards.players import urls as players_urls
 from obd.dashboards.players.profiles import urls as profiles_urls
-from obd.dashboards.administrators.fixtures import urls as fixtures_urls
-from obd.dashboards.administrators.results import urls as results_urls
 from obd.dashboards.administrators.champions import urls as champions_urls
 
 urlpatterns = [
@@ -51,8 +48,6 @@ urlpatterns = [
     path('dashboard/enviroments/', include(enviroments_urls, namespace='enviroments')),
     path('dashboard/profiles/', include(profiles_urls, namespace='profiles')),
     path('dashboard/leagues/', include(leagues_urls, namespace='league')),
-    path('dashboard/fixtures/', include(fixtures_urls, namespace='fixtures')),
-    path('dashboard/results/', include(results_urls, namespace='results')),
     path('dashboard/champions/', include(champions_urls, namespace='champions')),
     path('subscribe/', subscribe),
     path('admin/', admin.site.urls),
@@ -62,7 +57,6 @@ urlpatterns = [
     # Compatibilidade: antigas URLs /boa/... redirecionam para /obd/...
     path('boa/players/', RedirectView.as_view(pattern_name='boaplayers', permanent=True)),
     path('boa/leagues/', RedirectView.as_view(pattern_name='boaleagues', permanent=True)),
-    path('dashboard/public/result/<slug:slug>/match/<int:match>/view', public_result, name='result'),
     # New URLs for Events, News, and Documents
     path('eventos/', events_list, name='events'),
     path('noticias/', news_list, name='news'),

@@ -25,10 +25,4 @@ urlpatterns = [
     path('dashboard/player/login/recovery/password/confirm/<uidb64>/<token>', views.password_reset_confirm, name='password_reset_confirm'),
     path('dashboard/player/logout', views.logoutuser, name='logout'),
     path('dashboard/player/access', views.currentlogin, name='access'),
-    path('dashboard/player/access/admin/audit', views.audit, name='audit'),
-    path('dashboard/player/access/my/matches', views.player_audit, name='player_audit'),
-    path('dashboard/player/view/my/matches', views.mygames, name='mygames'),
-    path('dashboard/player/view/leagues', views.userleagues, name='leagues'),
-    path('dashboard/player/league/<slug:slug>/signup', views.signupleague, name='signup'),
-    path('dashboard/player/league/<slug:slug>/signoff', views.signoffleague, name='signoff')
 ]

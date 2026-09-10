@@ -419,7 +419,7 @@
       <div class="meta">
         <span><b>Revisão</b> 10 · set · 2026</span>
         <span><b>Stack</b> Django 4.2 · PostgreSQL · Railway</span>
-        <span><b>Telas</b> 44 templates</span>
+        <span><b>Telas</b> 34 templates</span>
       </div>
     </header>
 
@@ -488,7 +488,7 @@
 │   │                                  <span class="c">eventos, painel Liga Nacional</span>
 │   ├── obdlib/webscraping/n01.py      <span class="c">o robô de captura do N01</span>
 │   ├── management/commands/           <span class="c">tarefas de agendamento</span>
-│   └── templates/                     <span class="c">os 44 templates do site inteiro</span>
+│   └── templates/                     <span class="c">os 34 templates do site inteiro</span>
 ├── <b>dashboards/</b>
 │   ├── administrators/                <span class="c">área do administrador</span>
 │   │   ├── views.py                   <span class="c">captura, importações, mesclagem</span>
@@ -592,38 +592,46 @@
       <p><code>has_admin_role</code> é uma permissão personalizada declarada no <code>Meta</code> do
         modelo <code>Profile</code>. Não basta ser <code>is_staff</code> do Django.</p>
 
-      <h3><span class="n">3.5</span>Páginas órfãs (removidas)</h3>
+      <h3><span class="n">3.5</span>O que foi removido</h3>
 
-      <p>Havia telas sem nenhum link apontando para elas, resquícios do modelo antigo de liga online
-        (seção 8). Elas foram removidas do código:</p>
+      <p>Todo o modelo antigo de liga online foi retirado do código (seção 8). Saíram 13 telas, duas
+        camadas de views inteiras e as rotas correspondentes:</p>
 
       <div class="tbl">
         <table>
           <thead><tr><th>Removido</th><th>O que era</th></tr></thead>
           <tbody>
-            <tr><td><code>create_league.html</code> + <code>index</code>, <code>createnewleague</code>, <code>createleaguepage</code></td><td>Criar liga. Já estava quebrada: usava <code>Enviroment</code>, que nem sequer era importado no arquivo</td></tr>
-            <tr><td><code>user_public_ranking_show.html</code> + <code>public_division_view</code></td><td>Ranking público de uma divisão</td></tr>
-            <tr><td><code>user_public_players_leagues.html</code> + <code>public_league_view</code></td><td>Página pública de uma liga</td></tr>
-            <tr><td><code>leagues/forms.py</code> (<code>NewLeagueForm</code>)</td><td>Usado só pela tela de criar liga</td></tr>
-            <tr><td><code>core/bkp_views_2.py</code>, <code>leagues/bkp__views__.py</code></td><td>Cópias de segurança antigas, mortas</td></tr>
-            <tr><td><code>public_audit</code> em <code>core/views.py</code></td><td>Função vazia, sem rota</td></tr>
+            <tr><td><code>admin_adm_leagues.html</code>, <code>admin_players_leagues.html</code></td><td>Gestão de ligas e jogadores da liga</td></tr>
+            <tr><td><code>admin_ranking_show.html</code>, <code>user_ranking_show.html</code></td><td>Ranking de uma divisão</td></tr>
+            <tr><td><code>user_open_leagues.html</code></td><td>Inscrição em liga</td></tr>
+            <tr><td><code>user_result_submit.html</code></td><td>Lançamento de resultado pelo jogador</td></tr>
+            <tr><td><code>user_matches_show.html</code>, <code>user_all_games.html</code>, <code>user_audit_matches.html</code></td><td>Minhas partidas e relatórios</td></tr>
+            <tr><td><code>user_public_match_result.html</code></td><td>Relatório de partida</td></tr>
+            <tr><td><code>create_league.html</code>, <code>user_public_ranking_show.html</code>, <code>user_public_players_leagues.html</code></td><td>Criar liga e páginas públicas de liga/divisão</td></tr>
+            <tr><td><code>results/views.py</code>, <code>urls.py</code>, <code>forms.py</code></td><td>Lançamento e validação de resultado</td></tr>
+            <tr><td><code>fixtures/views.py</code>, <code>urls.py</code>, <code>forms.py</code></td><td>Tabela de confrontos</td></tr>
+            <tr><td><code>core/obdlib/fixturing.py</code></td><td>Gerador de confrontos todos-contra-todos</td></tr>
+            <tr><td><code>leagues/forms.py</code></td><td>Formulário de criação de liga</td></tr>
+            <tr><td><code>bkp_views_2.py</code>, <code>bkp__views__.py</code></td><td>Cópias de segurança antigas</td></tr>
           </tbody>
         </table>
       </div>
 
-      <p>Junto saíram as rotas <code>boaleagueview</code>, <code>boadivisionview</code>,
-        <code>league:index</code>, <code>league:create</code> e os dois redirecionamentos
-        <code>/boa/leagues/…</code> que apontavam para elas.</p>
+      <p>De <code>leagues/views.py</code> sobraram <strong>duas</strong> funções:
+        <code>orderofmerit</code> e <code>national_ranking</code>, os dois rankings públicos. De
+        <code>players/views.py</code> saíram inscrição, histórico e relatórios.</p>
 
-      <div class="alerta">
-        <span class="tarja-rot">Uma delas não era órfã</span>
-        <p><code>user_public_match_result.html</code> <strong>foi mantida</strong>, e a documentação
-          anterior errava ao listá-la como órfã. Ela é o <em>Relatório de Partida</em>, e continua
-          alcançável por dois caminhos vivos: no admin, Gestão de Ligas → Jogadores da liga →
-          Ranking; e na área do jogador, Ligas ou Minhas Partidas → Ranking. Removê-la derrubaria
-          <code>admin_ranking_show.html</code> e <code>user_ranking_show.html</code> com erro 500. O
-          botão “Ver Ranking” dela, que apontava para a tela removida, passou a apontar para
-          <code>results:ranking</code>.</p>
+      <p>Saíram também os atalhos que apontavam para essas telas: três na barra lateral do jogador
+        (<em>Meus Torneios</em>, <em>Ver meu histórico</em>, <em>Gerar relatório</em>) e um na do
+        administrador (<em>Backup de Resultados</em>), além da fila de validação de partidas no
+        painel do administrador.</p>
+
+      <div class="nota">
+        <span class="tarja-rot">Computação morta que saiu junto</span>
+        <p>A tela inicial calculava, a cada carregamento, agregados de partidas e resultados,
+          contagens de fase de liga e um bloco inteiro de estatísticas por torneio — e
+          <strong>nada disso era exibido</strong>. O template não usava nenhuma dessas variáveis. O
+          mesmo valia para uma consulta de partidas no perfil público.</p>
       </div>
     </section>
 
@@ -1049,26 +1057,40 @@ torneio : 'Open São Roque 2026 - OBD 21.02.2026'</code></pre>
 
     <!-- ============ 8 ============ -->
     <section id="s8">
-      <h2><span class="n">08</span><span>Módulo legado: a liga online</span></h2>
+      <h2><span class="n">08</span><span>O modelo antigo de liga online (removido)</span></h2>
 
-      <p>Existe no código um sistema completo de liga online — <code>League</code> com fases,
-        <code>Division</code>, <code>Fixture</code> (partidas), <code>Result</code>, inscrição de
+      <p>O site nasceu com um sistema completo de liga online: <code>League</code> com fases,
+        <code>Division</code>, <code>Fixture</code> (confrontos), <code>Result</code>, inscrição de
         jogadores, lançamento de resultado pelo próprio usuário, validação pelo administrador,
         playoffs e finais.</p>
 
       <div class="alerta">
-        <span class="tarja-rot">Fora de uso</span>
-        <p>Esse fluxo não está mais em uso. Uma verificação no banco encontrou 18 divisões e
-          <strong>zero</strong> fixtures. O modelo <code>League</code> foi reaproveitado para outra
-          coisa: hoje ele representa uma <em>etapa de ranking</em> importada por planilha.</p>
+        <span class="tarja-rot">Aposentado</span>
+        <p>Uma verificação no banco encontrou 18 divisões e <strong>zero</strong> confrontos: ninguém
+          usava havia muito tempo. Todo o código de tela foi removido (seção 3.5).</p>
       </div>
 
-      <p>As telas desse módulo que ninguém alcançava foram removidas (seção 3.5). O que sobrou
-        continua alcançável pelo menu do administrador e pela área do jogador, e por isso não foi
-        mexido — ainda que opere sobre dados que não existem mais.</p>
+      <h3>O que continua no banco</h3>
 
-      <p>Uma consequência que continua valendo: o nome <code>League</code> no código significa duas
-        coisas diferentes dependendo do contexto.</p>
+      <p>As <strong>tabelas</strong> de <code>Fixture</code>, <code>Result</code>,
+        <code>Merit</code> e <code>Validation</code> continuam existindo, assim como o registro delas
+        no admin do Django. Só o código que montava as telas saiu. Apagar as tabelas é um passo
+        separado e irreversível, que exige antes conferir que estão mesmo vazias.</p>
+
+      <p>Dois modelos desse conjunto <strong>continuam em uso ativo</strong> e não podem ser
+        removidos:</p>
+
+      <ul>
+        <li><strong><code>League</code></strong> foi reaproveitado: hoje representa uma <em>etapa de
+          ranking</em> importada por planilha, e é a ela que <code>Champion</code> e as entradas de
+          Order of Merit e Ranking Nacional apontam.</li>
+        <li><strong><code>Division</code></strong> é destino de uma chave estrangeira obrigatória em
+          <code>Champion</code>, e toda captura de torneio cria uma divisão “Principal”
+          (<code>get_or_create_league</code>).</li>
+      </ul>
+
+      <p>Por isso o nome <code>League</code> no código significa duas coisas diferentes conforme o
+        contexto — a armadilha que sobrou dessa história.</p>
     </section>
 
     <!-- ============ 9 ============ -->
@@ -1162,9 +1184,10 @@ torneio : 'Open São Roque 2026 - OBD 21.02.2026'</code></pre>
         <li><strong>Cabeçalhos de segurança HTTPS ausentes</strong>, incluindo
           <code>SECURE_PROXY_SSL_HEADER</code>.</li>
         <li><strong>Bootstrap não unificado</strong> (seção 9.2).</li>
-        <li><strong>O módulo legado de liga online</strong> (seção 8) continua no código e alcançável
-          pelos menus, operando sobre dados que não existem mais. Aposentá-lo é uma decisão maior,
-          que afeta telas do administrador e do jogador.</li>
+        <li><strong>Tabelas do modelo antigo de liga</strong> (seção 8) — <code>Fixture</code>,
+          <code>Result</code>, <code>Merit</code> e <code>Validation</code> continuam no banco sem
+          nenhum código que as use. Apagá-las é irreversível e exige conferir antes que estejam
+          vazias.</li>
       </ol>
     </section>
 

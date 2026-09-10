@@ -150,12 +150,6 @@ Description: This is the BASE template of all OBD DASHOBDRD pages. It cotains th
                                 class="bi bi-person-lines-fill"></i> Configurar Perfil</a>
                         <a href="{% url 'players:access' %}" class="list-group-item list-group-item-action"><i
                                 class="bi bi-key"></i> Atualizar Login</a>
-                        <a href="{% url 'players:leagues' %}" class="list-group-item list-group-item-action"><i
-                                class="bi bi-trophy"></i> Meus Torneios</a>
-                        <a href="{% url 'players:mygames' %}" class="list-group-item list-group-item-action"><i
-                                class="bi bi-list-stars"></i> Ver meu histórico</a>
-                        <a href="{% url 'players:player_audit' %}" class="list-group-item list-group-item-action"><i
-                                class="bi bi-file-text"></i> Gerar relatório</a>
                         {% if user.profile.pin and user.first_name and user.last_name %}
                         <a href="{% url 'profiles:publicprofile' pin=user.profile.pin first=user.first_name last=user.last_name %}"
                                 class="list-group-item list-group-item-action"><i class="bi bi-graph-up"></i> Perfil

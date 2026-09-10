@@ -7,15 +7,9 @@ from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required, permission_required
 from django.shortcuts import render, redirect, get_object_or_404
-from django.db.models.functions import Cast, Coalesce
-from obd.dashboards.administrators.divisions.models import Division
-from obd.dashboards.administrators.fixtures.models import Fixture
-from obd.dashboards.administrators.leagues.models import League
-from obd.dashboards.administrators.results.models import Result
 from obd.dashboards.administrators.leagues.models import OrderOfMeritEntry
-from django.db.models import Avg, Sum, Min, Count, Q, Max, F, Value
+from django.db.models import Sum, Min, Q, Max, F
 
-from obd.dashboards.players.stats.models import Stat
 from obd.core.models import TournamentResult, PlayerTournamentStat
 from obd.core.obdlib.webscraping.n01 import refresh_tournaments
 
@@ -59,30 +53,6 @@ def _pending_matches(stats):
 
 
 def index(request):
-
-    # Existing logic for legacy compatibility or other parts of the site
-    server = ('N01', 'OTH',)
-    games = Fixture.objects.filter(validation=1, server__in=server).count()
-
-    matches = Count('enabled', filter=Q(validation=1))
-    legs = Sum('legs', filter=Q(validation=1, walkover=False))
-    avg = Avg('average', filter=Q(validation=1, average__gt=0))
-    ton = Sum('ton', filter=Q(validation=1))
-    ton40 = Sum('ton40', filter=Q(validation=1))
-    ton70 = Sum('ton70', filter=Q(validation=1))
-    ton80 = Sum('ton80', filter=Q(validation=1))
-
-    results = Result.objects.filter(enabled=True, walkover=False)
-
-    boa = results.aggregate(
-        matches=matches,
-        legs=legs,
-        ton=ton,
-        ton40=ton40,
-        ton70=ton70,
-        ton80=ton80,
-        average=avg,
-    )
 
     # === Combobox de Etapas (agrupando divisões sob o mesmo nome de etapa) ===
     # Etapas em andamento ficam de fora: o rank 1 delas é só o líder do momento,
@@ -161,58 +131,6 @@ def index(request):
                 if card:
                     division_champions.append(card)
 
-    # NEW: Tournament Statistics Logic (Campeonato Brasileiro 2025)
-    all_tournaments = TournamentResult.objects.order_by('-date')
-    
-    # Get selected tournament ID from request (if any)
-    selected_tournament_id = request.GET.get('tournament_id')
-    
-    if selected_tournament_id:
-        try:
-            latest_tournament = TournamentResult.objects.get(id=selected_tournament_id)
-        except TournamentResult.DoesNotExist:
-            latest_tournament = all_tournaments.first()
-    else:
-        latest_tournament = all_tournaments.first()
-        
-    tournament_stats = {}
-    
-    if latest_tournament:
-        t_stats = latest_tournament.stats.all()
-        
-        # General Data
-        # General Data
-        tournament_stats['matches'] = t_stats.aggregate(Sum('matches_played'))['matches_played__sum'] or 0
-        tournament_stats['legs'] = t_stats.aggregate(Sum('legs_played'))['legs_played__sum'] or 0
-        tournament_stats['players'] = t_stats.count()
-
-        # Weighted Average Calculation (Average * Legs / Total Legs)
-        if tournament_stats['legs'] > 0:
-            weighted_sum = t_stats.aggregate(w_sum=Sum(F('average_3_dart') * F('legs_played')))['w_sum'] or 0
-            tournament_stats['average'] = weighted_sum / tournament_stats['legs']
-        else:
-            tournament_stats['average'] = 0
-        
-        # Scores
-        tournament_stats['ton'] = t_stats.aggregate(Sum('count_100_plus'))['count_100_plus__sum'] or 0
-        tournament_stats['ton40'] = t_stats.aggregate(Sum('count_140_plus'))['count_140_plus__sum'] or 0
-        tournament_stats['ton70'] = t_stats.aggregate(Sum('count_170_plus'))['count_170_plus__sum'] or 0
-        tournament_stats['ton80'] = t_stats.aggregate(Sum('count_180'))['count_180__sum'] or 0
-        
-        # Records/Highlights
-        tournament_stats['highest_out'] = t_stats.aggregate(Max('high_finish'))['high_finish__max'] or 0
-        tournament_stats['best_leg'] = t_stats.filter(best_leg__gte=9).aggregate(Min('best_leg'))['best_leg__min'] or 0
-        tournament_stats['best_avg'] = t_stats.aggregate(Max('average_3_dart'))['average_3_dart__max'] or 0
-        tournament_stats['name'] = latest_tournament.name
-        
-        # Champion (player with rank 1)
-        champion = t_stats.filter(rank=1).first()
-        if champion:
-            tournament_stats['champion_name'] = champion.player_name
-            tournament_stats['champion_avg'] = champion.average_3_dart
-            tournament_stats['champion_matches_won'] = champion.matches_won
-            tournament_stats['champion_legs_won'] = champion.legs_won
-
     t_stats_qs = PlayerTournamentStat.objects.filter(player__isnull=False)
 
     def _leaderboard(field, agg_func, limit=5):
@@ -252,64 +170,21 @@ def index(request):
         'prize_total': order_of_merit_prize_total + standalone_prize_total,
     }
 
-    matches = Fixture.objects.filter(status=1).order_by('-on_date')[:6]
-
-    server = Fixture.objects.filter(status=1).values('server').aggregate(
-        nakka=Count('server', filter=Q(server='N01')),
-        manual=Count('server', filter=Q(server='OTH'))
-    )
-
-    members = User.objects.all().count()
-
-    opens = int(League.objects.filter(status=True, phase=0).count())
-    formations = int(League.objects.filter(status=True, phase=1).count())
-    starts = int(League.objects.filter(status=True, phase=2).count())
-    playoffs = int(League.objects.filter(status=True, phase=3).count())
-    ends = int(League.objects.filter(status=True, phase=4).count())
-    finals = int(League.objects.filter(status=True, phase=6).count())
-    inactives = int(League.objects.filter(status=False, phase=5).count())
-
-    total = opens + \
-            formations + \
-            starts + \
-            playoffs + \
-            ends + \
-            finals + \
-            inactives
-
     # Query news and documents for homepage
     recent_news = News.objects.filter(is_active=True).order_by('-published_date')[:5]
     recent_documents = Document.objects.filter(is_active=True).order_by('-publish_date')[:5]
 
-    context = {'matches': matches,
-                'boa': boa,
-                'stats_out': stats_out,
-                'stats_180': stats_180,
-                'stats_avg': stats_avg,
-                'server': server,
-                'total': total,
-                'members': members,
-                'opens': opens,
-                'formations': formations,
-                'starts': starts,
-                'playoffs': playoffs,
-                'finals': finals,
-                'ends': ends,
-                'canceled': inactives,
-                'games': games,
-                'news': recent_news,
-                'documents': recent_documents,
-                'documents': recent_documents,
-                'tournament_stats': tournament_stats,
-                'all_tournaments': all_tournaments,
-                'division_champions': division_champions,
-                'selected_tournament_id': int(selected_tournament_id) if selected_tournament_id else (latest_tournament.id if latest_tournament else None),
-                'etapas_list': etapas_list,
-                'selected_etapa': selected_etapa,
-                'etapas_list': etapas_list,
-                'selected_etapa': selected_etapa,
-                'obd_numbers': obd_numbers,
-                }
+    context = {
+        'stats_out': stats_out,
+        'stats_180': stats_180,
+        'stats_avg': stats_avg,
+        'news': recent_news,
+        'documents': recent_documents,
+        'division_champions': division_champions,
+        'etapas_list': etapas_list,
+        'selected_etapa': selected_etapa,
+        'obd_numbers': obd_numbers,
+    }
 
     return render(request, 'index.html', context)
 
@@ -428,20 +303,6 @@ def refresh_league_stats(request):
 
     # Volta para a mesma etapa que estava sendo vista
     return redirect(f"{reverse('boaleagues')}?etapa={quote(stage['name'])}")
-
-def public_result(request, slug, match):
-
-    division = Division.objects.get(slug=slug)
-    game = Fixture.objects.get(id=match)
-    p1 = game.result_set.first()
-    p2 = game.result_set.last()
-
-    response = {'division': division,
-                'game': game,
-                'p1': p1,
-                'p2': p2}
-
-    return render(request, 'user_public_match_result.html', response)
 
 # New views for Events, News, and Documents
 from .models import Event, News, Document

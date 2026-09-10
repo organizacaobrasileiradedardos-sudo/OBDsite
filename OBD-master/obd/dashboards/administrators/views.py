@@ -2,11 +2,9 @@ from django.contrib.auth.decorators import login_required, permission_required
 from django.contrib.auth.models import User
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
-from django.urls import reverse
 from obd.core.models import TournamentResult
 from obd.core.models import PlayerTournamentStat
 from obd.core.obdlib.webscraping.n01 import N01TournamentScraper
-from obd.dashboards.administrators.fixtures.models import Fixture
 from obd.dashboards.administrators.leagues.models import League
 import pandas as pd 
 import datetime
@@ -28,7 +26,6 @@ def dashboard(request):
     ends = League.objects.filter(status=True, phase=4)
     finals = League.objects.filter(status=True, phase=6)
     inactives = League.objects.filter(status=False, phase=5)
-    pending = Fixture.objects.filter(status=1, validation=0)
 
 
     total = opens.count() + \
@@ -46,8 +43,7 @@ def dashboard(request):
                'playoffs': playoffs,
                'finals': finals,
                'ends': ends,
-               'canceled': inactives,
-               'pending': pending}
+               'canceled': inactives}
 
     return render(request, 'dashadmin.html', context)
 

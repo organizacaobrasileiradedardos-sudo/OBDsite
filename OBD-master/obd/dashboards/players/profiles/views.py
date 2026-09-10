@@ -3,8 +3,6 @@ from django.contrib.auth.decorators import login_required
 from django.http import HttpResponseRedirect
 from django.urls import reverse
 from django.shortcuts import render
-from obd.dashboards.administrators.fixtures.models import Fixture
-from obd.dashboards.administrators.results.models import Result
 from obd.dashboards.players.profiles.forms import ProfileForm
 from obd.dashboards.players.profiles.models import Profile
 from obd.dashboards.players.stats.models import Stat
@@ -70,14 +68,13 @@ def showprofile(request):
            {'form': ProfileForm(),
             'profile': Profile.objects.get(user=request.user)})
 
-from django.db.models import Sum, Max, Min, Count, F
+from django.db.models import Sum, Max, Min, F
 from obd.core.models import PlayerTournamentStat
 
 
 def publicprofile(request, pin, first, last):
 
     profile = Profile.objects.get(pin=pin)
-    matches = Fixture.objects.filter(status=1, validation=1, players__profile=profile).order_by('-on_date')[:5]
     stat = Stat.objects.get(user=profile.user)
     total = stat.divAwinner + stat.divBwinner + stat.divCwinner + stat.divDwinner + stat.divOtherswinner
 

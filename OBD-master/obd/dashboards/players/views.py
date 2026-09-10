@@ -1,4 +1,3 @@
-import datetime
 import io
 import resend
 from django.contrib import messages
@@ -8,20 +7,14 @@ from django.contrib.auth.tokens import default_token_generator
 from django.template.loader import render_to_string
 from django.contrib.auth import login, authenticate, logout
 from django.urls import reverse
-from django.contrib.auth.decorators import login_required, permission_required
+from django.contrib.auth.decorators import login_required
 from django.contrib.messages import get_messages
-from django.http import HttpResponseRedirect, HttpResponse
+from django.http import HttpResponseRedirect
 from django.shortcuts import render
 from django.utils.encoding import force_bytes, force_str
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from obd.core.obdlib.standardsession import ObdSession
-from obd.dashboards.administrators.divisions.models import Division
-from obd.dashboards.administrators.fixtures.models import Fixture
-from obd.dashboards.administrators.leagues.models import League
 from obd.dashboards.players.logins.forms import LoginUserForm, UpdateLoginForm, RecoveryPasswordForm, SetNewPasswordForm
-from obd.dashboards.players.stats.models import Stat
-from obd.dashboards.administrators.results.models import Result
-import pandas as pd
 
 
 @login_required()
@@ -149,55 +142,6 @@ def logoutuser(request):
     logout(request)
     token = ObdSession().startSession()
     return render(request, 'login.html', {'form': LoginUserForm(), 'token': token})
-
-
-@login_required()
-def signupleague(request, slug):
-    player = request.user
-    player_nakka = player.profile.nakka
-
-    # Check if user already has an account on NAKKA. If not, no allowed subscribe for leagues.
-    if (player_nakka == '' or player_nakka == 'Null'):
-        messages.success(request, f'Para se inscrever, primeiro informe seu apelido NAKKA em "Configurações do Perfil"')
-        return userleagues(request, alert='alert-danger')
-    else:
-        # Get league instance and related formation DIV;
-        league = League.objects.get(slug__iexact=slug)
-        div = Division.objects.get(league=league, formation=0)
-
-        # Add current logged player to DIV
-        div.players.add(player)
-
-        # If everything okay, set a success message and render user_open_leagues page.
-        messages.success(request, f'Valeu, {request.user.first_name}! Você agora está inscrito em {league.name}!')
-        return userleagues(request, alert='alert-success')
-
-
-@login_required()
-def signoffleague(request, slug):
-    # Get the league division by SLUG div and logged player...
-    division = Division.objects.get(slug__iexact=slug)
-    player = request.user
-
-    #Remove user from division/league
-    division.players.remove(player)
-
-    # If everything okay, set a success message and render user_open_leagues page.
-    messages.success(request, f'Valeu, {request.user.first_name}! Você saiu da liga {division.league.name}!')
-    return userleagues(request, alert='alert-danger')
-
-
-@login_required()
-def userleagues(request, alert=''):
-    # List all tournaments that user is participating in (all phases)
-    tournaments = Division.objects.filter(
-        status=True, 
-        players=request.user.id
-    ).exclude(
-        formation=0  # Exclude formation divisions
-    ).order_by('-league__phase', 'league__start_date')
-
-    return render(request, 'user_open_leagues.html', {'tournaments': tournaments, 'alert': alert})
 
 
 @login_required()
@@ -330,68 +274,4 @@ def updatelogin(request):
 def showcurrentlogin(request):
     return render(request, 'profile_update_passwd.html',
                   {'form': UpdateLoginForm()})
-
-
-@login_required()
-@permission_required('profiles.has_admin_role', raise_exception=True)
-def audit(request):
-    results = list(Result.objects.filter(validation=1).values())
-
-    for r in results:
-        u = User.objects.get(id=r['player_id'])
-        r['player_id'] = f'{u.first_name} {u.last_name} #{u.id}'
-        if not r['on_date'] is None:
-            r['on_date'] = r['on_date'].strftime("%m/%d/%Y, %H:%M:%S")
-        if not r['created_at'] is None:
-            r['created_at'] = r['created_at'].strftime("%m/%d/%Y, %H:%M:%S")
-        f = Fixture.objects.get(id=r['fixture_id'])
-        r.update([('Server', f.server), ('Link', f.link), ('League', f.division.league.name), ('Division', f.division.get_formation_display())])
-
-    path = str(datetime.date.today())
-    filename = f'OBD_BRASILONLINE_REPORT_AUDIT_{path}_BY_{request.user.profile.pin}.xlsx'
-    buffer = io.BytesIO()
-    try:
-        df = pd.DataFrame(data=results)
-        df.to_excel(buffer)
-    except ValueError:
-        pass
-
-    buffer.seek(0)
-    response = HttpResponse(buffer, content_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
-    response['Content-Disposition'] = f'attachment; filename={filename}'
-    return response
-
-
-@login_required()
-def player_audit(request):
-    results = list(Result.objects.filter(player=request.user, validation=1).values())
-    for r in results:
-        u = User.objects.get(id=r['player_id'])
-        r['player_id'] = f'{u.first_name} {u.last_name} #{u.id}'
-        if not r['on_date'] is None:
-            r['on_date'] = r['on_date'].strftime("%m/%d/%Y, %H:%M:%S")
-        if not r['created_at'] is None:
-            r['created_at'] = r['created_at'].strftime("%m/%d/%Y, %H:%M:%S")
-        f = Fixture.objects.get(id=r['fixture_id'])
-        r.update([('Server', f.server), ('Link', f.link), ('League', f.division.league.name), ('Division', f.division.get_formation_display())])
-
-    path = str(datetime.date.today())
-    filename = f'OBD_BRASILONLINE_REPORT_AUDIT_{path}_BY_{request.user.profile.pin}.xlsx'
-    buffer = io.BytesIO()
-    try:
-        df = pd.DataFrame(data=results)
-        df.to_excel(buffer)
-    except ValueError:
-        pass
-
-    buffer.seek(0)
-    response = HttpResponse(buffer, content_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
-    response['Content-Disposition'] = f'attachment; filename={filename}'
-    return response
-
-
-def mygames(request):
-    matches = Result.objects.filter(fixture__status=1, enabled=True, validation=1, player=request.user).all().order_by('-on_date')
-    context = {'matches': matches}
-    return render(request, 'user_all_games.html', context)
 
