@@ -20,14 +20,21 @@ Description: This is the page where main data will remains.
     .merit-total { font-weight: bold; color: #14532d; }
     .merit-empty { color: #ced4da; }
 
-    .sticky-col { position: sticky; z-index: 2; background-color: #fff; }
-    .sticky-col-1 { left: 0; width: 56px; }
-    .sticky-col-2 { left: 56px; min-width: 160px; box-shadow: 2px 0 4px -2px rgba(0,0,0,0.2); }
-    .sticky-col-right { right: 0; min-width: 100px; box-shadow: -2px 0 4px -2px rgba(0,0,0,0.2); }
+    .sticky-col { position: sticky; z-index: 2; background-color: #fff; vertical-align: middle; }
+    .sticky-col-1 { left: 0; width: 56px; min-width: 56px; max-width: 56px; white-space: nowrap; }
+    .sticky-col-2 { left: 56px; min-width: 150px; box-shadow: 2px 0 4px -2px rgba(0,0,0,0.2); }
+    .sticky-col-right { right: 0; min-width: 95px; white-space: nowrap; box-shadow: -2px 0 4px -2px rgba(0,0,0,0.2); }
     thead .sticky-col { z-index: 3; background-color: #212529; color: #fff; }
+    th.etapa-col, td.etapa-col { white-space: nowrap; min-width: 92px; }
+    tbody tr:nth-of-type(odd) .sticky-col { background-color: #f2f2f2; }
     tbody tr.merit-pos-1 .sticky-col { background-color: #fdf6df; }
     tbody tr.merit-pos-2 .sticky-col { background-color: #f5f5f5; }
     tbody tr.merit-pos-3 .sticky-col { background-color: #fbeee2; }
+
+    @media (max-width: 575.98px) {
+        .sticky-col-2 { min-width: 128px; font-size: 0.85rem; }
+        .sticky-col-2 .badge { font-size: 0.6rem; padding: 0.2em 0.4em; }
+    }
 </style>
 {% endblock %}
 {% block content %}
@@ -50,15 +57,16 @@ Description: This is the page where main data will remains.
                 </div>
             </div>
 
+            <p class="text-muted small mb-2">Valores em R$ recebidos por jogador em cada etapa da Liga Nacional.</p>
+
             <div class="table-responsive">
-                <table class="table table-striped table-bordered caption-top align-middle">
-                    <caption>Valores em R$ recebidos por jogador em cada etapa da Liga Nacional.</caption>
+                <table class="table table-striped table-bordered align-middle">
                     <thead class="table-dark">
                         <tr>
                             <th scope="col" class="text-center sticky-col sticky-col-1">#</th>
                             <th scope="col" class="sticky-col sticky-col-2">Jogador</th>
                             {% for etapa in etapas %}
-                            <th scope="col" class="text-center" title="{{ etapa.name }}">Etapa {{ forloop.counter }}</th>
+                            <th scope="col" class="text-center etapa-col" title="{{ etapa.name }}">Etapa {{ forloop.counter }}</th>
                             {% endfor %}
                             <th scope="col" class="text-center sticky-col sticky-col-right">Total</th>
                         </tr>
@@ -92,7 +100,7 @@ Description: This is the page where main data will remains.
                                 {% endif %}
                             </td>
                             {% for value in row.values %}
-                            <td class="text-center">
+                            <td class="text-center etapa-col">
                                 {% if value %}
                                 R$ {{ value|floatformat:2 }}
                                 {% else %}
