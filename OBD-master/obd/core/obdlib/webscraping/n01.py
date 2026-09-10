@@ -2,6 +2,7 @@ import requests
 from bs4 import BeautifulSoup
 from django.utils import timezone
 from obd.core.models import TournamentResult, PlayerTournamentStat
+from obd.core.tournament_categories import adivinhar_categoria
 import re
 import json
 from obd.dashboards.administrators.champions.utils import get_or_create_player, get_or_create_league, register_champion
@@ -162,6 +163,12 @@ class N01TournamentScraper:
                 source_url=self.url,
                 defaults=defaults,
             )
+
+        # O tipo é sugerido só quando o torneio nasce. Numa recaptura ele não é tocado,
+        # porque o administrador pode ter corrigido a sugestão no painel de captura.
+        if created:
+            tournament.category = adivinhar_categoria(tournament_name)
+            tournament.save(update_fields=['category'])
 
         PlayerTournamentStat.objects.filter(tournament=tournament).delete()
         champion_user = None  # rank 1

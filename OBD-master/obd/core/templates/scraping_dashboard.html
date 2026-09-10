@@ -59,6 +59,7 @@
                     <th scope="col">Data</th>
                     <th scope="col">Jogadores</th>
                     <th scope="col">Capturado em</th>
+                    <th scope="col">Tipo de Torneio</th>
                     <th scope="col">Premiação (R$)</th>
                     <th scope="col">Situação</th>
                     <th scope="col">Ações</th>
@@ -71,6 +72,21 @@
                     <td>{{ tournament.date|date:"d/m/Y" }}</td>
                     <td>{{ tournament.stats.count }}</td>
                     <td>{{ tournament.created_at|date:"d/m/Y H:i" }}</td>
+                    <td>
+                        <form method="post" action="{% url 'administrators:update_tournament_category' tournament.id %}" class="d-flex gap-1">
+                            {% csrf_token %}
+                            <select name="category" class="form-select form-select-sm bg-secondary text-white"
+                                style="min-width: 165px;"
+                                title="Define em qual bloco do Hall dos Campeões os campeões deste torneio aparecem.">
+                                {% for valor, rotulo in tipos_de_torneio %}
+                                <option value="{{ valor }}" {% if tournament.category == valor %}selected{% endif %}>{{ rotulo }}</option>
+                                {% endfor %}
+                            </select>
+                            <button type="submit" class="btn btn-sm btn-outline-light" title="Salvar tipo">
+                                <i class="bi bi-check-lg"></i>
+                            </button>
+                        </form>
+                    </td>
                     <td>
                         <form method="post" action="{% url 'administrators:update_tournament_prize' tournament.id %}" class="d-flex gap-1">
                             {% csrf_token %}
@@ -115,7 +131,7 @@
                 </tr>
                 {% empty %}
                 <tr>
-                    <td colspan="7" class="text-center">Nenhum torneio capturado ainda.</td>
+                    <td colspan="8" class="text-center">Nenhum torneio capturado ainda.</td>
                 </tr>
                 {% endfor %}
             </tbody>

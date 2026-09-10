@@ -138,6 +138,7 @@ exclusivo para usuários logados. Crie seu login ou faça o login"*. Ver seção
 | `.../admin/scraping/run/` | `run_capture` | — | Executa uma captura |
 | `.../admin/scraping/prize/<id>/` | `update_tournament_prize` | — | Grava a premiação de torneio avulso |
 | `.../admin/scraping/andamento/<id>/` | `update_tournament_progress` | — | Liga/desliga "em andamento" |
+| `.../admin/scraping/tipo/<id>/` | `update_tournament_category` | — | Grava o tipo do torneio |
 | `.../admin/scraping/excluir/<id>/` | `delete_tournament` | — | Apaga uma captura |
 | `.../admin/order-of-merit/` | `order_of_merit_dashboard` | `order_of_merit_dashboard.html` | Importar Order of Merit |
 | `.../admin/order-of-merit/import/` | `import_order_of_merit` | `import_review.html` | Tela de conferência |
@@ -184,6 +185,7 @@ divisão é um `TournamentResult` separado. Uma etapa com 4 divisões gera 4 reg
 | `created_at` | Primeira captura; nunca muda. É o campo confiável para ordenar |
 | `prize_value` | Só para torneios avulsos (ver 5.2) |
 | `in_progress` | Etapa ainda em disputa (ver 5.4) |
+| `category` | Tipo do torneio, que define o bloco do Hall dos Campeões (ver 5.7) |
 
 **`PlayerTournamentStat`** — a linha de um jogador num torneio: `rank`, partidas, legs,
 médias, contagens de 100+/140+/170+/180, melhor leg, maior fechamento.
@@ -359,28 +361,39 @@ clicada:
 - **Tour OBD**
 - **Circuito Nacional OBD**
 
-**A classificação sai do nome da liga** (`Champion.league.name`), porque é o único vínculo
-que um campeão tem com o torneio de origem — não existe campo de tipo no banco. A
-comparação ignora maiúsculas e acentos, então `3ª ETAPA LIGA NACIONAL OBD 2026`,
-`Liga Nacional OBD 2025` e `LIGA NACIONAL` caem todos no mesmo lugar.
+**O tipo é um campo de verdade no banco**, `TournamentResult.category`, escolhido pelo
+administrador na coluna *Tipo de Torneio* do painel de captura. Não é deduzido do nome na
+hora de exibir.
 
-| Categoria | Reconhecida quando o nome contém |
+O palpite pelo nome existe, mas só como **valor inicial**: quando um torneio é capturado
+pela primeira vez, e na migração que preencheu os torneios que já existiam. Depois disso,
+quem manda é o campo.
+
+| Categoria | Palpite inicial quando o nome contém |
 |---|---|
 | Liga Nacional OBD | `liga nacional` |
 | Tour OBD | a palavra `tour` isolada |
 | Circuito Nacional OBD | `circuito nacional` |
+| Outros Torneios | nenhum dos anteriores |
 
-`liga nacional` e `circuito nacional` são testadas **antes** de `tour`, por serem mais
-específicas: um nome que trouxesse as duas expressões cai na categoria mais precisa.
+O palpite ignora maiúsculas e acentos, e testa `liga nacional` e `circuito nacional`
+**antes** de `tour`, por serem mais específicas. Uma recaptura **não** mexe no tipo — se
+mexesse, apagaria a correção feita à mão.
 
-> **Existe uma quarta categoria, "Outros Torneios".** Ela recolhe tudo que não casa com
-> nenhum dos três padrões — Opens, campeonatos avulsos, torneios comemorativos — para que
-> nenhum campeão desapareça da tela. Ela só aparece quando tem alguém dentro. As três
-> categorias da OBD aparecem sempre, mesmo vazias, para a tela ter estrutura previsível.
+> **A quarta categoria, "Outros Torneios",** recolhe o que não é nenhum dos três — Opens,
+> campeonatos avulsos, torneios comemorativos — para que nenhum campeão desapareça da
+> tela. Ela só aparece quando tem alguém dentro. As três categorias da OBD aparecem
+> sempre, mesmo vazias, para a tela ter estrutura previsível.
 
-As três categorias são declaradas em `CATEGORIAS_CAMPEOES`, em
-`obd/dashboards/administrators/champions/views.py`. Acrescentar uma quarta categoria
-nomeada é acrescentar uma entrada nesse dicionário; nada mais precisa mudar.
+Tudo isso está definido num lugar só, `obd/core/tournament_categories.py`: os nomes das
+categorias, os ícones, os padrões do palpite e a ordem de exibição. Acrescentar uma
+categoria nova é acrescentar uma entrada nesse dicionário e gerar a migração do novo
+valor de `choices`.
+
+**O Hall encontra o tipo do campeão pelo nome**, porque `Champion` aponta para `League` e
+não para `TournamentResult`. A liga criada a partir de uma captura leva exatamente o nome
+do torneio (`get_or_create_league`), então os dois se encontram por aí. Se não houver
+torneio com aquele nome, o palpite pelo nome entra como rede de segurança.
 
 Dentro de cada categoria, os títulos continuam agrupados por ano, do mais recente para o
 mais antigo, e o filtro de temporada no topo da página vale para todas elas ao mesmo

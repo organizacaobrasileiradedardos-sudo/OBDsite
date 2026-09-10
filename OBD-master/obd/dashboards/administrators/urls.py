@@ -26,6 +26,7 @@ urlpatterns = [
     path('dashboard/admin/scraping/run/', views.run_capture, name='run_capture'),
     path('dashboard/admin/scraping/prize/<int:tournament_id>/', views.update_tournament_prize, name='update_tournament_prize'),
     path('dashboard/admin/scraping/andamento/<int:tournament_id>/', views.update_tournament_progress, name='update_tournament_progress'),
+    path('dashboard/admin/scraping/tipo/<int:tournament_id>/', views.update_tournament_category, name='update_tournament_category'),
     path('dashboard/admin/scraping/excluir/<int:tournament_id>/', views.delete_tournament, name='delete_tournament'),
     path('dashboard/admin/order-of-merit/', views.order_of_merit_dashboard, name='order_of_merit_dashboard'),
     path('dashboard/admin/order-of-merit/import/', views.import_order_of_merit, name='import_order_of_merit'),

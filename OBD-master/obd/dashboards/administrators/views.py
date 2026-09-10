@@ -62,8 +62,13 @@ def logoutAdm(request):
 @login_required
 @permission_required('profiles.has_admin_role', raise_exception=True)
 def scraping_dashboard(request):
+    from obd.core.tournament_categories import CHOICES
+
     tournaments = TournamentResult.objects.all().order_by('-created_at')
-    return render(request, 'scraping_dashboard.html', {'tournaments': tournaments})
+    return render(request, 'scraping_dashboard.html', {
+        'tournaments': tournaments,
+        'tipos_de_torneio': CHOICES,
+    })
 
 
 @login_required
@@ -102,6 +107,27 @@ def update_tournament_prize(request, tournament_id):
         tournament.save(update_fields=['prize_value'])
         messages.success(request, f"Premiação de \"{tournament.name}\" atualizada.")
 
+    return redirect('administrators:scraping_dashboard')
+
+
+@login_required
+@permission_required('profiles.has_admin_role', raise_exception=True)
+def update_tournament_category(request, tournament_id):
+    """Grava o tipo do torneio, que define o bloco do Hall dos Campeões."""
+    from obd.core.tournament_categories import CATEGORIAS, label
+
+    tournament = get_object_or_404(TournamentResult, id=tournament_id)
+    if request.method != 'POST':
+        return redirect('administrators:scraping_dashboard')
+
+    escolha = request.POST.get('category', '')
+    if escolha not in CATEGORIAS:
+        messages.error(request, "Tipo de torneio inválido. Nada foi alterado.")
+        return redirect('administrators:scraping_dashboard')
+
+    tournament.category = escolha
+    tournament.save(update_fields=['category'])
+    messages.success(request, f'"{tournament.name}" agora aparece em {label(escolha)}.')
     return redirect('administrators:scraping_dashboard')
 
 

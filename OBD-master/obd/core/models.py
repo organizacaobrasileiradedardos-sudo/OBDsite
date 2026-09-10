@@ -5,6 +5,8 @@ from django.db import models
 from django.utils import timezone
 from cloudinary.models import CloudinaryField
 
+from obd.core import tournament_categories
+
 
 class Event(models.Model):
     """Model for events calendar"""
@@ -145,6 +147,15 @@ class TournamentResult(models.Model):
         help_text='Preencha apenas para torneios avulsos (ex: Tour Online). '
                    'Etapas da Liga Nacional já têm a premiação somada via Order of Merit, '
                    'não preencha aqui para evitar contar em dobro.',
+    )
+    category = models.CharField(
+        'Tipo de Torneio',
+        max_length=20,
+        choices=tournament_categories.CHOICES,
+        default=tournament_categories.OUTROS,
+        help_text='Define em qual bloco do Hall dos Campeões os campeões deste torneio '
+                  'aparecem. Ao capturar, o site sugere um tipo pelo nome do torneio; '
+                  'corrija aqui se a sugestão estiver errada.',
     )
     in_progress = models.BooleanField(
         'Etapa em andamento',
