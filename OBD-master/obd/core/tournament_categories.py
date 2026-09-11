@@ -78,6 +78,19 @@ def adivinhar_categoria(nome_torneio):
     return OUTROS
 
 
+SUFIXO_DIVISAO = re.compile(r'\s*-\s*divis[aã]o\b.*$', re.IGNORECASE)
+
+
+def chave_do_evento(nome_torneio):
+    """Nome da etapa sem o sufixo da divisão.
+
+    Na Liga Nacional cada divisão é um torneio separado ("... - DIVISÃO A",
+    "... - DIVISÃO B"). Tirar o sufixo é o que permite juntar de novo as divisões
+    de uma mesma etapa.
+    """
+    return SUFIXO_DIVISAO.sub('', nome_torneio or '').strip()
+
+
 def label(slug):
     """Nome de exibição de uma categoria, tolerante a valor desconhecido no banco."""
     return CATEGORIAS.get(slug, CATEGORIAS[OUTROS])['label']

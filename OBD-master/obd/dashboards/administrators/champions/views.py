@@ -2,7 +2,7 @@ from collections import OrderedDict
 
 from django.shortcuts import render
 
-from obd.core.tournament_categories import CATEGORIAS, OUTROS, adivinhar_categoria
+from obd.core.tournament_categories import CATEGORIAS, OUTROS, adivinhar_categoria, chave_do_evento
 from obd.dashboards.administrators.champions.models import Champion
 
 
@@ -47,22 +47,40 @@ def champions(request):
             return slug
         return adivinhar_categoria(league.name if league else '')
 
-    # A consulta já vem ordenada por data decrescente, então os anos entram em ordem
-    # dentro de cada categoria sem precisar reordenar depois.
+    # A consulta já vem ordenada por data decrescente e, dentro da mesma data, por nome
+    # da liga — o que deixa as divisões de uma etapa lado a lado, na ordem A, B, C, D.
+    # Então anos e etapas entram em ordem sem precisar reordenar depois.
     for champ in champs:
         nome_liga = champ.league.name if champ.league else ''
         grupo = grupos[categoria_de(champ.league)]
         ano = champ.league.start_date.year if champ.league and champ.league.start_date else None
-        grupo['anos'].setdefault(ano, []).append(champ)
+        etapas = grupo['anos'].setdefault(ano, OrderedDict())
+        etapas.setdefault(chave_do_evento(nome_liga), []).append(champ)
         grupo['total'] += 1
         # Na Liga Nacional cada divisão tem seu campeão, então um mesmo torneio rende
         # vários títulos. Guardar os dois números evita ler "títulos" como "torneios".
         grupo['torneios'].add(nome_liga)
 
+    def em_blocos(anos):
+        return [
+            {'ano': ano, 'etapas': [{'nome': nome, 'campeoes': lista} for nome, lista in etapas.items()]}
+            for ano, etapas in anos.items()
+        ]
+
+    def tem_divisoes(anos):
+        """A categoria tem alguma etapa com mais de um campeão (ou seja, com divisões)?
+
+        É o que decide o formato da grade: categorias com divisões mostram 4 cards por
+        linha e quebram a linha a cada etapa, para uma etapa nunca dividir espaço com
+        outra. As demais, com um campeão por torneio, seguem em grade normal.
+        """
+        return any(len(lista) > 1 for etapas in anos.values() for lista in etapas.values())
+
     categorias = [
         {**grupo,
          'torneios': len(grupo['torneios']),
-         'anos': [{'ano': ano, 'campeoes': lista} for ano, lista in grupo['anos'].items()]}
+         'por_etapa': tem_divisoes(grupo['anos']),
+         'anos': em_blocos(grupo['anos'])}
         for slug, grupo in grupos.items()
         # As três categorias da OBD aparecem sempre, mesmo vazias, para a tela ter uma
         # estrutura previsível. "Outros" só aparece quando há algo nela.

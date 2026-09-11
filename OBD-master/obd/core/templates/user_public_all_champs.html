@@ -212,8 +212,12 @@ Description: Campeões separados por tipo de torneio, cada tipo expandindo ao se
                                 </div>
 
                                 <div class="row g-4">
-                                    {% for champ in bloco.campeoes %}
-                                    <div class="col-12 col-sm-6 col-lg-4">
+                                    {% for etapa in bloco.etapas %}
+                                    {% if categoria.por_etapa and not forloop.first %}
+                                    <div class="w-100"></div>
+                                    {% endif %}
+                                    {% for champ in etapa.campeoes %}
+                                    <div class="{% if categoria.por_etapa %}col-12 col-sm-6 col-lg-3{% else %}col-12 col-sm-6 col-lg-4{% endif %}">
                                         <div class="card card-dartboard h-100">
                                             <div class="card-header-dartboard {{ categoria.cor }} text-center py-2">
                                                 <div style="font-size: 0.7rem; text-transform: uppercase; opacity: 0.85;">
@@ -250,6 +254,7 @@ Description: Campeões separados por tipo de torneio, cada tipo expandindo ao se
                                             {% endif %}
                                         </div>
                                     </div>
+                                    {% endfor %}
                                     {% endfor %}
                                 </div>
                             </div>

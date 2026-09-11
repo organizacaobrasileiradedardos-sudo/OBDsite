@@ -451,6 +451,16 @@ Dentro de cada categoria, os títulos continuam agrupados por ano, do mais recen
 mais antigo, e o filtro de temporada no topo da página vale para todas elas ao mesmo
 tempo.
 
+**A grade muda conforme a categoria ter divisões ou não.** Na Liga Nacional cada etapa tem
+quatro divisões, cada uma com seu campeão: ali os cards ficam **4 por linha** e a linha é
+quebrada a cada etapa, de modo que uma etapa nunca divide a linha com outra. Nas demais
+categorias, onde cada torneio tem um campeão só, a grade é de 3 por linha, sem quebras.
+
+Isso não depende de a etapa ter sempre quatro divisões. Os campeões são agrupados por
+etapa — o nome do torneio sem o sufixo `- DIVISÃO X`, via `chave_do_evento` — e a categoria
+adota o formato de etapa quando **alguma** delas tem mais de um campeão. Uma etapa com três
+ou cinco divisões continua ocupando a sua própria linha.
+
 **A contagem no cabeçalho de cada categoria diz "N títulos em M torneios", e os dois
 números são diferentes de propósito.** Na Liga Nacional cada divisão tem seu próprio
 campeão, então uma etapa com quatro divisões rende quatro títulos num único torneio.

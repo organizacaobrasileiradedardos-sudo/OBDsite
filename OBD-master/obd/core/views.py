@@ -10,17 +10,16 @@ from django.shortcuts import render, redirect, get_object_or_404
 from obd.dashboards.administrators.leagues.models import OrderOfMeritEntry
 from django.db.models import Sum, Min, Q, Max, F
 
+from obd.core import tournament_categories
 from obd.core.models import TournamentResult, PlayerTournamentStat
 from obd.core.obdlib.webscraping.n01 import refresh_tournaments
 
 # Etapas com várias divisões (ex: "1ª ETAPA LIGA NACIONAL OBD 2026 - DIVISÃO A")
 # geram um TournamentResult por divisão. Para contar "torneios realizados" por
 # evento (não por divisão), agrupamos removendo o sufixo "- DIVISÃO X" do nome.
-_DIVISION_SUFFIX_RE = re.compile(r'\s*-\s*divis[aã]o\b.*$', re.IGNORECASE)
-
-
-def _tournament_event_key(name):
-    return _DIVISION_SUFFIX_RE.sub('', name).strip()
+# Apelido: a implementação mora em core/tournament_categories.py, que é também de onde
+# o Hall dos Campeões lê a mesma regra.
+_tournament_event_key = tournament_categories.chave_do_evento
 
 
 _DIVISION_LABEL_RE = re.compile(r'-\s*(divis[aã]o\b.*)$', re.IGNORECASE)
