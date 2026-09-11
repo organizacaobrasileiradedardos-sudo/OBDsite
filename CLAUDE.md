@@ -32,6 +32,16 @@ Responda sempre em português. Explique o "porquê" das coisas, não só o "o qu
 Commit direto na `main` e `git push`. O Railway publica sozinho. O `Procfile` roda
 `collectstatic` e `migrate` a cada deploy, então migrações sobem automaticamente.
 
+## Ao remover código
+
+Apagar uma consulta e esquecer a variável dela no dicionário de contexto derruba a página
+com `NameError`, e nem o `manage.py check` nem a compilação dos templates pegam isso —
+só quem abre a página. Já aconteceu: o perfil público ficou dando erro 500 depois de uma
+limpeza.
+
+Depois de remover qualquer código, rode `python3 ferramentas/nomes_indefinidos.py` na
+pasta `OBD-master`. Ele aponta nomes que são usados mas ninguém define.
+
 ## Armadilhas que já causaram problema
 
 - **Não deixe autoformatador de HTML rodar nos templates.** O tokenizador do Django é

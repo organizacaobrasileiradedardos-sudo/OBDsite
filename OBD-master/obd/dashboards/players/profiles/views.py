@@ -151,7 +151,6 @@ def publicprofile(request, pin, first, last):
     context = {'total': total,
                'profile': profile,
                'stat': stat,
-               'matches': matches,
                'recent_tournaments': recent_tournaments,
                'tournament_summary': tournament_summary,
                'qr_code': qr_code_base64}
