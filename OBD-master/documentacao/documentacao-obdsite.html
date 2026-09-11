@@ -833,7 +833,9 @@ already_past   = Q(end_date__isnull=False, end_date__lt=now)  | Q(end_date__isnu
 
       <p>O Hall dos Campeões separa os títulos em três categorias, cada uma expandindo ao ser
         clicada: <strong>Liga Nacional OBD</strong>, <strong>Tour OBD</strong> e
-        <strong>Circuito Nacional OBD</strong>.</p>
+        <strong>Circuito Nacional OBD</strong>. <strong>A página abre com todas fechadas</strong> — a
+        contagem no cabeçalho já diz o que existe dentro de cada uma, e quem escolhe o que abrir é o
+        usuário.</p>
 
       <p><strong>O tipo é um campo de verdade no banco, e mora em dois lugares.</strong>
         <code>TournamentResult.category</code> é onde o administrador escolhe, na coluna

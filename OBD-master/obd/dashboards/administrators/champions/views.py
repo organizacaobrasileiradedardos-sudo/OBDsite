@@ -87,13 +87,8 @@ def champions(request):
         if slug != OUTROS or grupo['total']
     ]
 
-    # Deixa aberta a primeira categoria que tenha campeões, para a página não abrir
-    # inteiramente fechada e parecer vazia.
-    for categoria in categorias:
-        categoria['aberta'] = False
-    primeira = next((c for c in categorias if c['total']), None)
-    if primeira:
-        primeira['aberta'] = True
+    # Todas as categorias abrem fechadas: quem escolhe o que ver é o usuário. A contagem
+    # no cabeçalho já mostra o que existe dentro de cada uma.
 
     response = {
         'categorias': categorias,

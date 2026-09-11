@@ -378,7 +378,8 @@ algo do ar preservando o registro.
 ### 5.7 Categorias do Hall dos Campeões
 
 O Hall dos Campeões separa os títulos em três categorias, cada uma expandindo ao ser
-clicada:
+clicada. **A página abre com todas fechadas** — a contagem no cabeçalho já diz o que existe
+dentro de cada uma, e quem escolhe o que abrir é o usuário. As categorias são:
 
 - **Liga Nacional OBD**
 - **Tour OBD**
