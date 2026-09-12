@@ -55,3 +55,7 @@ pasta `OBD-master`. Ele aponta nomes que são usados mas ninguém define.
 - **O fim de uma etapa da Liga Nacional não pode ser deduzido dos dados.** Uma etapa
   pode terminar com jogos pendentes. Quem encerra é o administrador, pelo campo
   `in_progress`.
+- **A mesma pessoa nunca disputa uma etapa com dois nomes diferentes.** Ela pode usar
+  nomes diferentes em etapas diferentes, e por isso um jogador tem vários apelidos do
+  N01 (`ApelidoN01`). Mas duas estatísticas do mesmo torneio para o mesmo jogador são
+  sempre duplicidade, nunca resultado legítimo.

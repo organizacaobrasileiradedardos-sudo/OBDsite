@@ -54,3 +54,58 @@ def create_user_profile(sender, instance, created, **kwargs):
 @receiver(post_save, sender=User)
 def save_user_profile(sender, instance, **kwargs):
     instance.profile.save()
+
+
+class ApelidoN01(models.Model):
+    """Outros nomes com que o mesmo jogador já apareceu no N01.
+
+    ``Profile.nakka`` guarda o apelido principal, mas um jogador pode aparecer com
+    nomes diferentes em etapas diferentes. Quando dois cadastros são mesclados, o
+    apelido do que foi absorvido vira um destes registros — sem isso, o robô de
+    captura deixaria de reconhecer aquele nome e recriaria o cadastro na captura
+    seguinte, desfazendo a mesclagem.
+    """
+
+    profile = models.ForeignKey(Profile, on_delete=models.CASCADE, related_name='apelidos_n01')
+    apelido = models.CharField('Apelido no N01', max_length=80, unique=True)
+    created_at = models.DateTimeField('Criado em', auto_now_add=True)
+
+    class Meta:
+        verbose_name = 'apelido no N01'
+        verbose_name_plural = 'apelidos no N01'
+        ordering = ('apelido',)
+
+    def __str__(self):
+        return self.apelido
+
+
+def jogador_por_apelido_n01(nome):
+    """Encontra o jogador por qualquer um dos nomes com que ele aparece no N01.
+
+    Procura primeiro no apelido principal do perfil e depois nos alternativos.
+    Devolve o User, ou None se nenhum cadastro usa aquele nome.
+    """
+    nome = (nome or '').strip()
+    if not nome:
+        return None
+
+    perfil = Profile.objects.filter(nakka__iexact=nome).first()
+    if perfil:
+        return perfil.user
+
+    alternativo = ApelidoN01.objects.select_related('profile__user').filter(apelido__iexact=nome).first()
+    return alternativo.profile.user if alternativo else None
+
+
+def apelido_n01_em_uso(nome, ignorar_profile=None):
+    """Diz se algum cadastro já usa esse nome, como apelido principal ou alternativo."""
+    nome = (nome or '').strip()
+    if not nome:
+        return True  # nome vazio não serve como apelido
+
+    perfis = Profile.objects.filter(nakka__iexact=nome)
+    apelidos = ApelidoN01.objects.filter(apelido__iexact=nome)
+    if ignorar_profile is not None:
+        perfis = perfis.exclude(pk=ignorar_profile.pk)
+        apelidos = apelidos.exclude(profile=ignorar_profile)
+    return perfis.exists() or apelidos.exists()

@@ -27,11 +27,11 @@ def get_or_create_player(name: str, pin: str) -> User:
     The associated Profile is also created via the post_save signal, but we set the
     ``pin`` and ``nickname`` fields explicitly when the profile is newly created.
     """
-    nakka = name.strip()
-    if nakka:
-        registered = Profile.objects.filter(nakka__iexact=nakka).first()
-        if registered:
-            return registered.user
+    from obd.dashboards.players.profiles.models import jogador_por_apelido_n01
+
+    registered = jogador_por_apelido_n01(name)
+    if registered:
+        return registered
 
     first, *last = name.split()
     last_name = " ".join(last) if last else ""
@@ -45,11 +45,61 @@ def get_or_create_player(name: str, pin: str) -> User:
     )
     if created:
         # The post_save signal creates an empty Profile; we fill the required fields.
-        Profile.objects.filter(user=user).update(pin=pin, nickname=name, is_verified=False)
+        # O nakka entra aqui de propósito: sem ele a conta provisória nasceria sem o
+        # campo que a torna reconhecível, e a captura seguinte criaria outra igual.
+        Profile.objects.filter(user=user).update(
+            pin=pin, nickname=name, nakka=name.strip(), is_verified=False
+        )
     return user
 
+def _herdar_apelidos_n01(source_user, target_user):
+    """Passa para o destino os nomes do N01 que a conta absorvida usava.
+
+    Sem isso a mesclagem se desfaz sozinha: o perfil da origem é apagado junto com o
+    usuário, o apelido some, e na captura seguinte o robô não reconhece mais aquele
+    nome e cria o cadastro de novo.
+
+    Devolve a lista de apelidos herdados.
+    """
+    from obd.dashboards.players.profiles.models import ApelidoN01, apelido_n01_em_uso
+
+    origem = getattr(source_user, 'profile', None)
+    destino = getattr(target_user, 'profile', None)
+    if destino is None:
+        return []
+
+    # Os três lugares onde pode estar o nome com que o N01 mostra esse jogador: o
+    # apelido gravado, o apelido do cadastro provisório criado pelo robô, e o nome
+    # completo da conta.
+    candidatos = []
+    if origem is not None:
+        candidatos += [origem.nakka, origem.nickname]
+        candidatos += list(origem.apelidos_n01.values_list('apelido', flat=True))
+    candidatos.append(f'{source_user.first_name} {source_user.last_name}'.strip())
+
+    herdados = []
+    vistos = set()
+    for nome in candidatos:
+        nome = (nome or '').strip()
+        chave = nome.lower()
+        if not nome or chave in vistos:
+            continue
+        vistos.add(chave)
+        # Se o destino já responde por esse nome, não há o que herdar. Se outro
+        # cadastro responde, o nome não é nosso para tomar.
+        if apelido_n01_em_uso(nome, ignorar_profile=origem):
+            continue
+        ApelidoN01.objects.create(profile=destino, apelido=nome)
+        herdados.append(nome)
+
+    return herdados
+
+
 def merge_player_accounts(source_user, target_user):
-    """Migra todos os dados vinculados de source_user para target_user e apaga source_user."""
+    """Migra todos os dados vinculados de source_user para target_user e apaga source_user.
+
+    Devolve (movidos, descartados, apelidos_herdados).
+    """
     from obd.core.models import PlayerTournamentStat
     from obd.dashboards.administrators.leagues.models import OrderOfMeritEntry, NationalRankingEntry
     from obd.dashboards.administrators.champions.models import Champion
@@ -57,7 +107,19 @@ def merge_player_accounts(source_user, target_user):
     moved = 0
     skipped = 0
 
-    moved += PlayerTournamentStat.objects.filter(player=source_user).update(player=target_user)
+    apelidos = _herdar_apelidos_n01(source_user, target_user)
+
+    # A mesma pessoa nunca disputa uma etapa com dois nomes diferentes, então duas
+    # linhas para o mesmo torneio só podem ser duplicidade — igual ao que já era
+    # feito com as entradas de ranking logo abaixo.
+    for stat in PlayerTournamentStat.objects.filter(player=source_user):
+        if PlayerTournamentStat.objects.filter(player=target_user, tournament=stat.tournament).exists():
+            stat.delete()
+            skipped += 1
+        else:
+            stat.player = target_user
+            stat.save()
+            moved += 1
 
     for entry in OrderOfMeritEntry.objects.filter(player=source_user):
         if OrderOfMeritEntry.objects.filter(player=target_user, league=entry.league).exists():
@@ -82,7 +144,7 @@ def merge_player_accounts(source_user, target_user):
 
     source_user.delete()
 
-    return moved, skipped
+    return moved, skipped, apelidos
 
 def get_or_create_league(name: str, start_date: datetime.date, category: str = None) -> tuple[League, Division]:
     """Return a League and its principal Division.

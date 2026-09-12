@@ -681,7 +681,7 @@
         <table>
           <thead><tr><th>Campo</th><th>Para que serve</th></tr></thead>
           <tbody>
-            <tr><td><code>nakka</code></td><td><strong>O apelido do jogador no N01.</strong> A chave que liga a conta do site à identidade dele no N01. Obrigatório no formulário de perfil e validado como único</td></tr>
+            <tr><td><code>nakka</code></td><td><strong>O apelido principal do jogador no N01.</strong> A chave que liga a conta do site à identidade dele no N01. Obrigatório no formulário de perfil e validado como único. Apelidos adicionais ficam em <code>ApelidoN01</code> (ver 6.4)</td></tr>
             <tr><td><code>pin</code></td><td>Identificador usado nas URLs públicas</td></tr>
             <tr><td><code>is_verified</code></td><td><code>False</code> = cadastro provisório criado por robô ou importação, ainda não reivindicado</td></tr>
             <tr><td><code>photo</code></td><td>Foto do jogador</td></tr>
@@ -987,12 +987,44 @@ torneio : 'Open São Roque 2026 - OBD 21.02.2026'</code></pre>
         <strong>“(é você? reivindique)”</strong>, que leva a <code>claim_account</code>. Ali o jogador
         assume o cadastro, e se ele já tiver outra conta os dados são mesclados.</p>
 
-      <h3><span class="n">6.4</span>Mesclagem manual</h3>
+      <h3><span class="n">6.4</span>Um jogador, vários apelidos</h3>
+
+      <p><code>Profile.nakka</code> guarda <strong>um</strong> apelido, mas a mesma pessoa pode
+        aparecer no N01 com nomes diferentes em etapas diferentes — foi o caso de “bruno amaro” e
+        “the taurus”. Por isso existe o modelo <strong><code>ApelidoN01</code></strong>, que liga ao
+        perfil quantos nomes alternativos forem necessários.</p>
+
+      <p>As duas buscas que identificam um jogador — a do robô de captura e a da importação de
+        planilha — usam a função <code>jogador_por_apelido_n01</code>, que procura no apelido
+        principal e depois nos alternativos.</p>
+
+      <div class="regra">
+        <span class="tarja-rot">Regra de negócio</span>
+        <p>A mesma pessoa <strong>nunca</strong> disputa uma etapa com dois nomes diferentes. O que
+          acontece é ela usar nomes diferentes em etapas diferentes. É essa distinção que autoriza o
+          sistema a tratar duas estatísticas do mesmo torneio para o mesmo jogador como
+          duplicidade.</p>
+      </div>
+
+      <h3><span class="n">6.5</span>Mesclagem manual</h3>
 
       <p><code>merge_player_accounts(source_user, target_user)</code> migra estatísticas, entradas de
         ranking e títulos de uma conta para outra e apaga a de origem. Registros que já existirem no
         destino são descartados em vez de duplicados. Disponível em <em>Mesclar Cadastros</em> no
-        painel do administrador.</p>
+        painel do administrador, e também no fluxo de reivindicação de cadastro.</p>
+
+      <div class="alerta">
+        <span class="tarja-rot">O passo que torna a mesclagem definitiva</span>
+        <p>Antes de apagar a origem, <strong>os apelidos dela são herdados pelo destino</strong>. Sem
+          esse passo a mesclagem se desfazia sozinha: apagar a conta apagava o perfil por cascata, o
+          apelido sumia, e na captura seguinte o robô não reconhecia mais aquele nome e recriava o
+          cadastro. São herdados o <code>nakka</code>, o <code>nickname</code> e o nome completo da
+          conta absorvida — os três lugares onde pode estar o nome que o N01 exibe.</p>
+      </div>
+
+      <p>Contas provisórias criadas pelo robô <strong>já nascem com o <code>nakka</code>
+        preenchido</strong>. Antes ele ficava vazio, e a conta nascia sem o campo que a tornaria
+        reconhecível.</p>
     </section>
 
     <!-- ============ 7 ============ -->

@@ -227,7 +227,7 @@ dos Campeões (ver 5.7).
 
 | Campo | Para que serve |
 |---|---|
-| `nakka` | **O apelido do jogador no N01.** A chave que liga a conta do site à identidade dele no N01. Obrigatório no formulário de perfil e validado como único |
+| `nakka` | **O apelido principal do jogador no N01.** A chave que liga a conta do site à identidade dele no N01. Obrigatório no formulário de perfil e validado como único. Apelidos adicionais ficam em `ApelidoN01` (ver 6.4) |
 | `pin` | Identificador usado nas URLs públicas |
 | `is_verified` | `False` = cadastro provisório criado por robô/importação, ainda não reivindicado |
 | `photo` | Foto do jogador |
@@ -522,12 +522,38 @@ tabelas públicas ela aparece com o selo amarelo **"Não Verificado"** e o link
 **"(é você? reivindique)"**, que leva a `claim_account`. Ali o jogador assume o cadastro,
 e se ele já tiver outra conta os dados são mesclados.
 
-### 6.4 Mesclagem manual
+### 6.4 Um jogador, vários apelidos
+
+`Profile.nakka` guarda **um** apelido, mas a mesma pessoa pode aparecer no N01 com nomes
+diferentes em etapas diferentes — foi o caso de "bruno amaro" e "the taurus". Por isso
+existe o modelo **`ApelidoN01`**, que liga ao perfil quantos nomes alternativos forem
+necessários.
+
+As duas buscas que identificam um jogador — a do robô de captura e a da importação de
+planilha — usam a função `jogador_por_apelido_n01`, que procura no apelido principal e
+depois nos alternativos.
+
+> **Regra de negócio:** a mesma pessoa **nunca** disputa uma etapa com dois nomes
+> diferentes. O que acontece é ela usar nomes diferentes em etapas diferentes. É essa
+> distinção que autoriza o sistema a tratar duas estatísticas do mesmo torneio para o
+> mesmo jogador como duplicidade.
+
+### 6.5 Mesclagem manual
 
 `merge_player_accounts(source_user, target_user)` migra estatísticas, entradas de ranking
 e títulos de uma conta para outra e apaga a de origem. Registros que já existirem no
 destino são descartados em vez de duplicados. Disponível em *Mesclar Cadastros* no painel
-do administrador.
+do administrador, e também no fluxo de reivindicação de cadastro.
+
+**Antes de apagar a origem, os apelidos dela são herdados pelo destino.** Isso é o que
+torna a mesclagem definitiva. Sem esse passo ela se desfazia sozinha: apagar a conta
+apagava o perfil por cascata, o apelido sumia, e na captura seguinte o robô não
+reconhecia mais aquele nome e recriava o cadastro. São herdados o `nakka`, o `nickname` e
+o nome completo da conta absorvida — os três lugares onde pode estar o nome que o N01
+exibe.
+
+Contas provisórias criadas pelo robô **já nascem com o `nakka` preenchido**. Antes ele
+ficava vazio, e a conta nascia sem o campo que a tornaria reconhecível.
 
 ---
 

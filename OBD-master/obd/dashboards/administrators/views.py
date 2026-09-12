@@ -332,9 +332,11 @@ def _classify_player(name):
     """
     pin = name.replace(' ', '').lower()
 
-    by_nakka = Profile.objects.filter(nakka__iexact=name.strip()).first()
+    from obd.dashboards.players.profiles.models import jogador_por_apelido_n01
+
+    by_nakka = jogador_por_apelido_n01(name)
     if by_nakka:
-        return 'nakka', by_nakka.user, []
+        return 'nakka', by_nakka, []
 
     exato = User.objects.filter(username__iexact=pin).first()
     if exato:
@@ -605,11 +607,17 @@ def merge_players_execute(request):
         return redirect('administrators:merge_players_dashboard')
 
     from obd.dashboards.administrators.champions.utils import merge_player_accounts
-    moved, skipped = merge_player_accounts(source_user, target_user)
+    moved, skipped, apelidos = merge_player_accounts(source_user, target_user)
 
     messages.success(
         request,
         f"Mesclagem concluída: {moved} registros migrados, {skipped} descartados por já existirem no destino. "
         f"'{source_username}' foi removido."
     )
+    if apelidos:
+        messages.info(
+            request,
+            "A conta de destino passa a responder também por: " + ", ".join(f'"{a}"' for a in apelidos) +
+            ". É isso que impede o cadastro de ser recriado na próxima captura do N01."
+        )
     return redirect('administrators:merge_players_dashboard')

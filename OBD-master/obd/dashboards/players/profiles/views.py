@@ -180,8 +180,13 @@ def claim_account(request, pin):
             from obd.dashboards.administrators.champions.utils import merge_player_accounts
             source_user = profile.user
             target_user = request.user
-            moved, skipped = merge_player_accounts(source_user, target_user)
+            moved, skipped, apelidos = merge_player_accounts(source_user, target_user)
             messages.success(request, f'Cadastros mesclados com sucesso! {moved} registro(s) migrado(s) para a sua conta.')
+            if apelidos:
+                messages.info(
+                    request,
+                    'Sua conta passa a ser reconhecida também como: ' + ', '.join(f'"{a}"' for a in apelidos) + '.'
+                )
             return HttpResponseRedirect(reverse('players:dashboard'))
 
         return render(request, 'claim_account_merge_confirm.html', {
