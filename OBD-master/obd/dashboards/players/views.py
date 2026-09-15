@@ -118,7 +118,7 @@ def dashboard(request):
 
 def loginuser(request):
     if request.method == 'POST':
-        form = LoginUserForm(request.POST)
+        form = LoginUserForm(request.POST, request=request)
         if not form.is_valid():
             token = ObdSession().startSession()
             return render(request, 'login.html', {'form': form, 'token': token})

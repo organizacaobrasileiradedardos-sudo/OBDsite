@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Event, News, NewsImage, Document
+from .models import Event, News, NewsImage, Document, TentativaDeLogin
 
 
 class NewsImageInline(admin.TabularInline):
@@ -73,3 +73,12 @@ class DocumentAdmin(admin.ModelAdmin):
             'fields': ('publish_date', 'is_active')
         }),
     )
+
+
+@admin.register(TentativaDeLogin)
+class TentativaDeLoginAdmin(admin.ModelAdmin):
+    """Tentativas de entrada que falharam, para consulta e para destravar alguém."""
+    list_display = ('identificador', 'ip', 'criado_em')
+    list_filter = ('criado_em',)
+    search_fields = ('identificador', 'ip')
+    date_hierarchy = 'criado_em'

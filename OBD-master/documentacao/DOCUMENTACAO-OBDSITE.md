@@ -748,7 +748,41 @@ senha" para quem esquecer. Repetir a senha por e-mail deixava uma cópia dela em
 puro na caixa do associado para sempre — e contradizia o próprio texto da mensagem, que
 diz que a OBD não guarda a senha.
 
-### 9.7 Datas: `date` versus `created_at`
+### 9.7 Limite de tentativas de entrada
+
+Sem limite, descobrir uma senha fraca é só questão de insistir. Hoje o site conta as
+tentativas que falham e passa a recusá-las:
+
+| Limite | Valor | Para que serve |
+|---|---|---|
+| Por nome de usuário | 5 falhas em 15 min | protege a conta de quem insiste numa senha só |
+| Por endereço de origem | 20 falhas em 15 min | protege contra quem varre muitas contas de uma vez |
+
+A janela é **deslizante**: o bloqueio se desfaz sozinho depois de 15 minutos sem
+tentativa. Entrar com sucesso zera as falhas daquele nome de usuário, mas **não** as do
+endereço — um acerto não deve limpar o rastro de quem estava varrendo várias contas.
+
+**Vale para as duas telas de entrada**, a dos jogadores e a do `/admin/`, sem precisar
+mexer em nenhuma das duas. O truque é o sinal `user_login_failed`, que o Django dispara
+sempre que `authenticate()` falha; o middleware `LimiteDeTentativasDeLogin` é quem
+recusa a tentativa antes de a senha ser verificada.
+
+> **Cuidado ao mexer:** o sinal só chega com informação útil se `authenticate()` receber
+> o `request`. O formulário de login dos jogadores passa a receber o request por isso.
+> Um `authenticate()` sem request dispara o sinal com `request=None`, e a tentativa não
+> é contada — foi assim que a primeira versão desta proteção não funcionou.
+
+Só as tentativas feitas **nos endereços de login** são contadas. Errar a senha na tela de
+"Atualizar Login", que também chama `authenticate`, não tranca ninguém para fora.
+
+A contagem fica no banco (`TentativaDeLogin`), e não em memória, porque o Railway roda
+vários processos do gunicorn — um contador em memória seria por processo, e cada um
+deixaria passar o limite inteiro.
+
+**Se você se trancar para fora do `/admin/`:** espere 15 minutos sem tentar. Se precisar
+destravar na hora, apague as linhas de `TentativaDeLogin` pelo console do Railway.
+
+### 9.8 Datas: `date` versus `created_at`
 
 Já dito na seção 5.3, mas vale repetir porque é a armadilha mais fácil de cair:
 **`TournamentResult.date` é reescrito a cada recaptura.** Para ordenação cronológica
@@ -760,11 +794,11 @@ confiável, use `created_at`.
 
 Levantados ao longo do desenvolvimento e ainda não resolvidos:
 
-1. **`/admin/` no caminho padrão**, sem limite de tentativas de login.
-2. **Sem limitação de tentativas** na tela de login dos jogadores.
-3. **Cabeçalhos de segurança HTTPS ausentes**, incluindo `SECURE_PROXY_SSL_HEADER`.
-4. **Bootstrap não unificado** (seção 9.2).
-5. **`stats.0010` não roda em SQLite** — ela usa `DROP COLUMN IF EXISTS`, sintaxe do
+1. **`/admin/` no caminho padrão.** Já tem limite de tentativas (ver 9.7), mas o
+   endereço previsível continua atraindo varredura automática.
+2. **Cabeçalhos de segurança HTTPS ausentes**, incluindo `SECURE_PROXY_SSL_HEADER`.
+3. **Bootstrap não unificado** (seção 9.2).
+4. **`stats.0010` não roda em SQLite** — ela usa `DROP COLUMN IF EXISTS`, sintaxe do
    PostgreSQL. Em produção já foi aplicada; o efeito é só atrapalhar quem quiser subir
    uma cópia local do banco em SQLite para testes.
 

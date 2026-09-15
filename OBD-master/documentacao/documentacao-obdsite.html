@@ -1268,7 +1268,55 @@ torneio : 'Open São Roque 2026 - OBD 21.02.2026'</code></pre>
         caixa do associado para sempre — e contradizia o próprio texto da mensagem, que diz que a OBD
         não guarda a senha.</p>
 
-      <h3><span class="n">9.7</span><code>date</code> versus <code>created_at</code></h3>
+      <h3><span class="n">9.7</span>Limite de tentativas de entrada</h3>
+
+      <p>Sem limite, descobrir uma senha fraca é só questão de insistir. Hoje o site conta as
+        tentativas que falham e passa a recusá-las:</p>
+
+      <div class="tbl">
+        <table>
+          <thead><tr><th>Limite</th><th>Valor</th><th>Para que serve</th></tr></thead>
+          <tbody>
+            <tr><td>Por nome de usuário</td><td>5 falhas em 15 min</td><td>protege a conta de quem insiste numa senha só</td></tr>
+            <tr><td>Por endereço de origem</td><td>20 falhas em 15 min</td><td>protege contra quem varre muitas contas de uma vez</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <p>A janela é <strong>deslizante</strong>: o bloqueio se desfaz sozinho depois de 15 minutos
+        sem tentativa. Entrar com sucesso zera as falhas daquele nome de usuário, mas <strong>não</strong>
+        as do endereço — um acerto não deve limpar o rastro de quem estava varrendo várias contas.</p>
+
+      <p><strong>Vale para as duas telas de entrada</strong>, a dos jogadores e a do
+        <code>/admin/</code>, sem precisar mexer em nenhuma das duas. O truque é o sinal
+        <code>user_login_failed</code>, que o Django dispara sempre que <code>authenticate()</code>
+        falha; o middleware <code>LimiteDeTentativasDeLogin</code> é quem recusa a tentativa antes de
+        a senha ser verificada.</p>
+
+      <div class="alerta">
+        <span class="tarja-rot">Cuidado ao mexer</span>
+        <p>O sinal só chega com informação útil se <code>authenticate()</code> receber o
+          <code>request</code>. O formulário de login dos jogadores passa a receber o request por
+          isso. Um <code>authenticate()</code> sem request dispara o sinal com
+          <code>request=None</code>, e a tentativa não é contada — foi assim que a primeira versão
+          desta proteção não funcionou.</p>
+      </div>
+
+      <p>Só as tentativas feitas <strong>nos endereços de login</strong> são contadas. Errar a senha
+        na tela de “Atualizar Login”, que também chama <code>authenticate</code>, não tranca ninguém
+        para fora.</p>
+
+      <p>A contagem fica no banco (<code>TentativaDeLogin</code>), e não em memória, porque o Railway
+        roda vários processos do gunicorn — um contador em memória seria por processo, e cada um
+        deixaria passar o limite inteiro.</p>
+
+      <div class="nota">
+        <span class="tarja-rot">Se você se trancar para fora do /admin/</span>
+        <p>Espere 15 minutos sem tentar. Se precisar destravar na hora, apague as linhas de
+          <code>TentativaDeLogin</code> pelo console do Railway.</p>
+      </div>
+
+      <h3><span class="n">9.8</span><code>date</code> versus <code>created_at</code></h3>
 
       <p>Já dito na seção 5.3, mas vale repetir porque é a armadilha mais fácil de cair:
         <strong><code>TournamentResult.date</code> é reescrito a cada recaptura.</strong> Para
@@ -1282,9 +1330,8 @@ torneio : 'Open São Roque 2026 - OBD 21.02.2026'</code></pre>
       <p>Levantados ao longo do desenvolvimento e ainda não resolvidos, do mais para o menos grave:</p>
 
       <ol>
-        <li><strong><code>/admin/</code> no caminho padrão</strong>, sem limite de tentativas de
-          login.</li>
-        <li><strong>Sem limitação de tentativas</strong> na tela de login dos jogadores.</li>
+        <li><strong><code>/admin/</code> no caminho padrão.</strong> Já tem limite de tentativas
+          (ver 9.7), mas o endereço previsível continua atraindo varredura automática.</li>
         <li><strong>Cabeçalhos de segurança HTTPS ausentes</strong>, incluindo
           <code>SECURE_PROXY_SSL_HEADER</code>.</li>
         <li><strong>Bootstrap não unificado</strong> (seção 9.2).</li>

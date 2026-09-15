@@ -214,3 +214,27 @@ class PlayerTournamentStat(models.Model):
     
     def __str__(self):
         return f"{self.rank}. {self.player_name} - {self.tournament.name}"
+
+
+class TentativaDeLogin(models.Model):
+    """Uma tentativa de entrar no site que não deu certo.
+
+    Serve para limitar quantas vezes seguidas alguém pode errar a senha. A regra e os
+    limites estão em `obd/core/seguranca.py`.
+
+    Fica no banco, e não em memória, porque o Railway roda vários processos do gunicorn
+    — um contador em memória seria por processo, e cada um deixaria passar o limite
+    inteiro.
+    """
+
+    identificador = models.CharField('Usuário tentado', max_length=150, blank=True, db_index=True)
+    ip = models.CharField('Endereço de origem', max_length=45, blank=True, db_index=True)
+    criado_em = models.DateTimeField('Quando', auto_now_add=True, db_index=True)
+
+    class Meta:
+        verbose_name = 'tentativa de login'
+        verbose_name_plural = 'tentativas de login'
+        ordering = ('-criado_em',)
+
+    def __str__(self):
+        return f'{self.identificador or "(sem usuário)"} em {self.criado_em:%d/%m/%Y %H:%M}'

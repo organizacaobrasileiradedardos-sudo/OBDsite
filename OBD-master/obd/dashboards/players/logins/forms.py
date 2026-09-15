@@ -11,12 +11,20 @@ class LoginUserForm(forms.Form):
     token = forms.CharField(label='Token', widget=forms.PasswordInput, required=False)
     email = forms.EmailField(label='Email', required=False)
 
+    def __init__(self, *args, request=None, **kwargs):
+        # O request é repassado ao authenticate() logo abaixo. Sem ele, o Django dispara
+        # o sinal user_login_failed com request=None, e o limite de tentativas de login
+        # não tem como saber de onde veio a tentativa — nem contá-la.
+        super().__init__(*args, **kwargs)
+        self.request = request
 
     def clean_password(self):
         if len(self.cleaned_data['username']) < 4:
             raise forms.ValidationError('Nome do usuário inválido!')
         else:
-            user = authenticate(username=self.cleaned_data['username'].lower(), password=self.cleaned_data['password'])
+            user = authenticate(request=self.request,
+                                username=self.cleaned_data['username'].lower(),
+                                password=self.cleaned_data['password'])
             if user is not None:
                 return self.cleaned_data['password']
             else:

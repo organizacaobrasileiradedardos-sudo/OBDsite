@@ -55,6 +55,9 @@ pasta `OBD-master`. Ele aponta nomes que são usados mas ninguém define.
 - **O fim de uma etapa da Liga Nacional não pode ser deduzido dos dados.** Uma etapa
   pode terminar com jogos pendentes. Quem encerra é o administrador, pelo campo
   `in_progress`.
+- **`authenticate()` tem que receber o `request`.** Sem ele o Django dispara
+  `user_login_failed` com `request=None`, e o limite de tentativas de login não conta a
+  tentativa. Foi assim que a primeira versão dessa proteção não funcionou.
 - **E-mail de usuário nunca copia a caixa da OBD.** Envie por
   `obd/core/emails.py`: `enviar_para_usuario` vai só para o destinatário (é por ali que
   passam o link de redefinição e a senha do cadastro), e `avisar_administracao` avisa a
