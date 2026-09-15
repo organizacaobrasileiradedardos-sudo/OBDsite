@@ -1262,6 +1262,12 @@ torneio : 'Open São Roque 2026 - OBD 21.02.2026'</code></pre>
           função.</p>
       </div>
 
+      <p>O e-mail de boas-vindas <strong>não repete mais a senha</strong> escolhida no cadastro. Ele
+        passou a dizer que a senha é a que a pessoa acabou de escolher e a apontar o “Esqueci minha
+        senha” para quem esquecer. Repetir a senha por e-mail deixava uma cópia dela em texto puro na
+        caixa do associado para sempre — e contradizia o próprio texto da mensagem, que diz que a OBD
+        não guarda a senha.</p>
+
       <h3><span class="n">9.7</span><code>date</code> versus <code>created_at</code></h3>
 
       <p>Já dito na seção 5.3, mas vale repetir porque é a armadilha mais fácil de cair:
@@ -1279,10 +1285,6 @@ torneio : 'Open São Roque 2026 - OBD 21.02.2026'</code></pre>
         <li><strong><code>/admin/</code> no caminho padrão</strong>, sem limite de tentativas de
           login.</li>
         <li><strong>Sem limitação de tentativas</strong> na tela de login dos jogadores.</li>
-        <li><strong>A senha escolhida no cadastro é enviada em texto puro</strong> ao novo
-          associado, no e-mail de boas-vindas — e o próprio texto do e-mail diz que a OBD não guarda
-          a senha. Não é mais um vazamento para terceiros (ver 9.6), mas continua sendo prática
-          ruim.</li>
         <li><strong>Cabeçalhos de segurança HTTPS ausentes</strong>, incluindo
           <code>SECURE_PROXY_SSL_HEADER</code>.</li>
         <li><strong>Bootstrap não unificado</strong> (seção 9.2).</li>

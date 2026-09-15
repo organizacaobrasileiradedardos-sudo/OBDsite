@@ -8,7 +8,9 @@ em sua inscrição para associação:
 Nome: {{ first_name }} {{ last_name }}
 Email: {{ email }}
 Usuário de acesso: {{ username }}
-Senha: {{ password }}
+
+A senha é a que você escolheu no cadastro. Por segurança ela não é repetida aqui: se
+esquecer, peça uma nova pelo link "Esqueci minha senha" na tela de entrada do site.
 
 Entre no nosso grupo WhatsApp aqui:  https://chat.whatsapp.com/DXtHYPEpmcb7sldYZuBaVz?mode=hqrc
 E-mail geral do OBD: organizacaobrasileiradedardos@gmail.com

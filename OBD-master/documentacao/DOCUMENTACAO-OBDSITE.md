@@ -742,6 +742,12 @@ cadastros — mas por um aviso próprio, que não serve para entrar em conta nen
 **Ao criar um e-mail novo, não acrescente a caixa da OBD à lista de destinatários de
 `enviar_para_usuario`.** Se a administração precisar saber, use a segunda função.
 
+O e-mail de boas-vindas **não repete mais a senha** escolhida no cadastro. Ele passou a
+dizer que a senha é a que a pessoa acabou de escolher e a apontar o "Esqueci minha
+senha" para quem esquecer. Repetir a senha por e-mail deixava uma cópia dela em texto
+puro na caixa do associado para sempre — e contradizia o próprio texto da mensagem, que
+diz que a OBD não guarda a senha.
+
 ### 9.7 Datas: `date` versus `created_at`
 
 Já dito na seção 5.3, mas vale repetir porque é a armadilha mais fácil de cair:
@@ -757,11 +763,8 @@ Levantados ao longo do desenvolvimento e ainda não resolvidos:
 1. **`/admin/` no caminho padrão**, sem limite de tentativas de login.
 2. **Sem limitação de tentativas** na tela de login dos jogadores.
 3. **Cabeçalhos de segurança HTTPS ausentes**, incluindo `SECURE_PROXY_SSL_HEADER`.
-4. **A senha escolhida no cadastro é enviada em texto puro** ao novo associado, no
-   e-mail de boas-vindas — e o próprio texto do e-mail diz que a OBD não guarda a senha.
-   Não é mais um vazamento para terceiros (ver 9.6), mas continua sendo prática ruim.
-5. **Bootstrap não unificado** (seção 9.2).
-6. **`stats.0010` não roda em SQLite** — ela usa `DROP COLUMN IF EXISTS`, sintaxe do
+4. **Bootstrap não unificado** (seção 9.2).
+5. **`stats.0010` não roda em SQLite** — ela usa `DROP COLUMN IF EXISTS`, sintaxe do
    PostgreSQL. Em produção já foi aplicada; o efeito é só atrapalhar quem quiser subir
    uma cópia local do banco em SQLite para testes.
 
