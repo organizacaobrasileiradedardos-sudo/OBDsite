@@ -56,13 +56,10 @@ INSTALLED_APPS = [
     'obd.dashboards.players.logins',
     'obd.dashboards.players.profiles.apps.ProfileConfig',
     'obd.dashboards.players.stats.apps.StatConfig',
-    'obd.dashboards.players.merits.apps.MeritConfig',
     'obd.dashboards.administrators',
     'obd.dashboards.administrators.enviroments.apps.EnviromentConfig',
     'obd.dashboards.administrators.leagues.apps.LeagueConfig',
     'obd.dashboards.administrators.divisions.apps.DivisionConfig',
-    'obd.dashboards.administrators.fixtures.apps.FixtureConfig',
-    'obd.dashboards.administrators.results.apps.ResultConfig',
     'obd.dashboards.administrators.champions.apps.ChampionConfig',
     'cloudinary'
 ]

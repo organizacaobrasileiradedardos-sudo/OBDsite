@@ -494,13 +494,12 @@
 │   │   ├── views.py                   <span class="c">captura, importações, mesclagem</span>
 │   │   ├── leagues/                   <span class="c">League, OrderOfMeritEntry,</span>
 │   │   │                              <span class="c">NationalRankingEntry</span>
-│   │   ├── divisions/, fixtures/,
-│   │   │   results/, champions/       <span class="c">modelo antigo de liga online</span>
+│   │   ├── divisions/, champions/    <span class="c">o que sobrou do modelo antigo de liga</span>
 │   │   └── enviroments/
 │   └── players/                       <span class="c">área do jogador</span>
 │       ├── views.py                   <span class="c">login, senha, painel</span>
-│       ├── profiles/                  <span class="c">Profile (inclui o campo nakka)</span>
-│       └── stats/, merits/, validations/
+│       ├── profiles/                  <span class="c">Profile (nakka) e ApelidoN01</span>
+│       └── stats/
 ├── <b>subscriptions/</b>                     <span class="c">cadastro de novo usuário</span>
 └── <b>updates/</b></div>
 
@@ -1137,10 +1136,10 @@ torneio : 'Open São Roque 2026 - OBD 21.02.2026'</code></pre>
           inexistente. O app inteiro foi apagado, sem precisar de migração.</p>
       </div>
 
-      <p>Os três apps (<code>fixtures</code>, <code>results</code>, <code>merits</code>) continuam no
-        <code>INSTALLED_APPS</code> com um <code>models.py</code> vazio: a migração que apaga a
-        tabela só roda se o app estiver instalado. Removê-los de vez é um passo posterior, depois que
-        a migração tiver sido aplicada.</p>
+      <p>Depois que as migrações de exclusão rodaram em produção, os três apps
+        (<code>fixtures</code>, <code>results</code>, <code>merits</code>) foram removidos por
+        inteiro — pastas, migrações e as linhas do <code>INSTALLED_APPS</code>. Nenhuma migração de
+        app que ficou dependia deles, então o grafo de migrações continua íntegro.</p>
 
       <p>Dois modelos desse conjunto <strong>continuam em uso ativo</strong> e não podem ser
         removidos:</p>
@@ -1249,9 +1248,10 @@ torneio : 'Open São Roque 2026 - OBD 21.02.2026'</code></pre>
         <li><strong>Cabeçalhos de segurança HTTPS ausentes</strong>, incluindo
           <code>SECURE_PROXY_SSL_HEADER</code>.</li>
         <li><strong>Bootstrap não unificado</strong> (seção 9.2).</li>
-        <li><strong>Apps vazios</strong> — <code>fixtures</code>, <code>results</code> e
-          <code>merits</code> continuam no <code>INSTALLED_APPS</code> só para as migrações de
-          exclusão rodarem. Podem ser removidos num deploy seguinte.</li>
+        <li><strong><code>stats.0010</code> não roda em SQLite</strong> — ela usa
+          <code>DROP COLUMN IF EXISTS</code>, sintaxe do PostgreSQL. Em produção já foi aplicada; o
+          efeito é só atrapalhar quem quiser subir uma cópia local do banco em SQLite para
+          testes.</li>
       </ol>
     </section>
 

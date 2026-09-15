@@ -73,13 +73,12 @@ obd/
 │   │   ├── views.py                   captura, importações, mesclagem
 │   │   ├── leagues/                   League, OrderOfMeritEntry,
 │   │   │                              NationalRankingEntry
-│   │   ├── divisions/, fixtures/,
-│   │   │   results/, champions/       modelo antigo de liga online
+│   │   ├── divisions/, champions/    o que sobrou do modelo antigo de liga
 │   │   └── enviroments/
 │   └── players/                       área do jogador
 │       ├── views.py                   login, senha, painel
-│       ├── profiles/                  Profile (inclui o campo `nakka`)
-│       ├── stats/, merits/, validations/
+│       ├── profiles/                  Profile (`nakka`) e ApelidoN01
+│       └── stats/
 ├── subscriptions/                     cadastro de novo usuário
 └── updates/
 ```
@@ -646,9 +645,10 @@ registros no admin do Django saíram junto.
 migração nenhuma, então a tabela `players_validation` jamais chegou a existir. Consultá-la
 dava erro de tabela inexistente. O app inteiro foi apagado, sem precisar de migração.
 
-Os três apps (`fixtures`, `results`, `merits`) continuam no `INSTALLED_APPS` com um
-`models.py` vazio: a migração que apaga a tabela só roda se o app estiver instalado.
-Removê-los de vez é um passo posterior, depois que a migração tiver sido aplicada.
+Depois que as migrações de exclusão rodaram em produção, os três apps (`fixtures`,
+`results`, `merits`) foram removidos por inteiro — pastas, migrações e as linhas do
+`INSTALLED_APPS`. Nenhuma migração de app que ficou dependia deles, então o grafo de
+migrações continua íntegro.
 
 Dois modelos desse conjunto **continuam em uso ativo** e não podem ser removidos:
 
@@ -734,8 +734,9 @@ Levantados ao longo do desenvolvimento e ainda não resolvidos:
 3. **Sem limitação de tentativas** na tela de login dos jogadores.
 4. **Cabeçalhos de segurança HTTPS ausentes**, incluindo `SECURE_PROXY_SSL_HEADER`.
 5. **Bootstrap não unificado** (seção 9.2).
-6. **Apps vazios** — `fixtures`, `results` e `merits` continuam no `INSTALLED_APPS` só
-   para as migrações de exclusão rodarem. Podem ser removidos num deploy seguinte.
+6. **`stats.0010` não roda em SQLite** — ela usa `DROP COLUMN IF EXISTS`, sintaxe do
+   PostgreSQL. Em produção já foi aplicada; o efeito é só atrapalhar quem quiser subir
+   uma cópia local do banco em SQLite para testes.
 
 ---
 
