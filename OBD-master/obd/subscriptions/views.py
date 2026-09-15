@@ -1,11 +1,9 @@
-import resend
-from django.conf import settings
+from obd.core.emails import avisar_administracao, enviar_para_usuario
 from django.contrib import messages
 from django.contrib.auth import logout
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
 from django.template.defaultfilters import slugify
-from django.template.loader import render_to_string
 from obd.subscriptions.forms import SubscriptionUserForm
 from django.contrib.auth.models import User, Permission
 from django.contrib.contenttypes.models import ContentType
@@ -51,12 +49,19 @@ def CreateNewMember(request):
     profile.slug = slugify(profile.pin+'-'+user.first_name+' '+user.last_name)
     profile.save()
 
-    # Send E-Mail to new member with a CC List to OBD Org.
-    _send_email('Confirmação de Associação ao OBD',
-                settings.DEFAULT_FROM_EMAIL,
-                form.cleaned_data['email'],
-                'subscription_email.txt',
-                form.cleaned_data)
+    # A mensagem de boas-vindas traz a senha escolhida, então vai só para o associado.
+    enviar_para_usuario('Confirmação de Associação ao OBD',
+                        form.cleaned_data['email'],
+                        'subscription_email.txt',
+                        form.cleaned_data)
+
+    avisar_administracao(
+        'Novo associado no site da OBD',
+        f"{form.cleaned_data['first_name']} {form.cleaned_data['last_name']} "
+        f"acabou de se cadastrar.\n\n"
+        f"Usuário: {form.cleaned_data['username']}\n"
+        f"E-mail: {form.cleaned_data['email']}"
+    )
 
     # Save form to DB
     # Subscription.objects.create(**form.cleaned_data)
@@ -71,11 +76,3 @@ def MemberSubscriptionPage(request):
     return render(request, 'subscription.html', {'form': SubscriptionUserForm()})
 
 
-def _send_email(subject, from_, to, template_name, context):
-    body = render_to_string(template_name, context)
-    resend.Emails.send({
-        "from": from_,
-        "to": [from_, to],
-        "subject": subject,
-        "text": body,
-    })

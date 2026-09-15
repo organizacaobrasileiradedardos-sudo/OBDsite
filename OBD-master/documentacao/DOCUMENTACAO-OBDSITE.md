@@ -715,7 +715,34 @@ Com `pt-br`, um `Decimal` renderizado em HTML vira `500,00`. Ao voltar pelo form
 `Decimal('500,00')` levanta exceção. Em campos ocultos use `{% load l10n %}` e o filtro
 `|unlocalize`.
 
-### 9.6 Datas: `date` versus `created_at`
+### 9.6 E-mail nunca copia a caixa da OBD
+
+Havia dois atalhos de envio iguais, um em `subscriptions/views.py` e outro em
+`players/views.py`, e os dois punham a caixa da OBD como destinatária junto com o
+usuário:
+
+```python
+"to": [from_, to]
+```
+
+O efeito era grave: **o link de redefinição de senha e a senha escolhida no cadastro iam
+parar na caixa da OBD.** Qualquer pessoa com acesso a ela entraria na conta de qualquer
+jogador.
+
+Hoje o envio passa por `obd/core/emails.py`, com duas funções de propósito separado:
+
+| Função | Para quem vai | O que pode conter |
+|---|---|---|
+| `enviar_para_usuario` | só o destinatário | é por aqui que passam o link e a senha |
+| `avisar_administracao` | só a caixa da OBD | corpo escrito à mão, **nunca** senha nem link |
+
+A administração continua sabendo dos pedidos de recuperação de senha e dos novos
+cadastros — mas por um aviso próprio, que não serve para entrar em conta nenhuma.
+
+**Ao criar um e-mail novo, não acrescente a caixa da OBD à lista de destinatários de
+`enviar_para_usuario`.** Se a administração precisar saber, use a segunda função.
+
+### 9.7 Datas: `date` versus `created_at`
 
 Já dito na seção 5.3, mas vale repetir porque é a armadilha mais fácil de cair:
 **`TournamentResult.date` é reescrito a cada recaptura.** Para ordenação cronológica
@@ -727,12 +754,12 @@ confiável, use `created_at`.
 
 Levantados ao longo do desenvolvimento e ainda não resolvidos:
 
-1. **E-mail de recuperação de senha com cópia para a caixa da OBD.** Qualquer pessoa com
-   acesso àquela caixa consegue redefinir a senha de qualquer jogador. É o item mais
-   sério da lista.
-2. **`/admin/` no caminho padrão**, sem limite de tentativas de login.
-3. **Sem limitação de tentativas** na tela de login dos jogadores.
-4. **Cabeçalhos de segurança HTTPS ausentes**, incluindo `SECURE_PROXY_SSL_HEADER`.
+1. **`/admin/` no caminho padrão**, sem limite de tentativas de login.
+2. **Sem limitação de tentativas** na tela de login dos jogadores.
+3. **Cabeçalhos de segurança HTTPS ausentes**, incluindo `SECURE_PROXY_SSL_HEADER`.
+4. **A senha escolhida no cadastro é enviada em texto puro** ao novo associado, no
+   e-mail de boas-vindas — e o próprio texto do e-mail diz que a OBD não guarda a senha.
+   Não é mais um vazamento para terceiros (ver 9.6), mas continua sendo prática ruim.
 5. **Bootstrap não unificado** (seção 9.2).
 6. **`stats.0010` não roda em SQLite** — ela usa `DROP COLUMN IF EXISTS`, sintaxe do
    PostgreSQL. Em produção já foi aplicada; o efeito é só atrapalhar quem quiser subir

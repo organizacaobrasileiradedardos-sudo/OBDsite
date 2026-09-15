@@ -1,10 +1,8 @@
 import io
-import resend
 from django.contrib import messages
-from django.conf import settings
+from obd.core.emails import avisar_administracao, enviar_para_usuario
 from django.contrib.auth.models import User
 from django.contrib.auth.tokens import default_token_generator
-from django.template.loader import render_to_string
 from django.contrib.auth import login, authenticate, logout
 from django.urls import reverse
 from django.contrib.auth.decorators import login_required
@@ -180,11 +178,20 @@ def recoverypassword(request):
                    'first': u.first_name.capitalize(),
                    'last': u.last_name.capitalize()}
 
-        _send_email('SOLICITAÇÃO DE RECUPERAÇÃO DE SENHA OBD',
-                    settings.DEFAULT_FROM_EMAIL,
-                    email,
-                    'recovery_password.txt',
-                    context)
+        enviar_para_usuario('SOLICITAÇÃO DE RECUPERAÇÃO DE SENHA OBD',
+                            email,
+                            'recovery_password.txt',
+                            context)
+
+        # A administração fica sabendo do pedido, mas sem o link — quem recebe o link
+        # consegue trocar a senha da conta.
+        avisar_administracao(
+            'Pedido de recuperação de senha no site da OBD',
+            f'O usuário "{u.username}" ({u.first_name} {u.last_name}) pediu para '
+            f'redefinir a senha, e o link foi enviado para o e-mail cadastrado dele.\n\n'
+            f'Este aviso não traz o link de propósito: quem tem o link consegue trocar '
+            f'a senha da conta.'
+        )
 
     # Success feedback (genérico, independente de o e-mail existir ou não)
     messages.success(request, 'Recebemos sua solicitação. Se o e-mail informado estiver cadastrado, você receberá em instantes um link para redefinir sua senha.')
@@ -221,16 +228,6 @@ def password_reset_confirm(request, uidb64, token):
         form = SetNewPasswordForm()
 
     return render(request, 'password_reset_confirm.html', {'form': form})
-
-
-def _send_email(subject, from_, to, template_name, context):
-    body = render_to_string(template_name, context)
-    resend.Emails.send({
-        "from": from_,
-        "to": [from_, to],
-        "subject": subject,
-        "text": body,
-    })
 
 
 def updatelogin(request):

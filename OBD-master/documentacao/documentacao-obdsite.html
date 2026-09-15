@@ -1225,7 +1225,44 @@ torneio : 'Open São Roque 2026 - OBD 21.02.2026'</code></pre>
         Ao voltar pelo formulário, <code>Decimal('500,00')</code> levanta exceção. Em campos ocultos
         use <code>{% load l10n %}</code> e o filtro <code>|unlocalize</code>.</p>
 
-      <h3><span class="n">9.6</span><code>date</code> versus <code>created_at</code></h3>
+      <h3><span class="n">9.6</span>E-mail nunca copia a caixa da OBD</h3>
+
+      <p>Havia dois atalhos de envio iguais, um em <code>subscriptions/views.py</code> e outro em
+        <code>players/views.py</code>, e os dois punham a caixa da OBD como destinatária junto com o
+        usuário:</p>
+
+      <pre><code>"to": [from_, to]</code></pre>
+
+      <div class="alerta">
+        <span class="tarja-rot">O que isso causava</span>
+        <p><strong>O link de redefinição de senha e a senha escolhida no cadastro iam parar na caixa
+          da OBD.</strong> Qualquer pessoa com acesso a ela entraria na conta de qualquer jogador.</p>
+      </div>
+
+      <p>Hoje o envio passa por <code>obd/core/emails.py</code>, com duas funções de propósito
+        separado:</p>
+
+      <div class="tbl">
+        <table>
+          <thead><tr><th>Função</th><th>Para quem vai</th><th>O que pode conter</th></tr></thead>
+          <tbody>
+            <tr><td><code>enviar_para_usuario</code></td><td>só o destinatário</td><td>é por aqui que passam o link e a senha</td></tr>
+            <tr><td><code>avisar_administracao</code></td><td>só a caixa da OBD</td><td>corpo escrito à mão, <strong>nunca</strong> senha nem link</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <p>A administração continua sabendo dos pedidos de recuperação de senha e dos novos cadastros —
+        mas por um aviso próprio, que não serve para entrar em conta nenhuma.</p>
+
+      <div class="nota">
+        <span class="tarja-rot">Ao criar um e-mail novo</span>
+        <p>Não acrescente a caixa da OBD à lista de destinatários de
+          <code>enviar_para_usuario</code>. Se a administração precisar saber, use a segunda
+          função.</p>
+      </div>
+
+      <h3><span class="n">9.7</span><code>date</code> versus <code>created_at</code></h3>
 
       <p>Já dito na seção 5.3, mas vale repetir porque é a armadilha mais fácil de cair:
         <strong><code>TournamentResult.date</code> é reescrito a cada recaptura.</strong> Para
@@ -1239,12 +1276,13 @@ torneio : 'Open São Roque 2026 - OBD 21.02.2026'</code></pre>
       <p>Levantados ao longo do desenvolvimento e ainda não resolvidos, do mais para o menos grave:</p>
 
       <ol>
-        <li><strong>E-mail de recuperação de senha com cópia para a caixa da OBD.</strong> Qualquer
-          pessoa com acesso àquela caixa consegue redefinir a senha de qualquer jogador. É o item mais
-          sério da lista.</li>
         <li><strong><code>/admin/</code> no caminho padrão</strong>, sem limite de tentativas de
           login.</li>
         <li><strong>Sem limitação de tentativas</strong> na tela de login dos jogadores.</li>
+        <li><strong>A senha escolhida no cadastro é enviada em texto puro</strong> ao novo
+          associado, no e-mail de boas-vindas — e o próprio texto do e-mail diz que a OBD não guarda
+          a senha. Não é mais um vazamento para terceiros (ver 9.6), mas continua sendo prática
+          ruim.</li>
         <li><strong>Cabeçalhos de segurança HTTPS ausentes</strong>, incluindo
           <code>SECURE_PROXY_SSL_HEADER</code>.</li>
         <li><strong>Bootstrap não unificado</strong> (seção 9.2).</li>
