@@ -861,13 +861,17 @@ confiável, use `created_at`.
 
 Levantados ao longo do desenvolvimento e ainda não resolvidos:
 
-1. **Conferir o `SECRET_KEY` de produção.** Ele assina os cookies de sessão e os links
-   de recuperação de senha; se for curto ou ainda for o placeholder
-   `django-insecure-...` do Django, dá para forjar sessão. O valor fica numa variável do
-   Railway e não é visível pelo código. Deve ter 50 caracteres ou mais, aleatórios.
+1. **Subir o HSTS para um ano.** Hoje está em 1 hora, de propósito, até haver confiança
+   de que nada quebrou (ver 9.9). Passadas algumas semanas sem problema, é trocar a
+   variável `SECURE_HSTS_SECONDS` para `31536000` no Railway.
 2. **`stats.0010` não roda em SQLite** — ela usa `DROP COLUMN IF EXISTS`, sintaxe do
    PostgreSQL. Em produção já foi aplicada; o efeito é só atrapalhar quem quiser subir
    uma cópia local do banco em SQLite para testes.
+
+O `SECRET_KEY` de produção foi conferido em 16/09/2026 e está forte: 50 caracteres ou
+mais, variados, e não é o placeholder do Django. Vale reconferir se um dia ele for
+trocado — ele assina os cookies de sessão e os links de recuperação de senha, e um valor
+fraco permitiria forjar sessão.
 
 ---
 
