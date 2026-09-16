@@ -1,7 +1,7 @@
 """Limite de tentativas de entrada no site.
 
 Sem limite, descobrir uma senha fraca é só questão de insistir: nada impedia milhares de
-tentativas seguidas, nem na tela dos jogadores nem no `/admin/`.
+tentativas seguidas, nem na tela dos jogadores nem na do admin do Django.
 
 A contagem fica **no banco**, e não em memória, porque o Railway roda vários processos do
 gunicorn. Um contador em memória seria por processo, e cada um deixaria passar o limite
@@ -9,7 +9,7 @@ inteiro — com quatro processos, quatro vezes mais tentativas do que o pretendi
 
 O ponto de captura é o sinal `user_login_failed`, que o Django dispara sempre que
 `authenticate()` falha. Isso cobre de uma vez a tela dos jogadores (cujo formulário
-chama `authenticate` na validação) e a tela do `/admin/`, sem precisar mexer em nenhuma
+chama `authenticate` na validação) e a do admin do Django, sem precisar mexer em nenhuma
 das duas.
 """
 import datetime
@@ -34,13 +34,29 @@ MAX_POR_IP = 20
 VALIDADE_DO_REGISTRO = datetime.timedelta(days=1)
 
 
+def caminho_do_admin_login():
+    """Endereço da tela de entrada do admin do Django.
+
+    Descoberto pelo nome da rota, e não escrito à mão, porque o admin pode estar montado
+    num endereço próprio (variável ADMIN_URL). Se ficasse fixo aqui, trocar o endereço
+    faria o admin perder o limite de tentativas sem nenhum aviso.
+    """
+    try:
+        return reverse('admin:login')
+    except NoReverseMatch:
+        return None
+
+
 def caminhos_de_login():
     """Os endereços onde vale contar e barrar tentativas.
 
     Só estes. Assim, errar a senha na tela de "Atualizar Login" — que também chama
     `authenticate` — não tranca o jogador para fora do site.
     """
-    caminhos = {'/admin/login/'}
+    caminhos = set()
+    admin_login = caminho_do_admin_login()
+    if admin_login:
+        caminhos.add(admin_login)
     try:
         caminhos.add(reverse('players:login'))
     except NoReverseMatch:

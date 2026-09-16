@@ -782,7 +782,34 @@ deixaria passar o limite inteiro.
 **Se você se trancar para fora do `/admin/`:** espere 15 minutos sem tentar. Se precisar
 destravar na hora, apague as linhas de `TentativaDeLogin` pelo console do Railway.
 
-### 9.8 Datas: `date` versus `created_at`
+### 9.8 Endereço do admin do Django
+
+O admin do Django não fica mais no `/admin/` fixo: o endereço vem da variável de
+ambiente **`ADMIN_URL`**, configurada no Railway. Sem a variável, continua valendo
+`admin/`, então nada quebra se ela faltar.
+
+O valor é normalizado em `settings.py`: barras e espaços sobrando são removidos, e um
+valor vazio cai no padrão. Não há como digitar algo que monte o admin na raiz do site.
+
+**Isso não deixa o admin mais forte — só o tira da mira.** Robôs varrem a internet
+pedindo `/admin/` o dia inteiro; com outro endereço eles recebem 404 e vão embora. Quem
+descobrir o endereço volta à estaca zero. A proteção de verdade é o limite de tentativas
+(9.7) e uma senha boa.
+
+> **A variável mora no Railway, não no código, de propósito.** Se o endereço estivesse
+> escrito no `urls.py`, iria para o repositório junto com o código — e um repositório
+> público publicaria o "segredo".
+
+**Atenção ao mexer:** nada no código pode escrever o endereço do admin à mão. O limite de
+tentativas descobre a tela de entrada do admin por `reverse('admin:login')`, em
+`caminho_do_admin_login()`. Se alguém voltar a fixar `/admin/login/` em algum lugar,
+trocar o `ADMIN_URL` fará o admin **perder o limite de tentativas sem nenhum aviso** —
+o site ficaria menos seguro do que antes da mudança.
+
+Não confunda com o **painel da OBD** (`/dashboard/administrators/...`), que é outra coisa
+e não mudou de lugar.
+
+### 9.9 Datas: `date` versus `created_at`
 
 Já dito na seção 5.3, mas vale repetir porque é a armadilha mais fácil de cair:
 **`TournamentResult.date` é reescrito a cada recaptura.** Para ordenação cronológica
@@ -794,11 +821,9 @@ confiável, use `created_at`.
 
 Levantados ao longo do desenvolvimento e ainda não resolvidos:
 
-1. **`/admin/` no caminho padrão.** Já tem limite de tentativas (ver 9.7), mas o
-   endereço previsível continua atraindo varredura automática.
-2. **Cabeçalhos de segurança HTTPS ausentes**, incluindo `SECURE_PROXY_SSL_HEADER`.
-3. **Bootstrap não unificado** (seção 9.2).
-4. **`stats.0010` não roda em SQLite** — ela usa `DROP COLUMN IF EXISTS`, sintaxe do
+1. **Cabeçalhos de segurança HTTPS ausentes**, incluindo `SECURE_PROXY_SSL_HEADER`.
+2. **Bootstrap não unificado** (seção 9.2).
+3. **`stats.0010` não roda em SQLite** — ela usa `DROP COLUMN IF EXISTS`, sintaxe do
    PostgreSQL. Em produção já foi aplicada; o efeito é só atrapalhar quem quiser subir
    uma cópia local do banco em SQLite para testes.
 

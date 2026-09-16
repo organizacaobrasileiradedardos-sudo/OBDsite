@@ -36,6 +36,14 @@ RESEND_API_KEY = config('RESEND_API_KEY')
 resend.api_key = RESEND_API_KEY
 LOGIN_URL = '/dashboard/players/dashboard/player/login'
 
+# Endereço do admin do Django. Fica numa variável de ambiente, e não no código, para
+# não ser publicado junto com o repositório. Trocar o endereço padrão não deixa o admin
+# mais forte — só o tira da mira dos robôs que varrem /admin/ o dia inteiro. Quem
+# protege de verdade é o limite de tentativas (core/seguranca.py) e uma senha boa.
+# Sem a variável, continua valendo 'admin/', então nada quebra se ela faltar.
+_admin_url = config('ADMIN_URL', default='admin').strip().strip('/')
+ADMIN_URL = f'{_admin_url or "admin"}/'
+
 # Application definition
 
 INSTALLED_APPS = [

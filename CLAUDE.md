@@ -55,6 +55,10 @@ pasta `OBD-master`. Ele aponta nomes que são usados mas ninguém define.
 - **O fim de uma etapa da Liga Nacional não pode ser deduzido dos dados.** Uma etapa
   pode terminar com jogos pendentes. Quem encerra é o administrador, pelo campo
   `in_progress`.
+- **O endereço do admin do Django vem da variável `ADMIN_URL`**, não é fixo. Nunca
+  escreva `/admin/` à mão no código: o limite de tentativas acha a tela de entrada por
+  `reverse('admin:login')`, e fixar o caminho faria o admin perder essa proteção em
+  silêncio se o endereço mudasse.
 - **`authenticate()` tem que receber o `request`.** Sem ele o Django dispara
   `user_login_failed` com `request=None`, e o limite de tentativas de login não conta a
   tentativa. Foi assim que a primeira versão dessa proteção não funcionou.

@@ -137,7 +137,7 @@ def update_tournament_category(request, tournament_id):
             f'Nenhuma liga com o nome "{tournament.name}" foi encontrada. Se o campeão deste '
             'torneio já estiver no Hall dos Campeões, ele continua na categoria antiga: '
             'o nome do torneio mudou depois que o campeão foi registrado. Corrija o tipo da '
-            'liga em /admin/ → Ligas.'
+            'liga no admin do Django, em Ligas.'
         )
 
     return redirect('administrators:scraping_dashboard')

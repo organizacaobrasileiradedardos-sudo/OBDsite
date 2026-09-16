@@ -1316,7 +1316,41 @@ torneio : 'Open São Roque 2026 - OBD 21.02.2026'</code></pre>
           <code>TentativaDeLogin</code> pelo console do Railway.</p>
       </div>
 
-      <h3><span class="n">9.8</span><code>date</code> versus <code>created_at</code></h3>
+      <h3><span class="n">9.8</span>Endereço do admin do Django</h3>
+
+      <p>O admin do Django não fica mais no <code>/admin/</code> fixo: o endereço vem da variável de
+        ambiente <strong><code>ADMIN_URL</code></strong>, configurada no Railway. Sem a variável,
+        continua valendo <code>admin/</code>, então nada quebra se ela faltar.</p>
+
+      <p>O valor é normalizado em <code>settings.py</code>: barras e espaços sobrando são removidos,
+        e um valor vazio cai no padrão. Não há como digitar algo que monte o admin na raiz do
+        site.</p>
+
+      <p><strong>Isso não deixa o admin mais forte — só o tira da mira.</strong> Robôs varrem a
+        internet pedindo <code>/admin/</code> o dia inteiro; com outro endereço eles recebem 404 e vão
+        embora. Quem descobrir o endereço volta à estaca zero. A proteção de verdade é o limite de
+        tentativas (9.7) e uma senha boa.</p>
+
+      <div class="nota">
+        <span class="tarja-rot">Por que no Railway e não no código</span>
+        <p>Se o endereço estivesse escrito no <code>urls.py</code>, iria para o repositório junto com
+          o código — e um repositório público publicaria o “segredo”.</p>
+      </div>
+
+      <div class="alerta">
+        <span class="tarja-rot">Atenção ao mexer</span>
+        <p>Nada no código pode escrever o endereço do admin à mão. O limite de tentativas descobre a
+          tela de entrada do admin por <code>reverse('admin:login')</code>, em
+          <code>caminho_do_admin_login()</code>. Se alguém voltar a fixar <code>/admin/login/</code>
+          em algum lugar, trocar o <code>ADMIN_URL</code> fará o admin <strong>perder o limite de
+          tentativas sem nenhum aviso</strong> — o site ficaria menos seguro do que antes da
+          mudança.</p>
+      </div>
+
+      <p>Não confunda com o <strong>painel da OBD</strong>
+        (<code>/dashboard/administrators/…</code>), que é outra coisa e não mudou de lugar.</p>
+
+      <h3><span class="n">9.9</span><code>date</code> versus <code>created_at</code></h3>
 
       <p>Já dito na seção 5.3, mas vale repetir porque é a armadilha mais fácil de cair:
         <strong><code>TournamentResult.date</code> é reescrito a cada recaptura.</strong> Para
@@ -1330,8 +1364,6 @@ torneio : 'Open São Roque 2026 - OBD 21.02.2026'</code></pre>
       <p>Levantados ao longo do desenvolvimento e ainda não resolvidos, do mais para o menos grave:</p>
 
       <ol>
-        <li><strong><code>/admin/</code> no caminho padrão.</strong> Já tem limite de tentativas
-          (ver 9.7), mas o endereço previsível continua atraindo varredura automática.</li>
         <li><strong>Cabeçalhos de segurança HTTPS ausentes</strong>, incluindo
           <code>SECURE_PROXY_SSL_HEADER</code>.</li>
         <li><strong>Bootstrap não unificado</strong> (seção 9.2).</li>

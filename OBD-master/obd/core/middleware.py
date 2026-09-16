@@ -8,7 +8,8 @@ from django.contrib import messages
 from django.http import HttpResponse
 from django.shortcuts import redirect
 
-from obd.core.seguranca import JANELA, caminhos_de_login, ip_do_pedido, motivo_do_bloqueio
+from obd.core.seguranca import (JANELA, caminho_do_admin_login, caminhos_de_login,
+                                ip_do_pedido, motivo_do_bloqueio)
 
 RECADO = (
     'Muitas tentativas de entrada seguidas. Por segurança, espere '
@@ -31,9 +32,9 @@ class LimiteDeTentativasDeLogin:
         return self.get_response(request)
 
     def _barrar(self, request):
-        # No /admin/ não há como devolver a mensagem pela tela de login do site, então
-        # a resposta é direta. 429 é o código de "tentativas demais".
-        if request.path.startswith('/admin/'):
+        # No admin do Django não há como devolver a mensagem pela tela de login do
+        # site, então a resposta é direta. 429 é o código de "tentativas demais".
+        if request.path == caminho_do_admin_login():
             return HttpResponse(RECADO, status=429, content_type='text/plain; charset=utf-8')
 
         messages.error(request, RECADO)

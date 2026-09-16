@@ -50,7 +50,7 @@ urlpatterns = [
     path('dashboard/leagues/', include(leagues_urls, namespace='league')),
     path('dashboard/champions/', include(champions_urls, namespace='champions')),
     path('subscribe/', subscribe),
-    path('admin/', admin.site.urls),
+    path(settings.ADMIN_URL, admin.site.urls),
     path('obd/players/', public_players, name='boaplayers'),
     path('obd/leagues/', public_leagues, name='boaleagues'),
     path('obd/leagues/atualizar/', refresh_league_stats, name='refresh_league_stats'),
