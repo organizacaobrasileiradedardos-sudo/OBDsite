@@ -1414,15 +1414,22 @@ torneio : 'Open São Roque 2026 - OBD 21.02.2026'</code></pre>
       <p>Levantados ao longo do desenvolvimento e ainda não resolvidos, do mais para o menos grave:</p>
 
       <ol>
-        <li><strong>Conferir o <code>SECRET_KEY</code> de produção.</strong> Ele assina os cookies
-          de sessão e os links de recuperação de senha; se for curto ou ainda for o placeholder
-          <code>django-insecure-…</code> do Django, dá para forjar sessão. O valor fica numa variável
-          do Railway e não é visível pelo código. Deve ter 50 caracteres ou mais, aleatórios.</li>
+        <li><strong>Subir o HSTS para um ano.</strong> Hoje está em 1 hora, de propósito, até haver
+          confiança de que nada quebrou (ver 9.9). Passadas algumas semanas sem problema, é trocar a
+          variável <code>SECURE_HSTS_SECONDS</code> para <code>31536000</code> no Railway.</li>
         <li><strong><code>stats.0010</code> não roda em SQLite</strong> — ela usa
           <code>DROP COLUMN IF EXISTS</code>, sintaxe do PostgreSQL. Em produção já foi aplicada; o
           efeito é só atrapalhar quem quiser subir uma cópia local do banco em SQLite para
           testes.</li>
       </ol>
+
+      <div class="nota">
+        <span class="tarja-rot">Já conferido</span>
+        <p>O <code>SECRET_KEY</code> de produção foi verificado em 16/09/2026 e está forte: 50
+          caracteres ou mais, variados, e não é o placeholder do Django. Vale reconferir se um dia
+          ele for trocado — ele assina os cookies de sessão e os links de recuperação de senha, e um
+          valor fraco permitiria forjar sessão.</p>
+      </div>
     </section>
 
     <!-- ============ 11 ============ -->
