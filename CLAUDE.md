@@ -18,6 +18,10 @@ armadilha nova descoberta, e item da seção 10 (Pontos em aberto) que foi resol
 Não vale para: ajuste de cor, tamanho ou espaçamento, e correção de bug que não muda
 a regra. Documentação que muda à toa perde a confiança de quem lê.
 
+**Atualize também a data de revisão do cabeçalho**, em dois lugares: a linha
+`Última revisão:` no `.md` e o campo `<b>Revisão</b>` no `.html`. Uma data velha faz o
+leitor duvidar do resto do documento.
+
 Ao atualizar, avise no fim da resposta qual seção foi mexida, porque o usuário mantém
 uma cópia desse arquivo como conhecimento de um Projeto no Claude Desktop e precisa
 subir a versão nova de lá.
