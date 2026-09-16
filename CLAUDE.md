@@ -42,6 +42,12 @@ limpeza.
 Depois de remover qualquer código, rode `python3 ferramentas/nomes_indefinidos.py` na
 pasta `OBD-master`. Ele aponta nomes que são usados mas ninguém define.
 
+## Se o site sair do ar depois de um deploy
+
+O redirecionamento de http para https depende do `SECURE_PROXY_SSL_HEADER`. Se o site
+entrar em laço de redirecionamento, ponha **`SECURE_SSL_REDIRECT=False`** nas variáveis
+do Railway e reinicie — desliga na hora, sem precisar de deploy.
+
 ## Armadilhas que já causaram problema
 
 - **Não deixe autoformatador de HTML rodar nos templates.** O tokenizador do Django é

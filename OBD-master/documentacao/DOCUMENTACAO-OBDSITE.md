@@ -809,7 +809,46 @@ o site ficaria menos seguro do que antes da mudança.
 Não confunda com o **painel da OBD** (`/dashboard/administrators/...`), que é outra coisa
 e não mudou de lugar.
 
-### 9.9 Datas: `date` versus `created_at`
+### 9.9 Segurança do tráfego (HTTPS)
+
+Todas as opções abaixo valem **só fora do `DEBUG`**: em desenvolvimento o site roda em
+http, e ligá-las localmente impediria de entrar.
+
+| Opção | O que faz |
+|---|---|
+| `SECURE_PROXY_SSL_HEADER` | ensina o Django a reconhecer o protocolo original atrás do proxy |
+| `SESSION_COOKIE_SECURE`, `CSRF_COOKIE_SECURE` | os cookies deixam de trafegar em http |
+| `SECURE_SSL_REDIRECT` | redireciona http para https |
+| `SECURE_CONTENT_TYPE_NOSNIFF` | o navegador não adivinha o tipo de um arquivo |
+| `SECURE_REFERRER_POLICY` | não repassa o endereço da página ao sair do site |
+| `SECURE_HSTS_SECONDS` | o navegador passa a recusar http neste domínio por conta própria |
+
+**O `SECURE_PROXY_SSL_HEADER` corrigiu um problema que já existia.** Atrás do proxy do
+Railway o Django recebe o pedido em http e concluía que a conexão não era segura — então
+`request.build_absolute_uri()` montava endereços **`http://`**, inclusive o link de
+recuperação de senha e o QR code do perfil.
+
+> **`SECURE_SSL_REDIRECT` depende do cabeçalho acima.** Sem ele o Django acha que todo
+> pedido é http e redireciona em círculo, derrubando o site. Por isso existe a variável
+> de ambiente de mesmo nome: pôr `SECURE_SSL_REDIRECT=False` no Railway e reiniciar
+> desliga o redirecionamento **sem precisar de deploy**. É a válvula de escape.
+
+**HSTS é a única opção daqui difícil de desfazer:** o navegador guarda a instrução pelo
+prazo informado, e desligar no servidor não apaga o que já foi guardado. Por isso começa
+em **1 hora**. Depois de algumas semanas sem problema, dá para subir para `31536000` (um
+ano) pela variável `SECURE_HSTS_SECONDS`. `INCLUDE_SUBDOMAINS` e `PRELOAD` ficam
+desligados de propósito — valeriam para todos os subdomínios e, no caso do preload, para
+listas embutidas nos navegadores, e desfazer leva meses.
+
+**`X_FRAME_OPTIONS` fica em `SAMEORIGIN`, não em `DENY`.** O `check --deploy` do Django
+reclama disso, mas a tela de Documentos abre PDFs num iframe, e `DENY` quebraria o
+visualizador se o arquivo vier do próprio domínio.
+
+O `python manage.py check --deploy` é o audit do próprio Django para isso. Hoje ele
+aponta quatro avisos, e três são escolhas deliberadas: HSTS sem subdomínios, HSTS sem
+preload e o `X_FRAME_OPTIONS`.
+
+### 9.10 Datas: `date` versus `created_at`
 
 Já dito na seção 5.3, mas vale repetir porque é a armadilha mais fácil de cair:
 **`TournamentResult.date` é reescrito a cada recaptura.** Para ordenação cronológica
@@ -821,7 +860,10 @@ confiável, use `created_at`.
 
 Levantados ao longo do desenvolvimento e ainda não resolvidos:
 
-1. **Cabeçalhos de segurança HTTPS ausentes**, incluindo `SECURE_PROXY_SSL_HEADER`.
+1. **Conferir o `SECRET_KEY` de produção.** Ele assina os cookies de sessão e os links
+   de recuperação de senha; se for curto ou ainda for o placeholder
+   `django-insecure-...` do Django, dá para forjar sessão. O valor fica numa variável do
+   Railway e não é visível pelo código. Deve ter 50 caracteres ou mais, aleatórios.
 2. **Bootstrap não unificado** (seção 9.2).
 3. **`stats.0010` não roda em SQLite** — ela usa `DROP COLUMN IF EXISTS`, sintaxe do
    PostgreSQL. Em produção já foi aplicada; o efeito é só atrapalhar quem quiser subir

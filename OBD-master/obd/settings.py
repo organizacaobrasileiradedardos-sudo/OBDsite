@@ -197,4 +197,51 @@ LOGGING = {
     "disable_existing_loggers": False,
 }
 
+# ---------------------------------------------------------------------------
+# Segurança do tráfego (HTTPS)
+#
+# Tudo aqui vale só fora do DEBUG: em desenvolvimento o site roda em http, e ligar
+# estas opções localmente impediria de entrar.
+# ---------------------------------------------------------------------------
+
+# O mais importante, e o que resolve um problema que já existia: atrás do proxy do
+# Railway, o Django recebe o pedido em http e concluía que a conexão não era segura.
+# Com isso, request.build_absolute_uri() montava endereços http:// — inclusive o link
+# de recuperação de senha e o QR code do perfil. Este cabeçalho é o que o proxy usa
+# para informar o protocolo original.
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+
+# Os cookies de sessão e de CSRF deixam de trafegar em http.
+SESSION_COOKIE_SECURE = not DEBUG
+CSRF_COOKIE_SECURE = not DEBUG
+
+# Impede o navegador de adivinhar o tipo de um arquivo e tratá-lo como outra coisa.
+SECURE_CONTENT_TYPE_NOSNIFF = True
+
+# Ao sair do site, o endereço completo da página de origem não é repassado.
+SECURE_REFERRER_POLICY = 'same-origin'
+
+# Redireciona http para https. Depende do cabeçalho lá de cima: sem ele o Django acha
+# que todo pedido é http e redireciona em círculo, derrubando o site. Por isso existe a
+# variável de ambiente — se algo der errado, basta pôr SECURE_SSL_REDIRECT=False no
+# Railway e reiniciar, sem precisar de um novo deploy.
+SECURE_SSL_REDIRECT = (not DEBUG) and config('SECURE_SSL_REDIRECT', default=True, cast=bool)
+
+# HSTS: o navegador passa a recusar http neste domínio por conta própria, o que fecha a
+# brecha do primeiro acesso, anterior ao redirecionamento.
+#
+# É a única opção daqui difícil de desfazer: o navegador guarda a instrução pelo prazo
+# informado, e desligar no servidor não apaga o que já foi guardado. Por isso começa com
+# 1 hora. Depois de algumas semanas sem problema, dá para subir para 31536000 (um ano)
+# pela variável de ambiente.
+#
+# INCLUDE_SUBDOMAINS e PRELOAD ficam desligados de propósito: valeriam para todos os
+# subdomínios e, no caso do preload, para listas embutidas nos navegadores — desfazer
+# isso leva meses.
+SECURE_HSTS_SECONDS = 0 if DEBUG else config('SECURE_HSTS_SECONDS', default=3600, cast=int)
+SECURE_HSTS_INCLUDE_SUBDOMAINS = False
+SECURE_HSTS_PRELOAD = False
+
+# Mantido em SAMEORIGIN, e não em DENY: a tela de Documentos abre PDFs dentro de um
+# iframe, e DENY quebraria o visualizador se o arquivo vier do próprio domínio.
 X_FRAME_OPTIONS = 'SAMEORIGIN'

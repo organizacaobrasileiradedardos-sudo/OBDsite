@@ -1350,7 +1350,59 @@ torneio : 'Open São Roque 2026 - OBD 21.02.2026'</code></pre>
       <p>Não confunda com o <strong>painel da OBD</strong>
         (<code>/dashboard/administrators/…</code>), que é outra coisa e não mudou de lugar.</p>
 
-      <h3><span class="n">9.9</span><code>date</code> versus <code>created_at</code></h3>
+      <h3><span class="n">9.9</span>Segurança do tráfego (HTTPS)</h3>
+
+      <p>Todas as opções abaixo valem <strong>só fora do <code>DEBUG</code></strong>: em
+        desenvolvimento o site roda em http, e ligá-las localmente impediria de entrar.</p>
+
+      <div class="tbl">
+        <table>
+          <thead><tr><th>Opção</th><th>O que faz</th></tr></thead>
+          <tbody>
+            <tr><td><code>SECURE_PROXY_SSL_HEADER</code></td><td>ensina o Django a reconhecer o protocolo original atrás do proxy</td></tr>
+            <tr><td><code>SESSION_COOKIE_SECURE</code>, <code>CSRF_COOKIE_SECURE</code></td><td>os cookies deixam de trafegar em http</td></tr>
+            <tr><td><code>SECURE_SSL_REDIRECT</code></td><td>redireciona http para https</td></tr>
+            <tr><td><code>SECURE_CONTENT_TYPE_NOSNIFF</code></td><td>o navegador não adivinha o tipo de um arquivo</td></tr>
+            <tr><td><code>SECURE_REFERRER_POLICY</code></td><td>não repassa o endereço da página ao sair do site</td></tr>
+            <tr><td><code>SECURE_HSTS_SECONDS</code></td><td>o navegador passa a recusar http neste domínio por conta própria</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <p><strong>O <code>SECURE_PROXY_SSL_HEADER</code> corrigiu um problema que já existia.</strong>
+        Atrás do proxy do Railway o Django recebe o pedido em http e concluía que a conexão não era
+        segura — então <code>request.build_absolute_uri()</code> montava endereços
+        <strong><code>http://</code></strong>, inclusive o link de recuperação de senha e o QR code
+        do perfil.</p>
+
+      <div class="alerta">
+        <span class="tarja-rot">A válvula de escape</span>
+        <p><code>SECURE_SSL_REDIRECT</code> depende do cabeçalho acima. Sem ele o Django acha que
+          todo pedido é http e redireciona em círculo, derrubando o site. Por isso existe a variável
+          de ambiente de mesmo nome: pôr <code>SECURE_SSL_REDIRECT=False</code> no Railway e
+          reiniciar desliga o redirecionamento <strong>sem precisar de deploy</strong>.</p>
+      </div>
+
+      <div class="regra">
+        <span class="tarja-rot">HSTS é difícil de desfazer</span>
+        <p>O navegador guarda a instrução pelo prazo informado, e desligar no servidor não apaga o
+          que já foi guardado. Por isso começa em <strong>1 hora</strong>. Depois de algumas semanas
+          sem problema, dá para subir para <code>31536000</code> (um ano) pela variável
+          <code>SECURE_HSTS_SECONDS</code>. <code>INCLUDE_SUBDOMAINS</code> e <code>PRELOAD</code>
+          ficam desligados de propósito — valeriam para todos os subdomínios e, no caso do preload,
+          para listas embutidas nos navegadores, e desfazer leva meses.</p>
+      </div>
+
+      <p><strong><code>X_FRAME_OPTIONS</code> fica em <code>SAMEORIGIN</code>, não em
+        <code>DENY</code>.</strong> O <code>check --deploy</code> do Django reclama disso, mas a tela
+        de Documentos abre PDFs num iframe, e <code>DENY</code> quebraria o visualizador se o arquivo
+        vier do próprio domínio.</p>
+
+      <p>O <code>python manage.py check --deploy</code> é o audit do próprio Django para isso. Hoje
+        ele aponta quatro avisos, e três são escolhas deliberadas: HSTS sem subdomínios, HSTS sem
+        preload e o <code>X_FRAME_OPTIONS</code>.</p>
+
+      <h3><span class="n">9.10</span><code>date</code> versus <code>created_at</code></h3>
 
       <p>Já dito na seção 5.3, mas vale repetir porque é a armadilha mais fácil de cair:
         <strong><code>TournamentResult.date</code> é reescrito a cada recaptura.</strong> Para
@@ -1364,8 +1416,10 @@ torneio : 'Open São Roque 2026 - OBD 21.02.2026'</code></pre>
       <p>Levantados ao longo do desenvolvimento e ainda não resolvidos, do mais para o menos grave:</p>
 
       <ol>
-        <li><strong>Cabeçalhos de segurança HTTPS ausentes</strong>, incluindo
-          <code>SECURE_PROXY_SSL_HEADER</code>.</li>
+        <li><strong>Conferir o <code>SECRET_KEY</code> de produção.</strong> Ele assina os cookies
+          de sessão e os links de recuperação de senha; se for curto ou ainda for o placeholder
+          <code>django-insecure-…</code> do Django, dá para forjar sessão. O valor fica numa variável
+          do Railway e não é visível pelo código. Deve ter 50 caracteres ou mais, aleatórios.</li>
         <li><strong>Bootstrap não unificado</strong> (seção 9.2).</li>
         <li><strong><code>stats.0010</code> não roda em SQLite</strong> — ela usa
           <code>DROP COLUMN IF EXISTS</code>, sintaxe do PostgreSQL. Em produção já foi aplicada; o
