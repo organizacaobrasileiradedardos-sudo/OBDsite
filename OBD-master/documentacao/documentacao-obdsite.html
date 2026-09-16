@@ -1424,7 +1424,39 @@ torneio : 'Open São Roque 2026 - OBD 21.02.2026'</code></pre>
         ele aponta quatro avisos, e três são escolhas deliberadas: HSTS sem subdomínios, HSTS sem
         preload e o <code>X_FRAME_OPTIONS</code>.</p>
 
-      <h3><span class="n">9.10</span><code>date</code> versus <code>created_at</code></h3>
+      <h3><span class="n">9.10</span>O banco não fica exposto à internet</h3>
+
+      <p>O site conversa com o PostgreSQL pela <strong>rede interna</strong> do Railway: o
+        <code>DATABASE_URL</code> do serviço aponta para <code>postgres.railway.internal</code>. Não
+        sai para a internet, não gera custo de tráfego, e não depende de o banco ter endereço
+        público.</p>
+
+      <div class="alerta">
+        <span class="tarja-rot">O que foi encontrado</span>
+        <p>Em setembro de 2026 descobriu-se que o Postgres do site <strong>estava com acesso público
+          ligado</strong> (<code>interchange.proxy.rlwy.net:24341</code>), sem que nada usasse. Foi
+          desligado. A única proteção daquela porta era a senha do banco, e do outro lado dela estão
+          os cadastros, e-mails e histórico de todos os jogadores.</p>
+      </div>
+
+      <div class="regra">
+        <span class="tarja-rot">A armadilha</span>
+        <p>A variável <code>DATABASE_PUBLIC_URL</code> <strong>existe em todo serviço Postgres do
+          Railway</strong>, esteja o acesso público ligado ou não. Ver a variável na lista não
+          significa nada. Duas formas de saber de verdade: em <strong>Settings → Networking</strong>,
+          o botão <em>“Add Public Access”</em> indica desligado e um domínio com lixeira indica
+          ligado; e o valor da variável fica com o endereço vazio
+          (<code>…@:/railway</code>) quando está desligado.</p>
+      </div>
+
+      <p><strong>Para alcançar o banco do seu computador</strong>, não religue o acesso público: use
+        <code>railway connect Postgres</code>, que abre um túnel criptografado temporário.</p>
+
+      <p>As consultas de manutenção rodam na aba <strong>Console do serviço do site</strong> (não do
+        Postgres), com <code>python3 manage.py shell</code>. É de lá que
+        <code>postgres.railway.internal</code> resolve.</p>
+
+      <h3><span class="n">9.11</span><code>date</code> versus <code>created_at</code></h3>
 
       <p>Já dito na seção 5.3, mas vale repetir porque é a armadilha mais fácil de cair:
         <strong><code>TournamentResult.date</code> é reescrito a cada recaptura.</strong> Para

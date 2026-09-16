@@ -52,6 +52,14 @@ O redirecionamento de http para https depende do `SECURE_PROXY_SSL_HEADER`. Se o
 entrar em laço de redirecionamento, ponha **`SECURE_SSL_REDIRECT=False`** nas variáveis
 do Railway e reinicie — desliga na hora, sem precisar de deploy.
 
+## Consultas de manutenção no Railway
+
+Rodam na aba **Console do serviço do site** (não do Postgres), com
+`python3 manage.py shell` — não `python`, que não existe no container. É de lá que o
+`postgres.railway.internal` do `DATABASE_URL` resolve. Do computador do usuário, o
+caminho é `railway connect Postgres`, que abre um túnel temporário; **nunca** religar o
+acesso público do banco, que foi desligado de propósito.
+
 ## Armadilhas que já causaram problema
 
 - **Não deixe autoformatador de HTML rodar nos templates.** O tokenizador do Django é

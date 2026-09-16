@@ -870,7 +870,33 @@ O `python manage.py check --deploy` é o audit do próprio Django para isso. Hoj
 aponta quatro avisos, e três são escolhas deliberadas: HSTS sem subdomínios, HSTS sem
 preload e o `X_FRAME_OPTIONS`.
 
-### 9.10 Datas: `date` versus `created_at`
+### 9.10 O banco não fica exposto à internet
+
+O site conversa com o PostgreSQL pela **rede interna** do Railway: o `DATABASE_URL` do
+serviço aponta para `postgres.railway.internal`. Não sai para a internet, não gera custo
+de tráfego, e não depende de o banco ter endereço público.
+
+Em setembro de 2026 descobriu-se que o Postgres do site **estava com acesso público
+ligado** (`interchange.proxy.rlwy.net:24341`), sem que nada usasse. Foi desligado. A
+única proteção daquela porta era a senha do banco, e do outro lado dela estão os
+cadastros, e-mails e histórico de todos os jogadores.
+
+> **A armadilha:** a variável `DATABASE_PUBLIC_URL` **existe em todo serviço Postgres do
+> Railway**, esteja o acesso público ligado ou não. Ver a variável na lista não significa
+> nada. Duas formas de saber de verdade:
+>
+> - **Settings → Networking**: se aparecer o botão *"Add Public Access"*, está desligado;
+>   se aparecer um domínio com uma lixeira ao lado, está ligado.
+> - **O valor da variável**: com o acesso desligado, o endereço fica vazio
+>   (`...@:/railway`), porque não há domínio nem porta para preencher.
+
+**Para alcançar o banco do seu computador**, não religue o acesso público: use
+`railway connect Postgres`, que abre um túnel criptografado temporário.
+
+As consultas de manutenção rodam na aba **Console do serviço do site** (não do Postgres),
+com `python3 manage.py shell`. É de lá que `postgres.railway.internal` resolve.
+
+### 9.11 Datas: `date` versus `created_at`
 
 Já dito na seção 5.3, mas vale repetir porque é a armadilha mais fácil de cair:
 **`TournamentResult.date` é reescrito a cada recaptura.** Para ordenação cronológica
