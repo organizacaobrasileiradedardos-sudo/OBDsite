@@ -417,7 +417,7 @@
       <p class="standfirst">Como o site da Organização Brasileira de Dardos funciona: quais telas
         existem, de onde vêm os números que elas mostram e quais regras estão embutidas no código.</p>
       <div class="meta">
-        <span><b>Revisão</b> 15 · set · 2026</span>
+        <span><b>Revisão</b> 16 · set · 2026</span>
         <span><b>Stack</b> Django 4.2 · PostgreSQL · Railway</span>
         <span><b>Telas</b> 34 templates</span>
       </div>
@@ -456,7 +456,7 @@
             <tr><td>Arquivos estáticos</td><td>whitenoise (<code>CompressedManifestStaticFilesStorage</code>)</td></tr>
             <tr><td>Imagens enviadas</td><td>Cloudinary</td></tr>
             <tr><td>E-mail</td><td>Resend</td></tr>
-            <tr><td>Front-end</td><td>Bootstrap 5 + Bootstrap Icons, CSS próprio</td></tr>
+            <tr><td>Front-end</td><td>Bootstrap 5.3.3 + Bootstrap Icons 1.11.3, CSS próprio</td></tr>
             <tr><td>Calendário</td><td>FullCalendar 5.11.3</td></tr>
             <tr><td>Raspagem</td><td>requests + BeautifulSoup</td></tr>
             <tr><td>Planilhas</td><td>pandas + openpyxl</td></tr>
@@ -1175,26 +1175,24 @@ torneio : 'Open São Roque 2026 - OBD 21.02.2026'</code></pre>
           claro.</p>
       </div>
 
-      <h3><span class="n">9.2</span>Versões diferentes de Bootstrap</h3>
+      <h3><span class="n">9.2</span>Versões de Bootstrap (unificadas)</h3>
 
-      <div class="tbl">
-        <table>
-          <thead><tr><th>Base</th><th>Bootstrap</th><th>Bootstrap Icons</th></tr></thead>
-          <tbody>
-            <tr><td><code>base.html</code> (público)</td><td>5.3.3</td><td>1.11.3</td></tr>
-            <tr><td><code>baseuser.html</code></td><td><strong>5.0.0-beta2</strong></td><td>1.11.3</td></tr>
-            <tr><td><code>baseadmin.html</code></td><td><strong>5.0.0-beta2</strong></td><td>1.11.3</td></tr>
-          </tbody>
-        </table>
+      <p>As três bases usam <strong>Bootstrap 5.3.3 e Bootstrap Icons 1.11.3</strong>. Antes,
+        <code>baseuser.html</code> e <code>baseadmin.html</code> estavam no 5.0.0-beta2, e componentes
+        mais novos se comportavam de forma diferente nas telas internas.</p>
+
+      <div class="alerta">
+        <span class="tarja-rot">Ao trocar a versão</span>
+        <p>O <code>integrity</code> tem que ser trocado junto. Ele é a impressão digital do arquivo:
+          com o hash da versão antiga, o navegador <strong>recusa o arquivo</strong> e a tela fica sem
+          estilo nenhum. É a forma mais fácil de quebrar tudo numa atualização dessas. Os hashes das
+          três bases são idênticos de propósito — se um dia divergirem, é sinal de que alguém
+          atualizou uma base e esqueceu as outras.</p>
       </div>
 
-      <p>Os ícones já foram unificados; <strong>o Bootstrap em si não</strong>. Componentes mais novos
-        podem se comportar de forma diferente nas telas internas. Unificar é um trabalho pendente e de
-        risco alto, porque afeta todas as telas administrativas de uma vez.</p>
-
-      <p><em>Sintoma típico da versão antiga:</em> um ícone que não existe naquela versão renderiza um
-        <code>&lt;i&gt;</code> vazio, e o botão aparece sem nada dentro — parecendo um problema de
-        cor.</p>
+      <p><em>Sintoma da versão antiga, que já apareceu aqui:</em> um ícone que não existe naquela
+        versão renderiza um <code>&lt;i&gt;</code> vazio, e o botão aparece sem nada dentro —
+        parecendo um problema de cor.</p>
 
       <h3><span class="n">9.3</span>Quebra de linha dentro de tag de template</h3>
 
@@ -1420,7 +1418,6 @@ torneio : 'Open São Roque 2026 - OBD 21.02.2026'</code></pre>
           de sessão e os links de recuperação de senha; se for curto ou ainda for o placeholder
           <code>django-insecure-…</code> do Django, dá para forjar sessão. O valor fica numa variável
           do Railway e não é visível pelo código. Deve ter 50 caracteres ou mais, aleatórios.</li>
-        <li><strong>Bootstrap não unificado</strong> (seção 9.2).</li>
         <li><strong><code>stats.0010</code> não roda em SQLite</strong> — ela usa
           <code>DROP COLUMN IF EXISTS</code>, sintaxe do PostgreSQL. Em produção já foi aplicada; o
           efeito é só atrapalhar quem quiser subir uma cópia local do banco em SQLite para

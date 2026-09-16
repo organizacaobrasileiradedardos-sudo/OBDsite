@@ -2,7 +2,7 @@
 
 **Organização Brasileira de Dardos — obdardos.com.br**
 
-Última revisão: 15 de setembro de 2026.
+Última revisão: 16 de setembro de 2026.
 
 Este documento descreve como o site funciona por dentro: quais telas existem, o que
 cada uma faz, de onde vêm os números que elas mostram e quais regras de negócio estão
@@ -38,7 +38,7 @@ mesmo "Bruno Amaro" que já tem conta no site.* A seção 6 trata disso em detal
 | Arquivos estáticos | whitenoise (`CompressedManifestStaticFilesStorage`) |
 | Imagens enviadas | Cloudinary |
 | E-mail | Resend |
-| Front-end | Bootstrap 5 + Bootstrap Icons, CSS próprio |
+| Front-end | Bootstrap 5.3.3 + Bootstrap Icons 1.11.3, CSS próprio |
 | Calendário | FullCalendar 5.11.3 |
 | Raspagem | requests + BeautifulSoup |
 | Planilhas | pandas + openpyxl |
@@ -673,20 +673,21 @@ escuro**, praticamente invisível. Isso já apareceu em vários lugares. Ao corr
 **escopar a regra**: `.card .card-title`, não `.card-title` solto — um `<h2 class="card-title">`
 fora de qualquer card ficaria branco sobre fundo claro.
 
-### 9.2 Versões diferentes de Bootstrap
+### 9.2 Versões de Bootstrap (unificadas)
 
-| Base | Bootstrap | Bootstrap Icons |
-|---|---|---|
-| `base.html` (público) | 5.3.3 | 1.11.3 |
-| `baseuser.html` | **5.0.0-beta2** | 1.11.3 |
-| `baseadmin.html` | **5.0.0-beta2** | 1.11.3 |
+As três bases usam **Bootstrap 5.3.3 e Bootstrap Icons 1.11.3**. Antes, `baseuser.html`
+e `baseadmin.html` estavam no 5.0.0-beta2, e componentes mais novos se comportavam de
+forma diferente nas telas internas.
 
-Os ícones já foram unificados. **O Bootstrap em si não.** Isso significa que componentes
-mais novos podem se comportar de forma diferente nas telas internas. Unificar é um
-trabalho pendente e de risco alto, porque afeta todas as telas administrativas de uma vez.
+**Ao trocar a versão, o `integrity` tem que ser trocado junto.** Ele é a impressão
+digital do arquivo: com o hash da versão antiga, o navegador **recusa o arquivo** e a
+tela fica sem estilo nenhum. É a forma mais fácil de quebrar tudo numa atualização
+dessas. Os hashes das três bases são idênticos de propósito — se um dia divergirem, é
+sinal de que alguém atualizou uma base e esqueceu as outras.
 
-*Sintoma típico da versão antiga:* um ícone que não existe naquela versão renderiza um
-`<i>` vazio, e o botão aparece sem nada dentro — parecendo um problema de cor.
+*Sintoma da versão antiga, que já apareceu aqui:* um ícone que não existe naquela versão
+renderiza um `<i>` vazio, e o botão aparece sem nada dentro — parecendo um problema de
+cor.
 
 ### 9.3 O tokenizador de templates do Django não aceita quebra de linha dentro de tag
 
@@ -864,8 +865,7 @@ Levantados ao longo do desenvolvimento e ainda não resolvidos:
    de recuperação de senha; se for curto ou ainda for o placeholder
    `django-insecure-...` do Django, dá para forjar sessão. O valor fica numa variável do
    Railway e não é visível pelo código. Deve ter 50 caracteres ou mais, aleatórios.
-2. **Bootstrap não unificado** (seção 9.2).
-3. **`stats.0010` não roda em SQLite** — ela usa `DROP COLUMN IF EXISTS`, sintaxe do
+2. **`stats.0010` não roda em SQLite** — ela usa `DROP COLUMN IF EXISTS`, sintaxe do
    PostgreSQL. Em produção já foi aplicada; o efeito é só atrapalhar quem quiser subir
    uma cópia local do banco em SQLite para testes.
 
