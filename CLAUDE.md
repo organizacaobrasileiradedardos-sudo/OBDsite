@@ -76,6 +76,9 @@ do Railway e reinicie — desliga na hora, sem precisar de deploy.
   `obd/core/emails.py`: `enviar_para_usuario` vai só para o destinatário (é por ali que
   passam o link de redefinição e a senha do cadastro), e `avisar_administracao` avisa a
   OBD com um texto próprio, sem nada que dê acesso a uma conta.
+- **`DEFAULT_FROM_EMAIL` é o remetente, não a caixa da OBD.** É `noreply@obdardos.com.br`
+  e não tem caixa postal. Avisos para a administração vão para `settings.EMAIL_AVISOS`.
+  Mandar para o remetente faz a mensagem sumir sem erro e sem rastro — já aconteceu.
 - **A mesma pessoa nunca disputa uma etapa com dois nomes diferentes.** Ela pode usar
   nomes diferentes em etapas diferentes, e por isso um jogador tem vários apelidos do
   N01 (`ApelidoN01`). Mas duas estatísticas do mesmo torneio para o mesmo jogador são

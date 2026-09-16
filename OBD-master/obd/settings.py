@@ -178,6 +178,12 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 ADMINS = [("OBD", "organizacaobrasileiradedardos@gmail.com")]
 MANAGERS = ADMINS
 
+# Para onde vão os avisos de que algo aconteceu no site (cadastro novo, pedido de
+# recuperação de senha). NÃO confundir com o DEFAULT_FROM_EMAIL, que é o remetente:
+# noreply@obdardos.com.br não tem caixa postal, e os avisos enviados para lá se
+# perderam. Sem a variável, cai no endereço do ADMINS acima, que é o certo.
+EMAIL_AVISOS = config('EMAIL_AVISOS', default='').strip() or ADMINS[0][1]
+
 cloudinary.config(
     cloud_name=config('CLOUDINARY_NAME'),
     api_key=config('CLOUDINARY_API_KEY'),

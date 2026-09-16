@@ -743,6 +743,27 @@ cadastros — mas por um aviso próprio, que não serve para entrar em conta nen
 **Ao criar um e-mail novo, não acrescente a caixa da OBD à lista de destinatários de
 `enviar_para_usuario`.** Se a administração precisar saber, use a segunda função.
 
+### Para onde vão os avisos
+
+`avisar_administracao` envia para **`settings.EMAIL_AVISOS`**, definido pela variável de
+ambiente de mesmo nome e, sem ela, pelo endereço do `ADMINS` no `settings.py`.
+
+> **Não confunda com o `DEFAULT_FROM_EMAIL`, que é o remetente.** Essa confusão já
+> custou caro: a primeira versão da função mandava os avisos para o próprio
+> `DEFAULT_FROM_EMAIL`, que é `noreply@obdardos.com.br` — um endereço sem caixa postal.
+> Os avisos saíam e se perdiam, sem erro e sem rastro.
+
+### Nenhum envio derruba a página
+
+`_enviar` captura qualquer exceção, registra no log e devolve `None`. Isso importa no
+cadastro: a conta é criada **antes** do envio, então uma falha ali mostrava erro 500 para
+quem tinha acabado de se cadastrar com sucesso — a pessoa achava que não tinha dado
+certo, tentava de novo e recebia "usuário já existe".
+
+As funções também **devolvem a resposta do Resend**. A primeira versão descartava o
+retorno, e por isso um diagnóstico de "os avisos não chegam" ficou cego: sem exceção e
+sem resposta, não havia como saber se o Resend tinha aceitado a mensagem.
+
 O e-mail de boas-vindas **não repete mais a senha** escolhida no cadastro. Ele passou a
 dizer que a senha é a que a pessoa acabou de escolher e a apontar o "Esqueci minha
 senha" para quem esquecer. Repetir a senha por e-mail deixava uma cópia dela em texto

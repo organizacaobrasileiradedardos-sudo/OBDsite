@@ -1260,6 +1260,30 @@ torneio : 'Open São Roque 2026 - OBD 21.02.2026'</code></pre>
           função.</p>
       </div>
 
+      <h4 style="font-family: var(--font-heading); font-weight: 600; margin: 28px 0 8px;">Para onde vão os avisos</h4>
+
+      <p><code>avisar_administracao</code> envia para <strong><code>settings.EMAIL_AVISOS</code></strong>,
+        definido pela variável de ambiente de mesmo nome e, sem ela, pelo endereço do
+        <code>ADMINS</code> no <code>settings.py</code>.</p>
+
+      <div class="alerta">
+        <span class="tarja-rot">Não confunda com o remetente</span>
+        <p>Essa confusão já custou caro: a primeira versão da função mandava os avisos para o próprio
+          <code>DEFAULT_FROM_EMAIL</code>, que é <code>noreply@obdardos.com.br</code> — um endereço
+          sem caixa postal. Os avisos saíam e se perdiam, sem erro e sem rastro.</p>
+      </div>
+
+      <h4 style="font-family: var(--font-heading); font-weight: 600; margin: 28px 0 8px;">Nenhum envio derruba a página</h4>
+
+      <p><code>_enviar</code> captura qualquer exceção, registra no log e devolve <code>None</code>.
+        Isso importa no cadastro: a conta é criada <strong>antes</strong> do envio, então uma falha
+        ali mostrava erro 500 para quem tinha acabado de se cadastrar com sucesso — a pessoa achava
+        que não tinha dado certo, tentava de novo e recebia “usuário já existe”.</p>
+
+      <p>As funções também <strong>devolvem a resposta do Resend</strong>. A primeira versão
+        descartava o retorno, e por isso um diagnóstico de “os avisos não chegam” ficou cego: sem
+        exceção e sem resposta, não havia como saber se o Resend tinha aceitado a mensagem.</p>
+
       <p>O e-mail de boas-vindas <strong>não repete mais a senha</strong> escolhida no cadastro. Ele
         passou a dizer que a senha é a que a pessoa acabou de escolher e a apontar o “Esqueci minha
         senha” para quem esquecer. Repetir a senha por e-mail deixava uma cópia dela em texto puro na
