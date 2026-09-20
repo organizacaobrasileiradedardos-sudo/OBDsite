@@ -417,7 +417,7 @@
       <p class="standfirst">Como o site da Organização Brasileira de Dardos funciona: quais telas
         existem, de onde vêm os números que elas mostram e quais regras estão embutidas no código.</p>
       <div class="meta">
-        <span><b>Revisão</b> 16 · set · 2026</span>
+        <span><b>Revisão</b> 19 · set · 2026</span>
         <span><b>Stack</b> Django 4.2 · PostgreSQL · Railway</span>
         <span><b>Telas</b> 34 templates</span>
       </div>
@@ -977,6 +977,24 @@ torneio : 'Open São Roque 2026 - OBD 21.02.2026'</code></pre>
             <tr><td><code>novo</code></td><td>Não achou ninguém</td><td><strong>Conferir</strong></td></tr>
           </tbody>
         </table>
+      </div>
+
+      <p><strong>A sigla do estado é ignorada na busca.</strong> As planilhas trazem o estado colado
+        no nome do jogador, em formatos que variam de linha para linha: <code>ILEO – PR</code>,
+        <code>JAMES MELO -SC</code>, <code>PEDRO TINOCO RJ</code>, <code>FULANO (SP)</code>. Sem
+        tratar isso, nenhum desses nomes casaria com o cadastro existente, todos cairiam na
+        conferência com <em>“criar cadastro novo”</em> pré-selecionado, e um clique distraído criaria
+        uma leva de duplicados de uma vez.</p>
+
+      <p>A busca tenta <strong>primeiro o nome como veio</strong> e só depois sem a sigla — nessa
+        ordem não se perde um cadastro cujo apelido tenha mesmo o estado dentro.</p>
+
+      <div class="alerta">
+        <span class="tarja-rot">Por que a sigla precisa vir separada</span>
+        <p>Ela só é reconhecida quando precedida de espaço ou de um traço. Sem essa exigência,
+          <code>JOSE</code> viraria <code>JO</code>, porque termina em <code>SE</code>, a sigla de
+          Sergipe. O mesmo valeria para qualquer nome terminado em duas letras que por acaso formem
+          uma sigla — <code>MOISES</code>, <code>ANDRES</code>, <code>ROSE</code>.</p>
       </div>
 
       <h3><span class="n">6.3</span>Cadastro provisório e reivindicação</h3>

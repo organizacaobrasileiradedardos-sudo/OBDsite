@@ -2,7 +2,7 @@
 
 **Organização Brasileira de Dardos — obdardos.com.br**
 
-Última revisão: 16 de setembro de 2026.
+Última revisão: 19 de setembro de 2026.
 
 Este documento descreve como o site funciona por dentro: quais telas existem, o que
 cada uma faz, de onde vêm os números que elas mostram e quais regras de negócio estão
@@ -513,6 +513,20 @@ Ao importar, cada nome é classificado em uma de cinco situações:
 | `palpite` | Achou um parecido, começando igual | **Conferir** |
 | `ambiguo` | Achou vários parecidos | **Conferir** |
 | `novo` | Não achou ninguém | **Conferir** |
+
+**A sigla do estado é ignorada na busca.** As planilhas trazem o estado colado no nome do
+jogador, em formatos que variam de linha para linha: `ILEO – PR`, `JAMES MELO -SC`,
+`PEDRO TINOCO RJ`, `FULANO (SP)`. Sem tratar isso, nenhum desses nomes casaria com o
+cadastro existente, todos cairiam na conferência com *"criar cadastro novo"*
+pré-selecionado, e um clique distraído criaria uma leva de duplicados de uma vez.
+
+A busca tenta **primeiro o nome como veio** e só depois sem a sigla — nessa ordem não se
+perde um cadastro cujo apelido tenha mesmo o estado dentro.
+
+> **A sigla só é reconhecida quando vem separada**, precedida de espaço ou de um traço.
+> Sem essa exigência, `JOSE` viraria `JO`, porque termina em `SE`, a sigla de Sergipe. O
+> mesmo valeria para qualquer nome terminado em duas letras que por acaso formem uma
+> sigla — `MOISES`, `ANDRES`, `ROSE`.
 
 ### 6.3 Cadastro provisório e reivindicação
 

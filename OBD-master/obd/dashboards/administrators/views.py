@@ -1,3 +1,4 @@
+import re
 from django.contrib.auth.decorators import login_required, permission_required
 from django.contrib.auth.models import User
 from django.shortcuts import render, redirect, get_object_or_404
@@ -320,6 +321,31 @@ def _parse_import_sheet(excel_file, kind):
     return etapa_name, etapa_date, linhas, None
 
 
+# Siglas dos 26 estados e do Distrito Federal.
+_UF = ('AC|AL|AP|AM|BA|CE|DF|ES|GO|MA|MT|MS|MG|PA|PB|PR|PE|PI|'
+       'RJ|RN|RS|RO|RR|SC|SP|SE|TO')
+
+# A sigla só é reconhecida quando vem separada do resto: precedida de espaço ou de um
+# traço. Sem essa exigência, "JOSE" viraria "JO", porque termina em "SE" — a sigla de
+# Sergipe. O mesmo valeria para qualquer nome terminado em duas letras que por acaso
+# formem uma sigla.
+_SUFIXO_ESTADO = re.compile(
+    rf'(?:\s+|\s*[-\u2013\u2014/]\s*)\(?(?:{_UF})\)?\s*$', re.IGNORECASE
+)
+
+
+def _sem_sufixo_de_estado(nome):
+    """Tira a sigla do estado do fim do nome: "ILEO - PR" vira "ILEO".
+
+    As planilhas de ranking trazem o estado colado no nome do jogador, em formatos que
+    variam de linha para linha: "- SC", "-SC", um traço longo em vez do hífen, ou nada
+    além do espaço. Sem tirar a sigla, nenhum desses nomes casa com o cadastro que já
+    existe, todos caem na conferência com "criar cadastro novo" pré-selecionado, e um
+    clique distraído criaria uma leva de duplicados de uma vez só.
+    """
+    return _SUFIXO_ESTADO.sub('', nome or '').strip()
+
+
 def _classify_player(name):
     """Como o nome da planilha se relaciona com as contas existentes.
 
@@ -330,18 +356,27 @@ def _classify_player(name):
       'ambiguo'  - vários candidatos por prefixo
       'novo'     - ninguém parecido
     """
-    pin = name.replace(' ', '').lower()
-
     from obd.dashboards.players.profiles.models import jogador_por_apelido_n01
 
-    by_nakka = jogador_por_apelido_n01(name)
-    if by_nakka:
-        return 'nakka', by_nakka, []
+    # Tenta primeiro o nome como veio na planilha e só depois sem a sigla do estado.
+    # Nessa ordem não se perde um cadastro cujo apelido tenha mesmo o estado dentro.
+    variantes = [name.strip()]
+    sem_estado = _sem_sufixo_de_estado(name)
+    if sem_estado and sem_estado.casefold() != name.strip().casefold():
+        variantes.append(sem_estado)
 
-    exato = User.objects.filter(username__iexact=pin).first()
-    if exato:
-        return 'username', exato, []
+    for variante in variantes:
+        by_nakka = jogador_por_apelido_n01(variante)
+        if by_nakka:
+            return 'nakka', by_nakka, []
 
+        exato = User.objects.filter(username__iexact=variante.replace(' ', '').lower()).first()
+        if exato:
+            return 'username', exato, []
+
+    # Para o palpite por prefixo vale a variante mais enxuta: é a que tem chance de
+    # casar com o começo de um nome de usuário.
+    pin = variantes[-1].replace(' ', '').lower()
     candidatos = list(User.objects.filter(username__istartswith=pin))
     if not candidatos:
         sem_acento = _strip_accents(pin)
