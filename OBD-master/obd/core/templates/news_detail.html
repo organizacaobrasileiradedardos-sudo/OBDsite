@@ -19,6 +19,18 @@ Description: This is the page where the full content of a single news article is
     <div class="row">
         <div class="col-lg-8 mx-auto">
 
+            {% if not news.is_active %}
+            <div class="alert alert-warning d-flex align-items-start gap-2" role="alert">
+                <i class="bi bi-eye-slash-fill fs-4"></i>
+                <div>
+                    <strong>Esta notícia ainda não está publicada.</strong><br>
+                    Você está vendo o rascunho porque é administrador. Para o público, esta
+                    página não existe, e a notícia não aparece na tela inicial nem na lista.
+                    Para publicar, marque <em>Ativo</em> no admin do Django.
+                </div>
+            </div>
+            {% endif %}
+
             <a href="{% url 'news' %}" class="btn btn-outline-secondary btn-sm mb-3">
                 <i class="bi bi-arrow-left"></i> Voltar para Notícias
             </a>

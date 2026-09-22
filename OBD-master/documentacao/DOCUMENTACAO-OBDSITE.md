@@ -2,7 +2,7 @@
 
 **Organização Brasileira de Dardos — obdardos.com.br**
 
-Última revisão: 19 de setembro de 2026.
+Última revisão: 22 de setembro de 2026.
 
 Este documento descreve como o site funciona por dentro: quais telas existem, o que
 cada uma faz, de onde vêm os números que elas mostram e quais regras de negócio estão
@@ -371,8 +371,20 @@ dois eventos no mesmo dia sejam distinguíveis. Não há ícones no calendário.
 
 ### 5.6 O campo "Ativo" das notícias
 
-`News.is_active = False` **esconde a notícia do site** sem apagá-la. É o jeito de tirar
-algo do ar preservando o registro.
+`News.is_active = False` **esconde a notícia do site** sem apagá-la. Serve para dois
+propósitos: tirar algo do ar preservando o registro, e escrever um **rascunho** antes de
+publicar.
+
+Uma notícia inativa não aparece na tela inicial nem na lista de notícias, e a página dela
+devolve "não encontrada" para o público.
+
+**Mas o administrador consegue abri-la**, para conferir como ficou antes de publicar. A
+página mostra uma tarja amarela avisando que é rascunho, para não haver confusão com uma
+notícia no ar. Sem isso, o único jeito de conferir seria ativar, olhar e desativar — e
+nesse intervalo a notícia ficaria visível para todo mundo.
+
+O caminho: no admin do Django, ao editar a notícia, use o botão **"Ver no site"** no
+canto superior direito. Ele aparece porque o modelo define `get_absolute_url`.
 
 ### 5.7 Categorias do Hall dos Campeões
 

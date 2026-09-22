@@ -82,6 +82,16 @@ class News(models.Model):
         return self.image_url
 
 
+    def get_absolute_url(self):
+        """Endereço público desta notícia.
+
+        Definir isto faz o admin do Django mostrar o botão "Ver no site" na tela de
+        edição — que é o caminho para conferir um rascunho antes de publicar.
+        """
+        from django.urls import reverse
+        return reverse('news_detail', args=[self.pk])
+
+
 class NewsImage(models.Model):
     """Extra gallery images for a News article, in addition to its main image"""
     news = models.ForeignKey(News, on_delete=models.CASCADE, related_name='gallery_images')

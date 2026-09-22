@@ -6,6 +6,7 @@ from django.urls import reverse
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required, permission_required
+from django.http import Http404
 from django.shortcuts import render, redirect, get_object_or_404
 from obd.dashboards.administrators.leagues.models import OrderOfMeritEntry
 from django.db.models import Sum, Min, Q, Max, F
@@ -402,8 +403,16 @@ def news_list(request):
 
 
 def news_detail(request, pk):
-    """Display the full content of a single OBD-authored news article"""
-    news = get_object_or_404(News, pk=pk, is_active=True)
+    """Conteúdo completo de uma notícia da OBD.
+
+    Uma notícia inativa é rascunho: não aparece na home nem na lista, e para o público
+    a página nem existe. Mas o administrador precisa conseguir vê-la para conferir como
+    ficou **antes** de publicar — senão o único jeito seria ativar, olhar e desativar,
+    e nesse intervalo ela fica visível para todo mundo.
+    """
+    news = get_object_or_404(News, pk=pk)
+    if not news.is_active and not request.user.has_perm('profiles.has_admin_role'):
+        raise Http404('Notícia não encontrada')
     return render(request, 'news_detail.html', {'news': news})
 
 

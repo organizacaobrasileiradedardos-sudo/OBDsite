@@ -417,7 +417,7 @@
       <p class="standfirst">Como o site da Organização Brasileira de Dardos funciona: quais telas
         existem, de onde vêm os números que elas mostram e quais regras estão embutidas no código.</p>
       <div class="meta">
-        <span><b>Revisão</b> 19 · set · 2026</span>
+        <span><b>Revisão</b> 22 · set · 2026</span>
         <span><b>Stack</b> Django 4.2 · PostgreSQL · Railway</span>
         <span><b>Telas</b> 34 templates</span>
       </div>
@@ -825,8 +825,21 @@ already_past   = Q(end_date__isnull=False, end_date__lt=now)  | Q(end_date__isnu
 
       <h3><span class="n">5.6</span>O campo “Ativo” das notícias</h3>
 
-      <p><code>News.is_active = False</code> <strong>esconde a notícia do site</strong> sem apagá-la.
-        É o jeito de tirar algo do ar preservando o registro.</p>
+      <p><code>News.is_active = False</code> <strong>esconde a notícia do site</strong> sem
+        apagá-la. Serve para dois propósitos: tirar algo do ar preservando o registro, e escrever um
+        <strong>rascunho</strong> antes de publicar.</p>
+
+      <p>Uma notícia inativa não aparece na tela inicial nem na lista de notícias, e a página dela
+        devolve “não encontrada” para o público.</p>
+
+      <div class="nota">
+        <span class="tarja-rot">Conferir antes de publicar</span>
+        <p>O administrador consegue abrir a notícia inativa, e a página mostra uma tarja amarela
+          avisando que é rascunho. Sem isso, o único jeito de conferir seria ativar, olhar e
+          desativar — e nesse intervalo a notícia ficaria visível para todo mundo. O caminho é o
+          botão <strong>“Ver no site”</strong> na tela de edição do admin do Django, que aparece
+          porque o modelo define <code>get_absolute_url</code>.</p>
+      </div>
 
       <h3><span class="n">5.7</span>Categorias do Hall dos Campeões</h3>
 
