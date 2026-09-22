@@ -489,8 +489,10 @@ convocados para o Grand Prix OBD, e desenha uma **linha de corte** logo depois d
 classificado. O número de vagas está em `VAGAS_GRAND_PRIX`, em `leagues/views.py` —
 mudou o regulamento, muda ali.
 
-As três primeiras linhas mantêm as cores de medalha: já estão destacadas por outro
-motivo, e são obviamente classificadas.
+**Todas as linhas classificadas recebem o mesmo verde, inclusive as três primeiras.** O
+Order of Merit não tinha troféus nem cores de medalha para o pódio: eles existiam e foram
+retirados, porque nesta tela o que interessa é quem disputa o Grand Prix, e um destaque
+competindo com o outro só confunde a leitura.
 
 A classificação segue a **ordem exibida na tela**, e não a colocação com empates. O
 motivo é que o Grand Prix tem um número fixo de vagas — "16 vagas" são 16 pessoas — e a

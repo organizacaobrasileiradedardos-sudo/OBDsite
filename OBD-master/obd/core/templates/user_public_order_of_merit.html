@@ -14,8 +14,9 @@ Description: This is the page where main data will remains.
 {% block title %}OBD Order Of Merit{% endblock %}
 {% block styles %}
 <style>
-    /* Classificados para o GRAND PRIX. Vem antes das regras do pódio de propósito:
-       as três primeiras linhas mantêm as cores de medalha, que já as destacam. */
+    /* Classificados para o GRAND PRIX. Todas as linhas classificadas recebem o mesmo
+       verde, inclusive as três primeiras: aqui o que interessa é quem disputa, não o
+       pódio da temporada. */
     .merit-classificado { background: rgba(5, 150, 105, 0.07); border-left: 4px solid var(--dartboard-green); }
     tbody tr.merit-classificado .sticky-col { background-color: #eaf7f1; }
 
@@ -47,9 +48,6 @@ Description: This is the page where main data will remains.
 
     .merit-aviso i { color: var(--dartboard-green-dark); font-size: 1.4rem; flex-shrink: 0; }
 
-    .merit-pos-1 { background: linear-gradient(90deg, rgba(255,215,0,0.15), transparent); border-left: 4px solid #d4af37; }
-    .merit-pos-2 { background: linear-gradient(90deg, rgba(192,192,192,0.15), transparent); border-left: 4px solid #b0b0b0; }
-    .merit-pos-3 { background: linear-gradient(90deg, rgba(205,127,50,0.15), transparent); border-left: 4px solid #cd7f32; }
     .merit-total { font-weight: bold; color: #14532d; }
     .merit-empty { color: #ced4da; }
 
@@ -60,9 +58,6 @@ Description: This is the page where main data will remains.
     thead .sticky-col { z-index: 3; background-color: #212529; color: #fff; }
     th.etapa-col, td.etapa-col { white-space: nowrap; min-width: 92px; }
     tbody tr:nth-of-type(odd) .sticky-col { background-color: #f2f2f2; }
-    tbody tr.merit-pos-1 .sticky-col { background-color: #fdf6df; }
-    tbody tr.merit-pos-2 .sticky-col { background-color: #f5f5f5; }
-    tbody tr.merit-pos-3 .sticky-col { background-color: #fbeee2; }
 
     @media (max-width: 575.98px) {
         .sticky-col-2 { min-width: 128px; font-size: 0.85rem; }
@@ -118,15 +113,8 @@ Description: This is the page where main data will remains.
                     </thead>
                     <tbody>
                         {% for row in ranking %}
-                        <tr class="{% if row.classificado %}merit-classificado {% endif %}{% if forloop.counter == 1 %}merit-pos-1{% elif forloop.counter == 2 %}merit-pos-2{% elif forloop.counter == 3 %}merit-pos-3{% endif %}">
+                        <tr class="{% if row.classificado %}merit-classificado{% endif %}">
                             <td class="text-center sticky-col sticky-col-1">
-                                {% if forloop.counter == 1 %}
-                                <i class="bi bi-trophy-fill" style="color: #d4af37;"></i>
-                                {% elif forloop.counter == 2 %}
-                                <i class="bi bi-trophy-fill" style="color: #b0b0b0;"></i>
-                                {% elif forloop.counter == 3 %}
-                                <i class="bi bi-trophy-fill" style="color: #cd7f32;"></i>
-                                {% endif %}
                                 {{ forloop.counter }}
                             </td>
                             <td class="sticky-col sticky-col-2">
