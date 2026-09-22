@@ -656,8 +656,14 @@ ar, a caixa de texto simples reaparece** e a edição continua possível, só se
 
 Na exibição, o filtro `conteudo_de_noticia` trata os dois tipos de conteúdo: o que vem do
 editor é HTML e vai como está; o das notícias escritas antes do editor é texto puro, e
-recebe o tratamento antigo, que transforma quebras de linha em parágrafos e endereços em
-links. Sem essa distinção, as notícias antigas virariam um bloco único de texto.
+recebe o tratamento antigo, que transforma quebras de linha em parágrafos. Sem essa
+distinção, as notícias antigas virariam um bloco único de texto.
+
+**Nos dois casos, um endereço digitado solto vira link clicável.** Isso exigiu cuidado:
+aplicar a conversão ao HTML inteiro linkaria também o endereço que está *dentro* do
+`href` de um link já existente, gerando etiquetas aninhadas. Por isso
+`_transformar_enderecos_em_links` converte só os pedaços de texto, e nunca dentro de uma
+etiqueta nem entre a abertura e o fechamento de um link.
 
 > **Por que o HTML da notícia é exibido sem escapar:** notícia só é escrita por quem tem
 > acesso ao admin do Django. Não há caminho pelo qual um visitante escreva ali. Texto

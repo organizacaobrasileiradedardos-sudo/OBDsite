@@ -1148,8 +1148,14 @@ torneio : 'Open São Roque 2026 - OBD 21.02.2026'</code></pre>
 
       <p>Na exibição, o filtro <code>conteudo_de_noticia</code> trata os dois tipos de conteúdo: o que
         vem do editor é HTML e vai como está; o das notícias escritas antes do editor é texto puro, e
-        recebe o tratamento antigo, que transforma quebras de linha em parágrafos e endereços em
-        links. Sem essa distinção, as notícias antigas virariam um bloco único de texto.</p>
+        recebe o tratamento antigo, que transforma quebras de linha em parágrafos. Sem essa
+        distinção, as notícias antigas virariam um bloco único de texto.</p>
+
+      <p><strong>Nos dois casos, um endereço digitado solto vira link clicável.</strong> Isso exigiu
+        cuidado: aplicar a conversão ao HTML inteiro linkaria também o endereço que está <em>dentro</em>
+        do <code>href</code> de um link já existente, gerando etiquetas aninhadas. Por isso
+        <code>_transformar_enderecos_em_links</code> converte só os pedaços de texto, e nunca dentro
+        de uma etiqueta nem entre a abertura e o fechamento de um link.</p>
 
       <div class="nota">
         <span class="tarja-rot">Por que o HTML da notícia é exibido sem escapar</span>
