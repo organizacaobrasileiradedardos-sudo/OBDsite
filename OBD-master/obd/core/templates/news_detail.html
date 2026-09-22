@@ -7,12 +7,34 @@ Description: This is the page where the full content of a single news article is
 -->
 {% extends 'base.html' %}
 {% load static %}
+{% load extras %}
 
 {% block title %}{{ news.title }} | OBD{% endblock %}
 
 {% block og_title %}{{ news.title }}{% endblock %}
-{% block og_description %}{{ news.content|default:news.summary|truncatewords:30 }}{% endblock %}
+{% block og_description %}{{ news.content|default:news.summary|striptags|truncatewords:30 }}{% endblock %}
 {% block og_image %}{% if news.display_image_url %}{{ news.display_image_url }}{% else %}{{ request.scheme }}://{{ request.get_host }}{% static 'media/logos/Logo_OBD_3.jpeg' %}{% endif %}{% endblock %}
+
+{% block styles %}
+<style>
+    /* O editor grava as listas sempre dentro de <ol>, distinguindo o marcador por um
+       atributo. Sem estas duas regras, uma lista com bolinhas apareceria numerada. */
+    .news-content li[data-list="bullet"] { list-style-type: disc; }
+    .news-content li[data-list="ordered"] { list-style-type: decimal; }
+
+    .news-content ul,
+    .news-content ol { padding-left: 1.6rem; margin-bottom: 1rem; }
+
+    .news-content p { margin-bottom: 1rem; }
+
+    /* Texto colado de outro programa costuma trazer tamanho e cor embutidos, que
+       destoariam do resto da página. */
+    .news-content [style*="font-size"],
+    .news-content [style*="font-family"] { font-size: inherit !important; font-family: inherit !important; }
+
+    .news-content img { max-width: 100%; height: auto; }
+</style>
+{% endblock %}
 
 {% block content %}
 <div class="container my-5">
@@ -53,7 +75,7 @@ Description: This is the page where the full content of a single news article is
                     </p>
 
                     <div class="news-content">
-                        {{ news.content|default:news.summary|urlize|linebreaks }}
+                        {{ news.content|default:news.summary|conteudo_de_noticia }}
                     </div>
 
                     {% if news.gallery_images.all %}

@@ -634,10 +634,28 @@ o mesmo nome de etapa é inofensivo: reescreve as mesmas linhas com os mesmos va
 
 ### 7.4 Publicar uma notícia
 
-Pelo admin do Django (`/admin/`), modelo *Notícias*. Campos: título, resumo, conteúdo
-completo, imagem (upload direto, vai para o Cloudinary), link externo opcional, fonte,
-data e destaque. Imagens adicionais entram como `NewsImage`. Desmarcar *Ativo* tira do ar
-sem apagar.
+Pelo admin do Django, modelo *Notícias*. Campos: título, resumo, conteúdo completo,
+imagem (upload direto, vai para o Cloudinary), link externo opcional, fonte, data e
+destaque. Imagens adicionais entram como `NewsImage`. Desmarcar *Ativo* tira do ar sem
+apagar — e serve para escrever rascunhos, que só o administrador enxerga (ver 5.6).
+
+**O conteúdo tem editor visual**, com botões de negrito, itálico, sublinhado, listas e
+link. É o Quill, carregado do CDN e aplicado à caixa de texto por
+`core/admin_noticia_editor.js`. Colar do Word preserva negrito e itálico.
+
+O campo no banco continua sendo o mesmo `TextField`: a caixa de texto original é
+escondida, e o conteúdo formatado é escrito nela ao salvar. **Se o CDN estiver fora do
+ar, a caixa de texto simples reaparece** e a edição continua possível, só sem a barra.
+
+Na exibição, o filtro `conteudo_de_noticia` trata os dois tipos de conteúdo: o que vem do
+editor é HTML e vai como está; o das notícias escritas antes do editor é texto puro, e
+recebe o tratamento antigo, que transforma quebras de linha em parágrafos e endereços em
+links. Sem essa distinção, as notícias antigas virariam um bloco único de texto.
+
+> **Por que o HTML da notícia é exibido sem escapar:** notícia só é escrita por quem tem
+> acesso ao admin do Django. Não há caminho pelo qual um visitante escreva ali. Texto
+> puro continua sendo escapado normalmente — um `<` digitado numa notícia antiga aparece
+> como `<`, e não vira etiqueta.
 
 ### 7.5 Deploy
 

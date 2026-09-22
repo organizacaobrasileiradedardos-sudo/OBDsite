@@ -33,6 +33,17 @@ class EventAdmin(admin.ModelAdmin):
 
 @admin.register(News)
 class NewsAdmin(admin.ModelAdmin):
+    class Media:
+        """Editor visual no campo de conteúdo.
+
+        O Quill é carregado do CDN e aplicado à caixa de texto pelo arquivo abaixo.
+        Se o CDN estiver fora do ar, a caixa de texto simples continua funcionando —
+        só sem a barra de formatação.
+        """
+        css = {'all': ('https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.snow.css',)}
+        js = ('https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.js',
+              'core/admin_noticia_editor.js')
+
     list_display = ('title', 'source', 'published_date', 'is_featured', 'is_active')
     list_filter = ('is_featured', 'is_active', 'published_date', 'source')
     search_fields = ('title', 'summary', 'source')
