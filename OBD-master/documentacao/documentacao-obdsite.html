@@ -947,6 +947,32 @@ torneio : 'Open São Roque 2026 - OBD 21.02.2026'</code></pre>
           eventos distintos do ano corrente com as divisões agrupadas (ver 5.2), enquanto o Hall
           conta títulos de todos os anos. São medidas diferentes da mesma realidade.</p>
       </div>
+      <h3><span class="n">5.9</span>Classificados para o Grand Prix</h3>
+
+      <p>A tela do <strong>Order of Merit</strong> destaca em verde os <strong>16 primeiros
+        colocados</strong>, que são os convocados para o Grand Prix OBD, e desenha uma
+        <strong>linha de corte</strong> logo depois do último classificado. O número de vagas está em
+        <code>VAGAS_GRAND_PRIX</code>, em <code>leagues/views.py</code> — mudou o regulamento, muda
+        ali.</p>
+
+      <p>As três primeiras linhas mantêm as cores de medalha: já estão destacadas por outro motivo, e
+        são obviamente classificadas.</p>
+
+      <p>A classificação segue a <strong>ordem exibida na tela</strong>, e não a colocação com
+        empates. O motivo é que o Grand Prix tem um número fixo de vagas — “16 vagas” são 16 pessoas
+        — e a tabela do Order of Merit numera as linhas em sequência (1, 2, 3, 4…), então o destaque
+        acompanha exatamente o que o leitor vê.</p>
+
+      <div class="alerta">
+        <span class="tarja-rot">Ponto de atenção</span>
+        <p>Quando dois jogadores têm o mesmo total, a ordem entre eles é alfabética, que é o critério
+          de desempate da ordenação. Se o empate cair bem na 16ª posição, a última vaga acaba
+          decidida pelo alfabeto — o que provavelmente não é o que o regulamento pretende. Vale
+          conferir com a diretoria se acontecer.</p>
+      </div>
+
+      <p>A linha de corte só aparece quando existe alguém depois dela: com 16 jogadores ou menos,
+        todos estão classificados e a linha não é desenhada.</p>
     </section>
 
     <!-- ============ 6 ============ -->

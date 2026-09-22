@@ -435,7 +435,7 @@ categorias, os ícones, os padrões do palpite e a ordem de exibição. Acrescen
 categoria nova é acrescentar uma entrada nesse dicionário e gerar a migração do novo
 valor de `choices`.
 
-### Por que o tipo mora na liga, e não só no torneio
+### 5.8 Por que o tipo mora na liga, e não só no torneio
 
 Esta é a parte que já deu problema na prática, e vale entender.
 
@@ -481,6 +481,29 @@ Esse número também **não bate** com "Torneios Realizados" da tela inicial, e 
 a home conta eventos distintos do ano corrente com as divisões agrupadas (ver 5.2 e o
 `_tournament_event_key`), enquanto o Hall conta títulos de todos os anos. São medidas
 diferentes da mesma realidade.
+
+### 5.9 Classificados para o Grand Prix
+
+A tela do **Order of Merit** destaca em verde os **16 primeiros colocados**, que são os
+convocados para o Grand Prix OBD, e desenha uma **linha de corte** logo depois do último
+classificado. O número de vagas está em `VAGAS_GRAND_PRIX`, em `leagues/views.py` —
+mudou o regulamento, muda ali.
+
+As três primeiras linhas mantêm as cores de medalha: já estão destacadas por outro
+motivo, e são obviamente classificadas.
+
+A classificação segue a **ordem exibida na tela**, e não a colocação com empates. O
+motivo é que o Grand Prix tem um número fixo de vagas — "16 vagas" são 16 pessoas — e a
+tabela do Order of Merit numera as linhas em sequência (1, 2, 3, 4…), então o destaque
+acompanha exatamente o que o leitor vê.
+
+> **Ponto de atenção:** quando dois jogadores têm o mesmo total, a ordem entre eles é
+> alfabética, que é o critério de desempate da ordenação. Se o empate cair bem na 16ª
+> posição, a última vaga acaba decidida pelo alfabeto — o que provavelmente não é o que o
+> regulamento pretende. Vale conferir com a diretoria se acontecer.
+
+A linha de corte só aparece quando existe alguém depois dela: com 16 jogadores ou menos,
+todos estão classificados e a linha não é desenhada.
 
 ---
 

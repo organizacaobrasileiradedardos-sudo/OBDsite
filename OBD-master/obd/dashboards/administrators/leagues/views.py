@@ -4,6 +4,11 @@ from decimal import Decimal
 from obd.dashboards.administrators.leagues.models import OrderOfMeritEntry
 from obd.dashboards.administrators.leagues.models import NationalRankingEntry
 
+# Vagas no GRAND PRIX OBD: os primeiros colocados do Order of Merit são convocados. A
+# tela marca até onde vai a classificação, com uma linha de corte depois do último.
+VAGAS_GRAND_PRIX = 16
+
+
 def orderofmerit(request):
     # Etapas que já tiveram alguma importação, em ordem cronológica
     etapas = League.objects.filter(
@@ -44,9 +49,19 @@ def orderofmerit(request):
         row['position'] = rank
         prev_total = row['total']
 
+    # A tela numera as linhas em sequência, e o Grand Prix tem um número fixo de vagas.
+    # Por isso a classificação segue a ordem exibida, e não a colocação com empates.
+    for indice, row in enumerate(ranking, start=1):
+        row['classificado'] = indice <= VAGAS_GRAND_PRIX
+        # A linha de corte só faz sentido se houver alguém depois dela.
+        row['ultimo_classificado'] = (indice == VAGAS_GRAND_PRIX
+                                      and len(ranking) > VAGAS_GRAND_PRIX)
+
     context = {
         'etapas': etapas,
         'ranking': ranking,
+        'vagas_grand_prix': VAGAS_GRAND_PRIX,
+        'tem_classificados': bool(ranking),
     }
     return render(request, 'user_public_order_of_merit.html', context)
 
