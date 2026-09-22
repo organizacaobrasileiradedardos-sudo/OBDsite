@@ -57,10 +57,22 @@
 
         caixaOriginal.style.display = 'none';
 
+        // O Quill insere a barra de ferramentas como irmã da área de texto. Sem esta
+        // caixa em volta, as duas caem lado a lado: o admin do Django organiza os
+        // campos em colunas flexíveis, e cada uma vira uma coluna. Dentro da caixa
+        // elas empilham como devem, com a barra em cima.
+        var caixa = document.createElement('div');
+        caixa.style.width = '100%';
+
         var area = document.createElement('div');
         area.style.minHeight = '320px';
+        // Cor e fundo explícitos: o tema escuro do admin deixaria o texto cinza-claro
+        // sobre o fundo branco do editor, praticamente ilegível.
         area.style.backgroundColor = '#fff';
-        caixaOriginal.parentNode.insertBefore(area, caixaOriginal);
+        area.style.color = '#1f2937';
+
+        caixa.appendChild(area);
+        caixaOriginal.parentNode.insertBefore(caixa, caixaOriginal);
 
         var editor = new Quill(area, {
             theme: 'snow',
