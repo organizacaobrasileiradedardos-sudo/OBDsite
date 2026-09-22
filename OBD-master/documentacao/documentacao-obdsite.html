@@ -1136,6 +1136,16 @@ torneio : 'Open São Roque 2026 - OBD 21.02.2026'</code></pre>
         ar, a caixa de texto simples reaparece</strong> e a edição continua possível, só sem a
         barra.</p>
 
+      <div class="alerta">
+        <span class="tarja-rot">Armadilha, que já custou uma notícia</span>
+        <p>Ao abrir no editor uma notícia escrita antes dele, o texto puro precisa ser convertido em
+          parágrafos <strong>antes</strong> de entrar no editor. Jogar o texto direto destrói as
+          quebras de linha, porque o HTML colapsa quebras em espaços — a notícia inteira vira um
+          bloco único, e é essa versão achatada que fica gravada no salvamento seguinte. A conversão
+          está em <code>prepararParaOEditor</code>, e
+          <code>ferramentas/teste_editor_noticia.js</code> cobre os casos.</p>
+      </div>
+
       <p>Na exibição, o filtro <code>conteudo_de_noticia</code> trata os dois tipos de conteúdo: o que
         vem do editor é HTML e vai como está; o das notícias escritas antes do editor é texto puro, e
         recebe o tratamento antigo, que transforma quebras de linha em parágrafos e endereços em

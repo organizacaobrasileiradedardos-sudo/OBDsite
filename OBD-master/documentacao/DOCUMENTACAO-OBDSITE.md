@@ -647,6 +647,13 @@ O campo no banco continua sendo o mesmo `TextField`: a caixa de texto original �
 escondida, e o conteúdo formatado é escrito nela ao salvar. **Se o CDN estiver fora do
 ar, a caixa de texto simples reaparece** e a edição continua possível, só sem a barra.
 
+> **Armadilha, que já custou uma notícia:** ao abrir no editor uma notícia escrita antes
+> dele, o texto puro precisa ser convertido em parágrafos **antes** de entrar no editor.
+> Jogar o texto direto destrói as quebras de linha, porque o HTML colapsa quebras em
+> espaços — a notícia inteira vira um bloco único, e é essa versão achatada que fica
+> gravada no salvamento seguinte. A conversão está em `prepararParaOEditor`, e
+> `ferramentas/teste_editor_noticia.js` cobre os casos.
+
 Na exibição, o filtro `conteudo_de_noticia` trata os dois tipos de conteúdo: o que vem do
 editor é HTML e vai como está; o das notícias escritas antes do editor é texto puro, e
 recebe o tratamento antigo, que transforma quebras de linha em parágrafos e endereços em
