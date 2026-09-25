@@ -2,7 +2,7 @@
 
 **Organização Brasileira de Dardos — obdardos.com.br**
 
-Última revisão: 22 de setembro de 2026.
+Última revisão: 25 de setembro de 2026.
 
 Este documento descreve como o site funciona por dentro: quais telas existem, o que
 cada uma faz, de onde vêm os números que elas mostram e quais regras de negócio estão
@@ -600,7 +600,14 @@ torna a mesclagem definitiva. Sem esse passo ela se desfazia sozinha: apagar a c
 apagava o perfil por cascata, o apelido sumia, e na captura seguinte o robô não
 reconhecia mais aquele nome e recriava o cadastro. São herdados o `nakka`, o `nickname` e
 o nome completo da conta absorvida — os três lugares onde pode estar o nome que o N01
-exibe.
+exibe — **mais as linhas de `ApelidoN01` que a origem já tinha**, que mudam de dono em
+vez de serem copiadas (ver 9.12).
+
+**A mesclagem é feita em bloco:** ou todos os passos acontecem, ou nenhum acontece. São
+muitos passos seguidos e o último apaga o cadastro de origem; uma falha no meio deixaria
+metade do histórico de um jogador num cadastro e metade no outro, sem aviso e sem como
+desfazer à mão. Se algo der errado, a tela de *Mesclar Cadastros* mostra o motivo técnico
+e informa que nada foi alterado, em vez de exibir a página de erro do servidor.
 
 Contas provisórias criadas pelo robô **já nascem com o `nakka` preenchido**. Antes ele
 ficava vazio, e a conta nascia sem o campo que a tornaria reconhecível.
@@ -983,6 +990,23 @@ com `python3 manage.py shell`. É de lá que `postgres.railway.internal` resolve
 Já dito na seção 5.3, mas vale repetir porque é a armadilha mais fácil de cair:
 **`TournamentResult.date` é reescrito a cada recaptura.** Para ordenação cronológica
 confiável, use `created_at`.
+
+### 9.12 `ApelidoN01.apelido` é único, e a origem só é apagada no fim
+
+Ao mesclar dois cadastros, os apelidos da conta absorvida passam para a conta que fica.
+A primeira versão dessa herança **criava linhas novas** no destino. Funcionava enquanto a
+conta absorvida não tivesse apelidos alternativos próprios — mas se ela já tivesse (por
+ter sido destino de uma mesclagem anterior, ou por edição no admin), a linha nova
+repetia um `apelido` que ainda existia, porque a conta de origem só é apagada no último
+passo. O campo é `unique=True`: o banco recusava, e a tela devolvia **erro 500**.
+
+A verificação `apelido_n01_em_uso(nome, ignorar_profile=origem)` não pegava o caso de
+propósito — ela ignora justamente as linhas da origem, que é o que se quer para os nomes
+que ainda não têm linha.
+
+**A regra agora:** linha de `ApelidoN01` que já existe **muda de dono** (`profile` passa
+a apontar para o destino). Só os nomes que ainda não têm linha — `nakka`, `nickname` e o
+nome completo — é que são criados.
 
 ---
 

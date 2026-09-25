@@ -417,7 +417,7 @@
       <p class="standfirst">Como o site da Organização Brasileira de Dardos funciona: quais telas
         existem, de onde vêm os números que elas mostram e quais regras estão embutidas no código.</p>
       <div class="meta">
-        <span><b>Revisão</b> 22 · set · 2026</span>
+        <span><b>Revisão</b> 25 · set · 2026</span>
         <span><b>Stack</b> Django 4.2 · PostgreSQL · Railway</span>
         <span><b>Telas</b> 34 templates</span>
       </div>
@@ -1077,8 +1077,17 @@ torneio : 'Open São Roque 2026 - OBD 21.02.2026'</code></pre>
           esse passo a mesclagem se desfazia sozinha: apagar a conta apagava o perfil por cascata, o
           apelido sumia, e na captura seguinte o robô não reconhecia mais aquele nome e recriava o
           cadastro. São herdados o <code>nakka</code>, o <code>nickname</code> e o nome completo da
-          conta absorvida — os três lugares onde pode estar o nome que o N01 exibe.</p>
+          conta absorvida — os três lugares onde pode estar o nome que o N01 exibe — <strong>mais as
+          linhas de <code>ApelidoN01</code> que a origem já tinha</strong>, que mudam de dono em vez
+          de serem copiadas (ver 9.12).</p>
       </div>
+
+      <p><strong>A mesclagem é feita em bloco:</strong> ou todos os passos acontecem, ou nenhum
+        acontece. São muitos passos seguidos e o último apaga o cadastro de origem; uma falha no
+        meio deixaria metade do histórico de um jogador num cadastro e metade no outro, sem aviso e
+        sem como desfazer à mão. Se algo der errado, a tela de <em>Mesclar Cadastros</em> mostra o
+        motivo técnico e informa que nada foi alterado, em vez de exibir a página de erro do
+        servidor.</p>
 
       <p>Contas provisórias criadas pelo robô <strong>já nascem com o <code>nakka</code>
         preenchido</strong>. Antes ele ficava vazio, e a conta nascia sem o campo que a tornaria
@@ -1557,6 +1566,28 @@ torneio : 'Open São Roque 2026 - OBD 21.02.2026'</code></pre>
       <p>Já dito na seção 5.3, mas vale repetir porque é a armadilha mais fácil de cair:
         <strong><code>TournamentResult.date</code> é reescrito a cada recaptura.</strong> Para
         ordenação cronológica confiável, use <code>created_at</code>.</p>
+
+      <h3><span class="n">9.12</span><code>ApelidoN01.apelido</code> é único, e a origem só é
+        apagada no fim</h3>
+
+      <p>Ao mesclar dois cadastros, os apelidos da conta absorvida passam para a conta que fica. A
+        primeira versão dessa herança <strong>criava linhas novas</strong> no destino. Funcionava
+        enquanto a conta absorvida não tivesse apelidos alternativos próprios — mas se ela já
+        tivesse (por ter sido destino de uma mesclagem anterior, ou por edição no admin), a linha
+        nova repetia um <code>apelido</code> que ainda existia, porque a conta de origem só é
+        apagada no último passo. O campo é <code>unique=True</code>: o banco recusava, e a tela
+        devolvia <strong>erro 500</strong>.</p>
+
+      <p>A verificação <code>apelido_n01_em_uso(nome, ignorar_profile=origem)</code> não pegava o
+        caso de propósito — ela ignora justamente as linhas da origem, que é o que se quer para os
+        nomes que ainda não têm linha.</p>
+
+      <div class="alerta">
+        <span class="tarja-rot">A regra agora</span>
+        <p>Linha de <code>ApelidoN01</code> que já existe <strong>muda de dono</strong> (o
+          <code>profile</code> passa a apontar para o destino). Só os nomes que ainda não têm linha
+          — <code>nakka</code>, <code>nickname</code> e o nome completo — é que são criados.</p>
+      </div>
     </section>
 
     <!-- ============ 10 ============ -->

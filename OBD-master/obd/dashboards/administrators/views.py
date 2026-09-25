@@ -1,3 +1,4 @@
+import logging
 import re
 from django.contrib.auth.decorators import login_required, permission_required
 from django.contrib.auth.models import User
@@ -16,6 +17,8 @@ from obd.dashboards.administrators.leagues.models import League, OrderOfMeritEnt
 from obd.dashboards.administrators.leagues.models import NationalRankingEntry
 from obd.dashboards.administrators.champions.utils import get_or_create_player
 from obd.dashboards.administrators.champions.models import Champion
+
+logger = logging.getLogger(__name__)
 
 @login_required()
 @permission_required('profiles.has_admin_role', raise_exception=True)
@@ -601,11 +604,17 @@ def merge_players_dashboard(request):
         except User.DoesNotExist:
             messages.error(request, f"Usuário '{source_username}' (a mesclar) não encontrado.")
             return render(request, 'merge_players_dashboard.html', context)
+        except User.MultipleObjectsReturned:
+            messages.error(request, f"Mais de um cadastro responde por '{source_username}' (a mesclar).")
+            return render(request, 'merge_players_dashboard.html', context)
 
         try:
             target_user = User.objects.get(username__iexact=target_username.strip())
         except User.DoesNotExist:
             messages.error(request, f"Usuário '{target_username}' (a manter) não encontrado.")
+            return render(request, 'merge_players_dashboard.html', context)
+        except User.MultipleObjectsReturned:
+            messages.error(request, f"Mais de um cadastro responde por '{target_username}' (a manter).")
             return render(request, 'merge_players_dashboard.html', context)
 
         if source_user.id == target_user.id:
@@ -636,13 +645,35 @@ def merge_players_execute(request):
     except User.DoesNotExist:
         messages.error(request, "Usuário não encontrado. Nada foi alterado.")
         return redirect('administrators:merge_players_dashboard')
+    except User.MultipleObjectsReturned:
+        # Acontece quando dois cadastros têm o mesmo nome de usuário diferindo só em
+        # maiúsculas. A busca é feita sem diferenciar caixa, então os dois respondem.
+        messages.error(
+            request,
+            "Mais de um cadastro responde por esse nome de usuário (a busca não "
+            "diferencia maiúsculas de minúsculas). Nada foi alterado."
+        )
+        return redirect('administrators:merge_players_dashboard')
 
     if source_user.id == target_user.id:
         messages.error(request, "Os dois usuários são o mesmo. Nada foi alterado.")
         return redirect('administrators:merge_players_dashboard')
 
     from obd.dashboards.administrators.champions.utils import merge_player_accounts
-    moved, skipped, apelidos = merge_player_accounts(source_user, target_user)
+    try:
+        moved, skipped, apelidos = merge_player_accounts(source_user, target_user)
+    except Exception as erro:
+        # A mesclagem roda dentro de uma transação, então uma falha aqui significa que
+        # nada foi alterado. Mostrar o motivo é melhor do que a tela de erro do
+        # servidor: quem está no admin consegue dizer o que aconteceu sem precisar
+        # abrir o log do Railway.
+        logger.exception('Falha ao mesclar %s em %s', source_username, target_username)
+        messages.error(
+            request,
+            f"A mesclagem não pôde ser feita e nada foi alterado. Motivo técnico: "
+            f"{type(erro).__name__}: {erro}"
+        )
+        return redirect('administrators:merge_players_dashboard')
 
     messages.success(
         request,

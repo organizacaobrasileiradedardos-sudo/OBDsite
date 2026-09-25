@@ -6,6 +6,7 @@ User, Profile, League, Division and Champion objects exist.
 
 import datetime
 from django.contrib.auth.models import User
+from django.db import transaction
 from obd.dashboards.players.profiles.models import Profile
 from obd.dashboards.administrators.leagues.models import League
 from obd.dashboards.administrators.divisions.models import Division
@@ -68,17 +69,33 @@ def _herdar_apelidos_n01(source_user, target_user):
     if destino is None:
         return []
 
-    # Os três lugares onde pode estar o nome com que o N01 mostra esse jogador: o
-    # apelido gravado, o apelido do cadastro provisório criado pelo robô, e o nome
-    # completo da conta.
+    herdados = []
+    vistos = set()
+
+    # Os apelidos que a origem já tinha gravados **mudam de dono**, em vez de serem
+    # criados de novo no destino. O campo `apelido` é único no banco e a linha da
+    # origem só seria apagada no fim da mesclagem: criar uma cópia antes disso viola
+    # a chave única e derruba a página com erro 500. Foi assim que a mesclagem de uma
+    # conta que já tinha absorvido outra parou de funcionar.
+    if origem is not None:
+        for registro in origem.apelidos_n01.all():
+            nome = (registro.apelido or '').strip()
+            chave = nome.lower()
+            if not nome or chave in vistos:
+                continue
+            vistos.add(chave)
+            registro.profile = destino
+            registro.save(update_fields=['profile'])
+            herdados.append(nome)
+
+    # Os outros lugares onde pode estar o nome com que o N01 mostra esse jogador: o
+    # apelido gravado no perfil, o apelido do cadastro provisório criado pelo robô, e
+    # o nome completo da conta. Esses ainda não têm linha própria, então são criados.
     candidatos = []
     if origem is not None:
         candidatos += [origem.nakka, origem.nickname]
-        candidatos += list(origem.apelidos_n01.values_list('apelido', flat=True))
     candidatos.append(f'{source_user.first_name} {source_user.last_name}'.strip())
 
-    herdados = []
-    vistos = set()
     for nome in candidatos:
         nome = (nome or '').strip()
         chave = nome.lower()
@@ -95,10 +112,16 @@ def _herdar_apelidos_n01(source_user, target_user):
     return herdados
 
 
+@transaction.atomic
 def merge_player_accounts(source_user, target_user):
     """Migra todos os dados vinculados de source_user para target_user e apaga source_user.
 
     Devolve (movidos, descartados, apelidos_herdados).
+
+    A mesclagem é feita **em bloco**: ou tudo acontece, ou nada acontece. São muitos
+    passos seguidos, e o último apaga o cadastro de origem. Sem isso, uma falha no meio
+    do caminho deixaria metade do histórico de um jogador num cadastro e metade no
+    outro, sem nenhum aviso — e não há como desfazer à mão o que já foi movido.
     """
     from obd.core.models import PlayerTournamentStat
     from obd.dashboards.administrators.leagues.models import OrderOfMeritEntry, NationalRankingEntry
