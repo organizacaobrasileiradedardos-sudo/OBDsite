@@ -1,0 +1,64 @@
+{% comment %}
+Popup que mostra uma foto no tamanho inteiro, sem sair da página.
+
+Quem usa: qualquer tela que queira uma foto ampliável. Basta a etiqueta de link em volta
+da foto trazer o atributo "data-foto" com o endereço da imagem grande, e incluir este
+arquivo uma vez no fim do conteúdo da página.
+
+Funciona sem o popup também, de propósito. O endereço do link é a própria foto e ele abre
+em aba nova, então: se o Bootstrap não carregar, ou se a pessoa clicar com Ctrl/Cmd ou com
+o botão do meio, a foto abre numa aba — que é exatamente o outro comportamento aceitável.
+Nada depende do JavaScript para a foto ser acessível.
+
+Sobre comentários neste arquivo: use sempre este formato, com abertura e fechamento em
+linhas próprias. O formato de uma linha só serve para uma linha só — o tokenizador do
+Django é compilado sem re.DOTALL, e um comentário que abre numa linha e fecha em outra
+deixa de ser comentário e vai para a página como texto. Ver seção 9.3 da documentação.
+{% endcomment %}
+
+<div class="modal fade" id="modalFoto" tabindex="-1" aria-labelledby="modalFotoTitulo" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-centered">
+        <div class="modal-content bg-transparent border-0">
+            <div class="modal-header border-0 pb-1">
+                <h2 class="visually-hidden" id="modalFotoTitulo">Foto ampliada</h2>
+                <button type="button" class="btn-close btn-close-white ms-auto" data-bs-dismiss="modal" aria-label="Fechar"></button>
+            </div>
+            <div class="modal-body text-center p-0">
+                <img src="" alt="" id="modalFotoImagem" class="img-fluid rounded" style="max-height: 85vh;">
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        var caixa = document.getElementById('modalFoto');
+        var imagem = document.getElementById('modalFotoImagem');
+        if (!caixa || !imagem || typeof bootstrap === 'undefined') {
+            return;   // sem o Bootstrap o clique abre a foto numa aba, pelo próprio link
+        }
+
+        var popup = new bootstrap.Modal(caixa);
+
+        document.querySelectorAll('a[data-foto]').forEach(function (link) {
+            link.addEventListener('click', function (evento) {
+                // Clique com Ctrl/Cmd/Shift ou em outro botão do mouse continua abrindo
+                // em aba nova, como qualquer link do site.
+                if (evento.button !== 0 || evento.metaKey || evento.ctrlKey || evento.shiftKey) {
+                    return;
+                }
+                evento.preventDefault();
+                imagem.src = link.dataset.foto;
+                imagem.alt = link.dataset.fotoAlt || '';
+                popup.show();
+            });
+        });
+
+        caixa.addEventListener('hidden.bs.modal', function () {
+            // Solta a foto ao fechar. Sem isto ela fica carregada na memória, e numa
+            // lista com várias notícias isso se acumula.
+            imagem.removeAttribute('src');
+            imagem.alt = '';
+        });
+    });
+</script>

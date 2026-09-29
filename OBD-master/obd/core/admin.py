@@ -57,8 +57,8 @@ class NewsAdmin(admin.ModelAdmin):
         ('Mídia', {
             'fields': ('image', 'image_url', 'image_link'),
             'description': 'Imagem principal: envie um arquivo OU informe uma URL externa (se as duas forem '
-                            'preenchidas, o upload tem prioridade). Para adicionar mais fotos, use a seção '
-                            '"Imagens da Galeria" logo abaixo.'
+                            'preenchidas, o upload tem prioridade). No site, clicar nela abre a foto inteira '
+                            'num popup. Para adicionar mais fotos, use a seção "Imagens da Galeria" logo abaixo.'
         }),
         ('Data e Configurações', {
             'fields': ('published_date', 'is_featured', 'is_active')

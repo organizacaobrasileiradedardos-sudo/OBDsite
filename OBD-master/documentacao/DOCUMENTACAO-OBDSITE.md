@@ -672,19 +672,30 @@ imagem (upload direto, vai para o Cloudinary), link externo opcional, fonte, dat
 destaque. Imagens adicionais entram como `NewsImage`. Desmarcar *Ativo* tira do ar sem
 apagar — e serve para escrever rascunhos, que só o administrador enxerga (ver 5.6).
 
-**A imagem principal pode ser um link.** O campo *Link da Imagem Principal*
-(`News.image_link`), na seção *Mídia*, é opcional: preenchido, quem clicar na imagem vai
-para aquele endereço, numa aba nova; vazio, a imagem continua sendo só imagem. Vale nos
-dois lugares onde a imagem principal aparece — o card de destaque na lista de notícias e a
-página da notícia. Serve para uma arte que precisa levar a algum lugar, como um flyer de
-inscrição.
+**Clicar na imagem principal abre a foto inteira num popup.** Vale sem configurar nada, nos
+dois lugares onde a imagem principal aparece: o card de destaque na lista de notícias e a
+página da notícia. Isso importa porque nas duas telas a imagem é exibida recortada
+(`object-fit: cover`) — parte da foto não está visível, e o popup é o que mostra o resto.
+
+O popup fica em `_foto_ampliada.html`, incluído uma vez por tela. Para tornar uma foto
+ampliável, a etiqueta de link em volta dela recebe o atributo `data-foto` com o endereço da
+imagem grande.
+
+> **Nada depende do JavaScript.** O endereço do link é a própria foto, não `#`. Se o
+> Bootstrap não carregar, um clique abre a foto numa aba — e Ctrl+clique abre em aba nova
+> como em qualquer link do site. O popup é um acréscimo, não um pré-requisito.
+
+**O campo *Link da Imagem Principal* (`News.image_link`) é uma exceção a essa regra:**
+preenchido, o clique vai para aquele endereço em vez de abrir a foto. Serve para uma arte
+que precisa levar a algum lugar, como um flyer de inscrição. Vazio — o caso normal — o
+clique abre a foto.
 
 São **três** campos de endereço na mesma tela, e confundi-los é fácil:
 
 | Campo | O que é |
 |---|---|
 | `image_url` | **Onde a foto está.** Alternativa ao upload, quando a imagem já mora em outro servidor |
-| `image_link` | **Para onde a foto leva** ao ser clicada |
+| `image_link` | **Exceção:** desvia o clique na foto para outro endereço, em vez de abrir a foto. Normalmente fica vazio |
 | `link` | Fonte externa da notícia. Preenchido, o botão *"Ler Notícia Completa"* aponta para lá em vez da página da notícia no site |
 
 **O conteúdo tem editor visual**, com botões de negrito, itálico, sublinhado, listas e

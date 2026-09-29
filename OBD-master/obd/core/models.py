@@ -61,9 +61,10 @@ class News(models.Model):
     image_link = models.URLField(
         'Link da Imagem Principal (opcional)',
         blank=True,
-        help_text='Preenchido, transforma a imagem principal num link: quem clicar nela '
-                  'vai para este endereço, numa aba nova. Vazio, a imagem continua sendo '
-                  'só imagem. Não confundir com "URL da Imagem", que é onde a foto está.',
+        help_text='Normalmente deixe vazio: clicar na imagem já abre a foto inteira. '
+                  'Preencha só quando a imagem precisar levar a outro lugar (um formulário '
+                  'de inscrição, por exemplo) — aí o clique vai para este endereço em vez '
+                  'de abrir a foto. Não confundir com "URL da Imagem", que é onde a foto está.',
     )
     is_featured = models.BooleanField('Destaque', default=False)
     is_active = models.BooleanField('Ativo', default=True)

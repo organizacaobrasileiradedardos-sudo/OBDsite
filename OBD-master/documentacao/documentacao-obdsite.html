@@ -1166,12 +1166,27 @@ torneio : 'Open São Roque 2026 - OBD 21.02.2026'</code></pre>
         Imagens adicionais entram como <code>NewsImage</code>. Desmarcar <em>Ativo</em> tira do ar sem
         apagar — e serve para escrever rascunhos, que só o administrador enxerga (ver 5.6).</p>
 
-      <p><strong>A imagem principal pode ser um link.</strong> O campo <em>Link da Imagem Principal</em>
-        (<code>News.image_link</code>), na seção <em>Mídia</em>, é opcional: preenchido, quem clicar na
-        imagem vai para aquele endereço, numa aba nova; vazio, a imagem continua sendo só imagem. Vale
-        nos dois lugares onde a imagem principal aparece — o card de destaque na lista de notícias e a
-        página da notícia. Serve para uma arte que precisa levar a algum lugar, como um flyer de
-        inscrição.</p>
+      <p><strong>Clicar na imagem principal abre a foto inteira num popup.</strong> Vale sem
+        configurar nada, nos dois lugares onde a imagem principal aparece: o card de destaque na lista
+        de notícias e a página da notícia. Isso importa porque nas duas telas a imagem é exibida
+        recortada (<code>object-fit: cover</code>) — parte da foto não está visível, e o popup é o que
+        mostra o resto.</p>
+
+      <p>O popup fica em <code>_foto_ampliada.html</code>, incluído uma vez por tela. Para tornar uma
+        foto ampliável, a etiqueta de link em volta dela recebe o atributo <code>data-foto</code> com
+        o endereço da imagem grande.</p>
+
+      <div class="nota">
+        <span class="tarja-rot">Nada depende do JavaScript</span>
+        <p>O endereço do link é a própria foto, não <code>#</code>. Se o Bootstrap não carregar, um
+          clique abre a foto numa aba — e Ctrl+clique abre em aba nova como em qualquer link do site.
+          O popup é um acréscimo, não um pré-requisito.</p>
+      </div>
+
+      <p><strong>O campo <em>Link da Imagem Principal</em> (<code>News.image_link</code>) é uma
+        exceção a essa regra:</strong> preenchido, o clique vai para aquele endereço em vez de abrir a
+        foto. Serve para uma arte que precisa levar a algum lugar, como um flyer de inscrição. Vazio —
+        o caso normal — o clique abre a foto.</p>
 
       <p>São <strong>três</strong> campos de endereço na mesma tela, e confundi-los é fácil:</p>
 
@@ -1180,7 +1195,7 @@ torneio : 'Open São Roque 2026 - OBD 21.02.2026'</code></pre>
           <thead><tr><th>Campo</th><th>O que é</th></tr></thead>
           <tbody>
             <tr><td><code>image_url</code></td><td><strong>Onde a foto está.</strong> Alternativa ao upload, quando a imagem já mora em outro servidor</td></tr>
-            <tr><td><code>image_link</code></td><td><strong>Para onde a foto leva</strong> ao ser clicada</td></tr>
+            <tr><td><code>image_link</code></td><td><strong>Exceção:</strong> desvia o clique na foto para outro endereço, em vez de abrir a foto. Normalmente fica vazio</td></tr>
             <tr><td><code>link</code></td><td>Fonte externa da notícia. Preenchido, o botão <em>"Ler Notícia Completa"</em> aponta para lá em vez da página da notícia no site</td></tr>
           </tbody>
         </table>

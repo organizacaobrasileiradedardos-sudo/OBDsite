@@ -27,11 +27,15 @@
                 <div class="col-md-4">
                     <div class="card card-dartboard h-100 hover-lift">
                         {% if news.display_image_url %}
-                        {# Só vira link se o campo Link da Imagem Principal estiver preenchido. #}
-                        {% if news.image_link %}<a href="{{ news.image_link }}" target="_blank" rel="noopener">{% endif %}
+                        {# Mesma regra da página da notícia: o clique abre a foto inteira. #}
+                        {% if news.image_link %}
+                        <a href="{{ news.image_link }}" target="_blank" rel="noopener" title="Abrir o link desta imagem">
+                        {% else %}
+                        <a href="{{ news.display_image_url }}" target="_blank" rel="noopener" style="cursor: zoom-in;" title="Clique para ver a foto inteira" data-foto="{{ news.display_image_url }}" data-foto-alt="{{ news.title }}">
+                        {% endif %}
                         <img src="{{ news.display_image_url }}" class="card-img-top" alt="{{ news.title }}"
                             style="height: 200px; object-fit: cover;">
-                        {% if news.image_link %}</a>{% endif %}
+                        </a>
                         {% else %}
                         <div class="card-img-top bg-gradient"
                             style="height: 200px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);"></div>
@@ -111,6 +115,8 @@
         </div>
     </div>
 </div>
+
+{% include '_foto_ampliada.html' %}
 
 <style>
     .hover-lift {

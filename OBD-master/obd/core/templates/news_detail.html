@@ -59,11 +59,26 @@ Description: This is the page where the full content of a single news article is
 
             <article class="card card-dartboard">
                 {% if news.display_image_url %}
-                {# Com o campo Link da Imagem Principal preenchido, a imagem vira um link. #}
-                {% if news.image_link %}<a href="{{ news.image_link }}" target="_blank" rel="noopener">{% endif %}
+                {% comment %}
+                Clicar na imagem principal abre a foto inteira num popup. Isso importa aqui
+                porque a imagem aparece recortada (object-fit: cover), então parte dela não
+                está visível na página.
+
+                O endereço do link é a própria foto, e não "#": é o que garante que a foto
+                continue acessível se o popup não funcionar, e que Ctrl+clique abra em aba
+                nova como em qualquer link.
+
+                Com o campo Link da Imagem Principal preenchido, o clique vai para aquele
+                endereço em vez de abrir a foto.
+                {% endcomment %}
+                {% if news.image_link %}
+                <a href="{{ news.image_link }}" target="_blank" rel="noopener" title="Abrir o link desta imagem">
+                {% else %}
+                <a href="{{ news.display_image_url }}" target="_blank" rel="noopener" style="cursor: zoom-in;" title="Clique para ver a foto inteira" data-foto="{{ news.display_image_url }}" data-foto-alt="{{ news.title }}">
+                {% endif %}
                 <img src="{{ news.display_image_url }}" class="card-img-top" alt="{{ news.title }}"
                     style="max-height: 400px; object-fit: cover;">
-                {% if news.image_link %}</a>{% endif %}
+                </a>
                 {% endif %}
                 <div class="card-body">
                     {% if news.is_featured %}
@@ -114,4 +129,6 @@ Description: This is the page where the full content of a single news article is
         </div>
     </div>
 </div>
+
+{% include '_foto_ampliada.html' %}
 {% endblock %}
