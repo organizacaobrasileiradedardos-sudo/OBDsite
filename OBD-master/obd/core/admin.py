@@ -55,7 +55,7 @@ class NewsAdmin(admin.ModelAdmin):
             'fields': ('title', 'summary', 'content', 'link', 'source')
         }),
         ('Mídia', {
-            'fields': ('image', 'image_url'),
+            'fields': ('image', 'image_url', 'image_link'),
             'description': 'Imagem principal: envie um arquivo OU informe uma URL externa (se as duas forem '
                             'preenchidas, o upload tem prioridade). Para adicionar mais fotos, use a seção '
                             '"Imagens da Galeria" logo abaixo.'

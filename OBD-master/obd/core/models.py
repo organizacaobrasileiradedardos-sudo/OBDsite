@@ -58,6 +58,13 @@ class News(models.Model):
     published_date = models.DateField('Data de Publicação')
     image = CloudinaryField('Imagem (upload)', blank=True, null=True)
     image_url = models.URLField('URL da Imagem (alternativa ao upload)', blank=True)
+    image_link = models.URLField(
+        'Link da Imagem Principal (opcional)',
+        blank=True,
+        help_text='Preenchido, transforma a imagem principal num link: quem clicar nela '
+                  'vai para este endereço, numa aba nova. Vazio, a imagem continua sendo '
+                  'só imagem. Não confundir com "URL da Imagem", que é onde a foto está.',
+    )
     is_featured = models.BooleanField('Destaque', default=False)
     is_active = models.BooleanField('Ativo', default=True)
     created_at = models.DateTimeField('Criado em', auto_now_add=True)

@@ -417,7 +417,7 @@
       <p class="standfirst">Como o site da Organização Brasileira de Dardos funciona: quais telas
         existem, de onde vêm os números que elas mostram e quais regras estão embutidas no código.</p>
       <div class="meta">
-        <span><b>Revisão</b> 25 · set · 2026</span>
+        <span><b>Revisão</b> 28 · set · 2026</span>
         <span><b>Stack</b> Django 4.2 · PostgreSQL · Railway</span>
         <span><b>Telas</b> 34 templates</span>
       </div>
@@ -689,7 +689,9 @@
       </div>
 
       <p><strong><code>News</code>, <code>NewsImage</code>, <code>Document</code>,
-        <code>Event</code></strong> — conteúdo editorial, alimentado pelo admin do Django.</p>
+        <code>Event</code></strong> — conteúdo editorial, alimentado pelo admin do Django.
+        <code>News</code> tem três campos de endereço que é fácil confundir —
+        <code>image_url</code>, <code>image_link</code> e <code>link</code> (ver 7.4).</p>
 
       <h3><span class="n">4.2</span>Relações principais</h3>
 
@@ -1163,6 +1165,26 @@ torneio : 'Open São Roque 2026 - OBD 21.02.2026'</code></pre>
         imagem (upload direto, vai para o Cloudinary), link externo opcional, fonte, data e destaque.
         Imagens adicionais entram como <code>NewsImage</code>. Desmarcar <em>Ativo</em> tira do ar sem
         apagar — e serve para escrever rascunhos, que só o administrador enxerga (ver 5.6).</p>
+
+      <p><strong>A imagem principal pode ser um link.</strong> O campo <em>Link da Imagem Principal</em>
+        (<code>News.image_link</code>), na seção <em>Mídia</em>, é opcional: preenchido, quem clicar na
+        imagem vai para aquele endereço, numa aba nova; vazio, a imagem continua sendo só imagem. Vale
+        nos dois lugares onde a imagem principal aparece — o card de destaque na lista de notícias e a
+        página da notícia. Serve para uma arte que precisa levar a algum lugar, como um flyer de
+        inscrição.</p>
+
+      <p>São <strong>três</strong> campos de endereço na mesma tela, e confundi-los é fácil:</p>
+
+      <div class="tbl">
+        <table>
+          <thead><tr><th>Campo</th><th>O que é</th></tr></thead>
+          <tbody>
+            <tr><td><code>image_url</code></td><td><strong>Onde a foto está.</strong> Alternativa ao upload, quando a imagem já mora em outro servidor</td></tr>
+            <tr><td><code>image_link</code></td><td><strong>Para onde a foto leva</strong> ao ser clicada</td></tr>
+            <tr><td><code>link</code></td><td>Fonte externa da notícia. Preenchido, o botão <em>"Ler Notícia Completa"</em> aponta para lá em vez da página da notícia no site</td></tr>
+          </tbody>
+        </table>
+      </div>
 
       <p><strong>O conteúdo tem editor visual</strong>, com botões de negrito, itálico, sublinhado,
         listas e link. É o Quill, carregado do CDN e aplicado à caixa de texto por

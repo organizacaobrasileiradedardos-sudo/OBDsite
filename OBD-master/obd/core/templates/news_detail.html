@@ -59,8 +59,13 @@ Description: This is the page where the full content of a single news article is
 
             <article class="card card-dartboard">
                 {% if news.display_image_url %}
+                {# Com "Link da Imagem Principal" preenchido, a imagem vira um link. Sem ele,
+                   continua sendo só imagem — por isso a tag <a> é condicional e o <img> é o
+                   mesmo nos dois casos. #}
+                {% if news.image_link %}<a href="{{ news.image_link }}" target="_blank" rel="noopener">{% endif %}
                 <img src="{{ news.display_image_url }}" class="card-img-top" alt="{{ news.title }}"
                     style="max-height: 400px; object-fit: cover;">
+                {% if news.image_link %}</a>{% endif %}
                 {% endif %}
                 <div class="card-body">
                     {% if news.is_featured %}

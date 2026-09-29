@@ -2,7 +2,7 @@
 
 **Organização Brasileira de Dardos — obdardos.com.br**
 
-Última revisão: 25 de setembro de 2026.
+Última revisão: 28 de setembro de 2026.
 
 Este documento descreve como o site funciona por dentro: quais telas existem, o que
 cada uma faz, de onde vêm os números que elas mostram e quais regras de negócio estão
@@ -232,7 +232,8 @@ dos Campeões (ver 5.7).
 | `photo` | Foto do jogador |
 
 **`News`, `NewsImage`, `Document`, `Event`** — conteúdo editorial, alimentado pelo admin
-do Django.
+do Django. `News` tem três campos de endereço que é fácil confundir — `image_url`,
+`image_link` e `link` (ver 7.4).
 
 ### 4.2 Relações principais
 
@@ -670,6 +671,21 @@ Pelo admin do Django, modelo *Notícias*. Campos: título, resumo, conteúdo com
 imagem (upload direto, vai para o Cloudinary), link externo opcional, fonte, data e
 destaque. Imagens adicionais entram como `NewsImage`. Desmarcar *Ativo* tira do ar sem
 apagar — e serve para escrever rascunhos, que só o administrador enxerga (ver 5.6).
+
+**A imagem principal pode ser um link.** O campo *Link da Imagem Principal*
+(`News.image_link`), na seção *Mídia*, é opcional: preenchido, quem clicar na imagem vai
+para aquele endereço, numa aba nova; vazio, a imagem continua sendo só imagem. Vale nos
+dois lugares onde a imagem principal aparece — o card de destaque na lista de notícias e a
+página da notícia. Serve para uma arte que precisa levar a algum lugar, como um flyer de
+inscrição.
+
+São **três** campos de endereço na mesma tela, e confundi-los é fácil:
+
+| Campo | O que é |
+|---|---|
+| `image_url` | **Onde a foto está.** Alternativa ao upload, quando a imagem já mora em outro servidor |
+| `image_link` | **Para onde a foto leva** ao ser clicada |
+| `link` | Fonte externa da notícia. Preenchido, o botão *"Ler Notícia Completa"* aponta para lá em vez da página da notícia no site |
 
 **O conteúdo tem editor visual**, com botões de negrito, itálico, sublinhado, listas e
 link. É o Quill, carregado do CDN e aplicado à caixa de texto por
