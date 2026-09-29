@@ -62,9 +62,16 @@ acesso público do banco, que foi desligado de propósito.
 
 ## Armadilhas que já causaram problema
 
-- **Não deixe autoformatador de HTML rodar nos templates.** O tokenizador do Django é
-  compilado sem `re.DOTALL`: uma tag `{% %}` quebrada em duas linhas deixa de ser tag
-  e derruba a página. Já aconteceu com 171 tags e 7 telas fora do ar.
+- **Toda tag de template tem que caber numa única linha.** Vale para `{% %}`, `{{ }}` e
+  também para o comentário `{# #}`. O tokenizador do Django é compilado sem `re.DOTALL`:
+  uma abertura que só fecha na linha seguinte deixa de ser tag, e o Django não avisa
+  nada. Já aconteceu duas vezes — com 171 tags `{% %}` estragadas por um autoformatador
+  de HTML (7 telas fora do ar), e com um comentário `{# #}` de três linhas escrito à mão,
+  que apareceu como texto na notícia e, pior, teve o `<a>` e o `<img>` de dentro dele
+  interpretados pelo navegador como etiquetas de verdade, deixando a imagem sem o link
+  dela. Por isso: **não deixe autoformatador de HTML rodar nos templates**, e depois de
+  mexer em qualquer template rode `python3 ferramentas/tags_quebradas.py` na pasta
+  `OBD-master`.
 - **`TournamentResult.date` é reescrito a cada recaptura.** Para ordem cronológica
   confiável use `created_at`.
 - **Duas folhas de estilo se atropelam** (`dartboard-theme.css` clara e `style.css`

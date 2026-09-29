@@ -808,6 +808,23 @@ do editor já inseriu quebras em 171 tags e derrubou 7 telas.
 
 **Nunca deixe um autoformatador de HTML rodar solto nos templates.**
 
+**A regra vale igualmente para o comentário `{# #}`**, e aí o estrago é mais sorrateiro,
+porque nada quebra: o comentário de três linhas simplesmente aparece como texto na
+página. Aconteceu na imagem da notícia. O comentário explicava a lógica e, para isso,
+citava `<a>` e `<img>` — e como o texto foi para a página, **o navegador interpretou
+essas duas citações como etiquetas de verdade**. O `<a>` solto, sem destino, atropelou o
+link que devia envolver a imagem, e a imagem deixou de ser clicável. Ou seja: o sintoma
+apareceu longe da causa, e o teste que eu tinha feito passou, porque ele conferia se a
+etiqueta do link existia — e ela existia.
+
+`ferramentas/tags_quebradas.py` varre todos os templates e aponta qualquer `{%`, `{{` ou
+`{#` que abre numa linha e fecha em outra. **Rode depois de mexer em template.** Ele foi
+validado contra a versão defeituosa: pega os três tipos de quebra.
+
+> **Ao escrever comentário em template, não cite etiquetas HTML dentro dele.** Se o
+> comentário vazar, a citação vira marcação de verdade. Descreva em palavras — "a
+> abertura do link é condicional" em vez de "a tag `<a>` é condicional".
+
 ### 9.4 `config()` e `os.getenv()` misturados
 
 `settings.py` usa os dois. `config()` (python-decouple) **quebra a inicialização** se a

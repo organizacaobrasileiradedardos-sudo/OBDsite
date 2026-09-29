@@ -1337,6 +1337,28 @@ torneio : 'Open São Roque 2026 - OBD 21.02.2026'</code></pre>
         <p>Não deixe um autoformatador de HTML rodar solto nos templates.</p>
       </div>
 
+      <p><strong>A regra vale igualmente para o comentário <code>{# #}</code></strong>, e aí o estrago
+        é mais sorrateiro, porque nada quebra: o comentário de três linhas simplesmente aparece como
+        texto na página. Aconteceu na imagem da notícia. O comentário explicava a lógica e, para
+        isso, citava <code>&lt;a&gt;</code> e <code>&lt;img&gt;</code> — e como o texto foi para a
+        página, <strong>o navegador interpretou essas duas citações como etiquetas de
+        verdade</strong>. O <code>&lt;a&gt;</code> solto, sem destino, atropelou o link que devia
+        envolver a imagem, e a imagem deixou de ser clicável. O sintoma apareceu longe da causa, e o
+        teste feito na hora passou, porque ele conferia se a etiqueta do link existia — e ela
+        existia.</p>
+
+      <p><code>ferramentas/tags_quebradas.py</code> varre todos os templates e aponta qualquer
+        <code>{%</code>, <code>{{</code> ou <code>{#</code> que abre numa linha e fecha em outra.
+        <strong>Rode depois de mexer em template.</strong> Ele foi validado contra a versão
+        defeituosa: pega os três tipos de quebra.</p>
+
+      <div class="alerta">
+        <span class="tarja-rot">Ao escrever comentário em template</span>
+        <p>Não cite etiquetas HTML dentro do comentário. Se ele vazar, a citação vira marcação de
+          verdade. Descreva em palavras — “a abertura do link é condicional” em vez de “a tag
+          <code>&lt;a&gt;</code> é condicional”.</p>
+      </div>
+
       <h3><span class="n">9.4</span><code>config()</code> e <code>os.getenv()</code> misturados</h3>
 
       <p><code>settings.py</code> usa os dois. <code>config()</code> (python-decouple)
