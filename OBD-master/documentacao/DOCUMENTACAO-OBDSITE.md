@@ -524,6 +524,51 @@ acompanha exatamente o que o leitor vê.
 A linha de corte só aparece quando existe alguém depois dela: com 16 jogadores ou menos,
 todos estão classificados e a linha não é desenhada.
 
+### 5.10 O que os números da tela inicial realmente contam
+
+Os rótulos da tela inicial são curtos, e por isso ambíguos. Esta seção existe porque
+"Melhores Médias" pode ser lido de três jeitos diferentes, e só um está certo.
+
+**A origem é sempre a mesma:** `PlayerTournamentStat`, que tem **uma linha por jogador por
+torneio**, com os números que o N01 entrega já consolidados do torneio inteiro. O site
+**não tem dados de partida individual** — `Fixture` e `Result` saíram do banco junto com o
+modelo antigo de liga (seção 8). Nenhum número da tela inicial é por partida, e nenhum
+pode ser, com os dados de hoje.
+
+#### Os três quadros de líderes
+
+Todos mostram **os 5 primeiros** e consideram só linhas vinculadas a um cadastro
+(`player__isnull=False`) — uma estatística que não foi ligada a ninguém fica de fora.
+**Nenhum dos três filtra por ano:** valem para todos os torneios já capturados.
+
+| Quadro | O que é | Como é calculado |
+|---|---|---|
+| **Melhores Médias** | A melhor média de 3 dardos que o jogador fez **num torneio** | `Max(average_3_dart)` por jogador |
+| **Melhores Fechadas** | O maior fechamento do jogador | `Max(high_finish)` por jogador |
+| **180s** | O total de 180s do jogador, somando todos os torneios | `Sum(count_180)` por jogador |
+
+> **"Melhor média" é a média de um torneio, não de uma partida nem da carreira.** Cada
+> jogador aparece uma única vez, com o seu melhor torneio — é um recorde pessoal, não uma
+> média de carreira. E como não há filtro de ano, um recorde de 2025 continua no quadro em
+> 2026.
+
+#### O bloco "OBD em Números"
+
+Aqui convivem recortes diferentes no mesmo bloco, e é o que mais engana:
+
+| Número | Recorte real | O rótulo combina? |
+|---|---|---|
+| Torneios Realizados em *ano* | Ano corrente, por `date`, só com `in_progress=False` | sim |
+| Jogadores Cadastrados | Todos, de todos os tempos | sim, não cita ano |
+| Partidas Disputadas | Todas, de todos os tempos (soma de `matches_played` dividida por 2, porque cada jogo conta nas duas pontas) | sim, não cita ano |
+| 180s no ano | **Todos, de todos os tempos** — não há filtro de ano | **não** (ver 10) |
+| Premiação Distribuída | Order of Merit **de todos os tempos** + `prize_value` **do ano corrente** | **não**, é uma mistura (ver 10) |
+
+> **Os filtros de ano usam `date`, que é reescrito a cada recaptura** (armadilha 9.11).
+> Recapturar um torneio antigo faz a data dele virar hoje, e ele passa a contar no ano
+> corrente. Não acontece na rotina normal — o agendamento só recaptura a etapa em
+> andamento — mas acontece se alguém colar à mão a URL de um torneio de outro ano.
+
 ---
 
 ## 6. Identidade do jogador — o problema central
@@ -1127,7 +1172,17 @@ Levantados ao longo do desenvolvimento e ainda não resolvidos:
 1. **Subir o HSTS para um ano.** Hoje está em 1 hora, de propósito, até haver confiança
    de que nada quebrou (ver 9.9). Passadas algumas semanas sem problema, é trocar a
    variável `SECURE_HSTS_SECONDS` para `31536000` no Railway.
-2. **`stats.0010` não roda em SQLite** — ela usa `DROP COLUMN IF EXISTS`, sintaxe do
+2. **"180s no ano" não é do ano.** O rótulo diz "no ano", mas a consulta soma
+   `count_180` de **todos** os torneios já capturados, sem filtro de ano (ver 5.10). Um
+   dos dois está errado, e qual deles depende do que a OBD quer mostrar: se é do ano,
+   falta filtrar; se é de todos os tempos, o rótulo é que precisa mudar. Enquanto não se
+   decide, o número exibido é o acumulado de sempre.
+3. **"Premiação Distribuída" mistura dois recortes.** O valor é a soma de todo o Order of
+   Merit, de todos os tempos, com os `prize_value` apenas do ano corrente (ver 5.2 e
+   5.10). O resultado não é nem do ano nem de todos os tempos. O rótulo não cita ano, o
+   que sugere que a intenção era o acumulado — nesse caso é o filtro de ano do
+   `prize_value` que está sobrando.
+4. **`stats.0010` não roda em SQLite** — ela usa `DROP COLUMN IF EXISTS`, sintaxe do
    PostgreSQL. Em produção já foi aplicada; o efeito é só atrapalhar quem quiser subir
    uma cópia local do banco em SQLite para testes.
 
