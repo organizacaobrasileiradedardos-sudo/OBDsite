@@ -87,13 +87,24 @@ def index(request):
                 return None
 
             div_stats = tournament.stats.all()
-            div_matches = div_stats.aggregate(Sum('matches_played'))['matches_played__sum'] or 0
-            div_legs = div_stats.aggregate(Sum('legs_played'))['legs_played__sum'] or 0
+
+            # `matches_played` e `legs_played` são gravados por jogador, e os dois jogadores
+            # de uma partida registram a mesma partida e as mesmas legs. Somar tudo dá o
+            # dobro do que aconteceu em quadra, e era isso que o card mostrava: 288 partidas
+            # num torneio de 144. O painel da Liga Nacional e o bloco "OBD em Números" já
+            # dividiam por 2; o card era o único lugar que não dividia.
+            legs_por_jogador = div_stats.aggregate(Sum('legs_played'))['legs_played__sum'] or 0
+            div_matches = (div_stats.aggregate(Sum('matches_played'))['matches_played__sum'] or 0) // 2
+            div_legs = legs_por_jogador // 2
             div_players = div_stats.count()
 
-            if div_legs > 0:
+            if legs_por_jogador > 0:
+                # A ponderação usa a soma **por jogador**, não a metade: a média de cada um
+                # pesa pelas legs que ele próprio jogou. Usar `div_legs` aqui dobraria a
+                # média geral — o erro de contagem se cancelava sozinho nesta divisão, e
+                # corrigir só um dos lados a estragaria.
                 weighted_sum = div_stats.aggregate(w=Sum(F('average_3_dart') * F('legs_played')))['w'] or 0
-                div_average = weighted_sum / div_legs
+                div_average = weighted_sum / legs_por_jogador
             else:
                 div_average = 0
 

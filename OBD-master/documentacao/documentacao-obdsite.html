@@ -417,7 +417,7 @@
       <p class="standfirst">Como o site da Organização Brasileira de Dardos funciona: quais telas
         existem, de onde vêm os números que elas mostram e quais regras estão embutidas no código.</p>
       <div class="meta">
-        <span><b>Revisão</b> 10 · nov · 2026</span>
+        <span><b>Revisão</b> 11 · nov · 2026</span>
         <span><b>Stack</b> Django 4.2 · PostgreSQL · Railway</span>
         <span><b>Telas</b> 34 templates</span>
       </div>
@@ -1056,6 +1056,32 @@ torneio : 'Open São Roque 2026 - OBD 21.02.2026'</code></pre>
           rotina normal — o agendamento só recaptura a etapa em andamento — mas acontece se alguém
           colar à mão a URL de um torneio de outro ano.</p>
       </div>
+
+      <p><strong>O card do campeão, e a armadilha de contar duas vezes.</strong>
+        <code>matches_played</code> e <code>legs_played</code> são gravados por jogador. Os dois
+        jogadores de uma partida registram aquela mesma partida e aquelas mesmas legs, então
+        <strong>somar tudo dá o dobro do que aconteceu em quadra</strong>. Quem quiser o número real
+        divide por 2.</p>
+
+      <p>O site erra isso com facilidade porque a soma crua parece certa. O card do campeão mostrou
+        <strong>288 partidas</strong> num Campeonato Brasileiro de 144, e <strong>1140 legs</strong>
+        onde foram 570, até ser corrigido em novembro de 2026. O painel da Liga Nacional e o bloco
+        “OBD em Números” já dividiam; o card era o único lugar que não.</p>
+
+      <div class="alerta">
+        <span class="tarja-rot">Ao corrigir uma contagem dessas</span>
+        <p>Cuidado com o que depende dela. A média geral do card é ponderada pelas legs:
+          <code>Σ(média × legs) / Σ(legs)</code>. A duplicação estava nos dois lados da divisão e
+          <strong>se cancelava sozinha</strong> — a média sempre esteve certa. Dividir o denominador
+          por 2 junto com o resto dobraria a média. Por isso a média usa a soma por jogador, e só os
+          números exibidos usam a metade.</p>
+      </div>
+
+      <p>O que <strong>não</strong> duplica, e por isso é somado direto: 100+, 140+, 170+, 180s e
+        <code>count_100_plus_finish</code>, porque cada jogador conta só os arremessos dele.
+        <code>matches_won</code> e <code>legs_won</code> também não duplicam — toda partida e toda leg
+        têm um só vencedor, o que os torna a forma mais rápida de conferir se uma contagem está
+        dobrada.</p>
     </section>
 
     <!-- ============ 6 ============ -->

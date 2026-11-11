@@ -2,7 +2,7 @@
 
 **Organização Brasileira de Dardos — obdardos.com.br**
 
-Última revisão: 10 de novembro de 2026.
+Última revisão: 11 de novembro de 2026.
 
 Este documento descreve como o site funciona por dentro: quais telas existem, o que
 cada uma faz, de onde vêm os números que elas mostram e quais regras de negócio estão
@@ -568,6 +568,28 @@ Aqui convivem recortes diferentes no mesmo bloco, e é o que mais engana:
 > Recapturar um torneio antigo faz a data dele virar hoje, e ele passa a contar no ano
 > corrente. Não acontece na rotina normal — o agendamento só recaptura a etapa em
 > andamento — mas acontece se alguém colar à mão a URL de um torneio de outro ano.
+
+#### O card do campeão, e a armadilha de contar duas vezes
+
+**`matches_played` e `legs_played` são gravados por jogador.** Os dois jogadores de uma
+partida registram aquela mesma partida e aquelas mesmas legs, então **somar tudo dá o dobro
+do que aconteceu em quadra**. Quem quiser o número real divide por 2.
+
+O site erra isso com facilidade porque a soma crua parece certa. O card do campeão mostrou
+**288 partidas** num Campeonato Brasileiro de 144, e **1140 legs** onde foram 570, até ser
+corrigido em novembro de 2026. O painel da Liga Nacional e o bloco "OBD em Números" já
+dividiam; o card era o único lugar que não.
+
+> **Ao corrigir uma contagem dessas, cuidado com o que depende dela.** A média geral do card
+> é ponderada pelas legs: `Σ(média × legs) / Σ(legs)`. A duplicação estava nos dois lados da
+> divisão e **se cancelava sozinha** — a média sempre esteve certa. Dividir o denominador por
+> 2 junto com o resto dobraria a média. Por isso a média usa a soma por jogador, e só os
+> números exibidos usam a metade.
+
+O que **não** duplica, e por isso é somado direto: 100+, 140+, 170+, 180s e
+`count_100_plus_finish`, porque cada jogador conta só os arremessos dele. `matches_won` e
+`legs_won` também não duplicam — toda partida e toda leg têm um só vencedor, o que os torna
+a forma mais rápida de conferir se uma contagem está dobrada.
 
 ---
 
