@@ -1115,7 +1115,17 @@ cadastros, e-mails e histórico de todos os jogadores.
 `railway connect Postgres`, que abre um túnel criptografado temporário.
 
 As consultas de manutenção rodam na aba **Console do serviço do site** (não do Postgres),
-com `python3 manage.py shell`. É de lá que `postgres.railway.internal` resolve.
+com o caminho inteiro do Python:
+
+```
+/app/.venv/bin/python manage.py shell
+```
+
+O Python do container fica numa pasta própria, `/app/.venv`, que o console não põe no
+PATH. Por isso `python` e `python3` respondem "não encontrado". Até novembro de 2026
+`python3` funcionava; parou quando o Railway mudou a montagem do container. Se mudar de
+novo, `ls -d /opt/venv/bin/python* /app/.venv/bin/python*` mostra onde ele está. É de lá
+que `postgres.railway.internal` resolve.
 
 ### 9.11 Datas: `date` versus `created_at`
 

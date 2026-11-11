@@ -55,8 +55,16 @@ do Railway e reinicie — desliga na hora, sem precisar de deploy.
 ## Consultas de manutenção no Railway
 
 Rodam na aba **Console do serviço do site** (não do Postgres), com
-`python3 manage.py shell` — não `python`, que não existe no container. É de lá que o
-`postgres.railway.internal` do `DATABASE_URL` resolve. Do computador do usuário, o
+**`/app/.venv/bin/python manage.py shell`**, com o caminho inteiro. O Python do container fica
+numa pasta própria (`/app/.venv`) que o console não põe no PATH, então nem `python` nem
+`python3` são encontrados. Já funcionou com `python3`, até o Railway mudar a montagem do
+container; em novembro de 2026 parou. Se o caminho mudar de novo, descubra com
+`ls -d /opt/venv/bin/python* /app/.venv/bin/python*`. É de lá que o
+`postgres.railway.internal` do `DATABASE_URL` resolve.
+
+Ao passar um bloco com laços para o usuário colar no console, embrulhe em
+`exec('''...''')`. O console interativo exige linha em branco depois de cada bloco
+indentado e quebra com um trecho colado de uma vez. Do computador do usuário, o
 caminho é `railway connect Postgres`, que abre um túnel temporário; **nunca** religar o
 acesso público do banco, que foi desligado de propósito.
 

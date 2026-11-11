@@ -1727,8 +1727,16 @@ torneio : 'Open São Roque 2026 - OBD 21.02.2026'</code></pre>
         <code>railway connect Postgres</code>, que abre um túnel criptografado temporário.</p>
 
       <p>As consultas de manutenção rodam na aba <strong>Console do serviço do site</strong> (não do
-        Postgres), com <code>python3 manage.py shell</code>. É de lá que
-        <code>postgres.railway.internal</code> resolve.</p>
+        Postgres), com o caminho inteiro do Python:</p>
+
+      <pre><code>/app/.venv/bin/python manage.py shell</code></pre>
+
+      <p>O Python do container fica numa pasta própria, <code>/app/.venv</code>, que o console não
+        põe no PATH. Por isso <code>python</code> e <code>python3</code> respondem “não
+        encontrado”. Até novembro de 2026 <code>python3</code> funcionava; parou quando o Railway
+        mudou a montagem do container. Se mudar de novo,
+        <code>ls -d /opt/venv/bin/python* /app/.venv/bin/python*</code> mostra onde ele está. É de lá
+        que <code>postgres.railway.internal</code> resolve.</p>
 
       <h3><span class="n">9.11</span><code>date</code> versus <code>created_at</code></h3>
 
