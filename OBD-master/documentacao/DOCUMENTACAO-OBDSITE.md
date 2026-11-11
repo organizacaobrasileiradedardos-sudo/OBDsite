@@ -549,7 +549,8 @@ todos estão classificados e a linha não é desenhada.
 ### 5.10 O que os números da tela inicial realmente contam
 
 Os rótulos da tela inicial são curtos, e por isso ambíguos. Esta seção existe porque
-"Melhores Médias" pode ser lido de três jeitos diferentes, e só um está certo.
+"Melhores Médias" pode ser lido de três jeitos diferentes, e só um está certo. Por isso, desde
+11/11/2026, o título do quadro diz "Melhores Médias (em torneios)".
 
 **A origem é sempre a mesma:** `PlayerTournamentStat`, que tem **uma linha por jogador por
 torneio**, com os números que o N01 entrega já consolidados do torneio inteiro. O site
@@ -565,7 +566,7 @@ Todos mostram **os 5 primeiros** e consideram só linhas vinculadas a um cadastr
 
 | Quadro | O que é | Como é calculado |
 |---|---|---|
-| **Melhores Médias** | A melhor média de 3 dardos que o jogador fez **num torneio** | `Max(average_3_dart)` por jogador |
+| **Melhores Médias (em torneios)** | A melhor média de 3 dardos que o jogador fez **num torneio** | `Max(average_3_dart)` por jogador |
 | **Melhores Fechadas** | O maior fechamento do jogador | `Max(high_finish)` por jogador |
 | **180s** | O total de 180s do jogador, somando todos os torneios | `Sum(count_180)` por jogador |
 

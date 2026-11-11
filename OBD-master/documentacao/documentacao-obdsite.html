@@ -1030,7 +1030,8 @@ torneio : 'Open São Roque 2026 - OBD 21.02.2026'</code></pre>
       <h3><span class="n">5.10</span>O que os números da tela inicial realmente contam</h3>
 
       <p>Os rótulos da tela inicial são curtos, e por isso ambíguos. Esta seção existe porque
-        “Melhores Médias” pode ser lido de três jeitos diferentes, e só um está certo.</p>
+        “Melhores Médias” pode ser lido de três jeitos diferentes, e só um está certo. Por isso,
+        desde 11/11/2026, o título do quadro diz “Melhores Médias (em torneios)”.</p>
 
       <p><strong>A origem é sempre a mesma:</strong> <code>PlayerTournamentStat</code>, que tem
         <strong>uma linha por jogador por torneio</strong>, com os números que o N01 entrega já
@@ -1048,7 +1049,7 @@ torneio : 'Open São Roque 2026 - OBD 21.02.2026'</code></pre>
         <table>
           <thead><tr><th>Quadro</th><th>O que é</th><th>Como é calculado</th></tr></thead>
           <tbody>
-            <tr><td><strong>Melhores Médias</strong></td><td>A melhor média de 3 dardos que o jogador fez <strong>num torneio</strong></td><td><code>Max(average_3_dart)</code> por jogador</td></tr>
+            <tr><td><strong>Melhores Médias (em torneios)</strong></td><td>A melhor média de 3 dardos que o jogador fez <strong>num torneio</strong></td><td><code>Max(average_3_dart)</code> por jogador</td></tr>
             <tr><td><strong>Melhores Fechadas</strong></td><td>O maior fechamento do jogador</td><td><code>Max(high_finish)</code> por jogador</td></tr>
             <tr><td><strong>180s</strong></td><td>O total de 180s do jogador, somando todos os torneios</td><td><code>Sum(count_180)</code> por jogador</td></tr>
           </tbody>
