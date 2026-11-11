@@ -1680,9 +1680,11 @@ torneio : 'Open São Roque 2026 - OBD 21.02.2026'</code></pre>
       <div class="regra">
         <span class="tarja-rot">HSTS é difícil de desfazer</span>
         <p>O navegador guarda a instrução pelo prazo informado, e desligar no servidor não apaga o
-          que já foi guardado. Por isso começa em <strong>1 hora</strong>. Depois de algumas semanas
-          sem problema, dá para subir para <code>31536000</code> (um ano) pela variável
-          <code>SECURE_HSTS_SECONDS</code>. <code>INCLUDE_SUBDOMAINS</code> e <code>PRELOAD</code>
+          que já foi guardado. Por isso começou em <strong>1 hora</strong>, que é o padrão escrito no
+          código. Em 11/11/2026, depois de dois meses sem problema, subiu para <strong>um
+          ano</strong> (<code>31536000</code>) pela variável <code>SECURE_HSTS_SECONDS</code> do
+          Railway, sem mexer no código: a variável, quando existe, vale mais que o padrão. Para
+          mudar o prazo de novo, é só alterar a variável. <code>INCLUDE_SUBDOMAINS</code> e <code>PRELOAD</code>
           ficam desligados de propósito — valeriam para todos os subdomínios e, no caso do preload,
           para listas embutidas nos navegadores, e desfazer leva meses.</p>
       </div>
@@ -1810,9 +1812,6 @@ me.phpTournamentStats = me.phpSite + 'n01_stats_t.php';</code></pre>
       <p>Levantados ao longo do desenvolvimento e ainda não resolvidos, do mais para o menos grave:</p>
 
       <ol>
-        <li><strong>Subir o HSTS para um ano.</strong> Hoje está em 1 hora, de propósito, até haver
-          confiança de que nada quebrou (ver 9.9). Passadas algumas semanas sem problema, é trocar a
-          variável <code>SECURE_HSTS_SECONDS</code> para <code>31536000</code> no Railway.</li>
         <li><strong>“180s no ano” não é do ano.</strong> O rótulo diz “no ano”, mas a consulta soma
           <code>count_180</code> de <strong>todos</strong> os torneios já capturados, sem filtro de
           ano (ver 5.10). Um dos dois está errado, e qual deles depende do que a OBD quer mostrar: se

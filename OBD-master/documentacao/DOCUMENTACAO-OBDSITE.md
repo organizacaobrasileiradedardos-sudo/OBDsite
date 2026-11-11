@@ -1075,9 +1075,11 @@ recuperação de senha e o QR code do perfil.
 > desliga o redirecionamento **sem precisar de deploy**. É a válvula de escape.
 
 **HSTS é a única opção daqui difícil de desfazer:** o navegador guarda a instrução pelo
-prazo informado, e desligar no servidor não apaga o que já foi guardado. Por isso começa
-em **1 hora**. Depois de algumas semanas sem problema, dá para subir para `31536000` (um
-ano) pela variável `SECURE_HSTS_SECONDS`. `INCLUDE_SUBDOMAINS` e `PRELOAD` ficam
+prazo informado, e desligar no servidor não apaga o que já foi guardado. Por isso começou
+em **1 hora**, que é o padrão escrito no código. Em 11/11/2026, depois de dois meses sem
+problema, subiu para **um ano** (`31536000`) pela variável `SECURE_HSTS_SECONDS` do
+Railway, sem mexer no código: a variável, quando existe, vale mais que o padrão. Para
+mudar o prazo de novo, é só alterar a variável. `INCLUDE_SUBDOMAINS` e `PRELOAD` ficam
 desligados de propósito — valeriam para todos os subdomínios e, no caso do preload, para
 listas embutidas nos navegadores, e desfazer leva meses.
 
@@ -1191,20 +1193,17 @@ que `phpSite` diz hoje.
 
 Levantados ao longo do desenvolvimento e ainda não resolvidos:
 
-1. **Subir o HSTS para um ano.** Hoje está em 1 hora, de propósito, até haver confiança
-   de que nada quebrou (ver 9.9). Passadas algumas semanas sem problema, é trocar a
-   variável `SECURE_HSTS_SECONDS` para `31536000` no Railway.
-2. **"180s no ano" não é do ano.** O rótulo diz "no ano", mas a consulta soma
+1. **"180s no ano" não é do ano.** O rótulo diz "no ano", mas a consulta soma
    `count_180` de **todos** os torneios já capturados, sem filtro de ano (ver 5.10). Um
    dos dois está errado, e qual deles depende do que a OBD quer mostrar: se é do ano,
    falta filtrar; se é de todos os tempos, o rótulo é que precisa mudar. Enquanto não se
    decide, o número exibido é o acumulado de sempre.
-3. **"Premiação Distribuída" mistura dois recortes.** O valor é a soma de todo o Order of
+2. **"Premiação Distribuída" mistura dois recortes.** O valor é a soma de todo o Order of
    Merit, de todos os tempos, com os `prize_value` apenas do ano corrente (ver 5.2 e
    5.10). O resultado não é nem do ano nem de todos os tempos. O rótulo não cita ano, o
    que sugere que a intenção era o acumulado — nesse caso é o filtro de ano do
    `prize_value` que está sobrando.
-4. **`stats.0010` não roda em SQLite** — ela usa `DROP COLUMN IF EXISTS`, sintaxe do
+3. **`stats.0010` não roda em SQLite** — ela usa `DROP COLUMN IF EXISTS`, sintaxe do
    PostgreSQL. Em produção já foi aplicada; o efeito é só atrapalhar quem quiser subir
    uma cópia local do banco em SQLite para testes.
 
