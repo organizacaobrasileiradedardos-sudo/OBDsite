@@ -333,6 +333,12 @@ h6 {
     background: linear-gradient(135deg, var(--dartboard-black) 0%, var(--dartboard-gray-dark) 100%);
 }
 
+/* Cinza: variante discreta, usada pelo bloco "Outros Torneios" do Hall dos Campeões.
+   Nenhuma cor nova foi inventada — os dois tons já existem na paleta do tema. */
+.card-header-dartboard.gray {
+    background: linear-gradient(135deg, var(--dartboard-gray) 0%, var(--dartboard-gray-dark) 100%);
+}
+
 .card-body-dartboard {
     padding: 24px;
 }

@@ -417,7 +417,7 @@
       <p class="standfirst">Como o site da Organização Brasileira de Dardos funciona: quais telas
         existem, de onde vêm os números que elas mostram e quais regras estão embutidas no código.</p>
       <div class="meta">
-        <span><b>Revisão</b> 28 · set · 2026</span>
+        <span><b>Revisão</b> 10 · nov · 2026</span>
         <span><b>Stack</b> Django 4.2 · PostgreSQL · Railway</span>
         <span><b>Telas</b> 34 templates</span>
       </div>
@@ -845,9 +845,11 @@ already_past   = Q(end_date__isnull=False, end_date__lt=now)  | Q(end_date__isnu
 
       <h3><span class="n">5.7</span>Categorias do Hall dos Campeões</h3>
 
-      <p>O Hall dos Campeões separa os títulos em três categorias, cada uma expandindo ao ser
-        clicada: <strong>Liga Nacional OBD</strong>, <strong>Tour OBD</strong> e
-        <strong>Circuito Nacional OBD</strong>. <strong>A página abre com todas fechadas</strong> — a
+      <p>O Hall dos Campeões separa os títulos em quatro categorias, cada uma expandindo ao ser
+        clicada, nesta ordem: <strong>Campeonato Brasileiro OBD</strong>,
+        <strong>Liga Nacional OBD</strong>, <strong>Tour OBD</strong> e
+        <strong>Circuito Nacional OBD</strong>. O Campeonato Brasileiro vem primeiro por ser o
+        torneio mais importante do ano. <strong>A página abre com todas fechadas</strong> — a
         contagem no cabeçalho já diz o que existe dentro de cada uma, e quem escolhe o que abrir é o
         usuário.</p>
 
@@ -866,40 +868,57 @@ already_past   = Q(end_date__isnull=False, end_date__lt=now)  | Q(end_date__isnu
 
       <div class="tbl">
         <table>
-          <thead><tr><th>Categoria</th><th>Cor</th><th>Palpite inicial quando o nome contém</th></tr></thead>
+          <thead><tr><th>Categoria</th><th>Cor</th><th>Ícone</th><th>Palpite inicial quando o nome contém</th></tr></thead>
           <tbody>
-            <tr><td>Liga Nacional OBD</td><td>dourado</td><td><code>liga nacional</code></td></tr>
-            <tr><td>Tour OBD</td><td>verde</td><td>a palavra <code>tour</code> isolada</td></tr>
-            <tr><td>Circuito Nacional OBD</td><td>vermelho</td><td><code>circuito nacional</code></td></tr>
-            <tr><td>Outros Torneios</td><td>preto</td><td>nenhum dos anteriores</td></tr>
+            <tr><td>Campeonato Brasileiro OBD</td><td>preto</td><td>medalha</td><td><code>campeonato brasileiro</code></td></tr>
+            <tr><td>Liga Nacional OBD</td><td>dourado</td><td>troféu</td><td><code>liga nacional</code></td></tr>
+            <tr><td>Tour OBD</td><td>verde</td><td>globo</td><td>a palavra <code>tour</code> isolada</td></tr>
+            <tr><td>Circuito Nacional OBD</td><td>vermelho</td><td>alfinete de mapa</td><td><code>circuito nacional</code></td></tr>
+            <tr><td>Outros Torneios</td><td>cinza</td><td>estrela</td><td>nenhum dos anteriores</td></tr>
           </tbody>
         </table>
       </div>
 
       <p>Cada categoria tem uma cor, usada no cabeçalho do bloco, no ícone, na contagem, na tarja do
-        ano e no cabeçalho de cada card de campeão. São as <strong>quatro variantes de
-        <code>.card-header-dartboard</code> que o tema do site já define</strong> — nenhuma cor foi
-        inventada. A troca é feita por variáveis CSS (<code>--cat-cor</code>,
+        ano e no cabeçalho de cada card de campeão. São as <strong>cinco variantes de
+        <code>.card-header-dartboard</code> que o tema do site define</strong> — nenhuma cor foi
+        inventada: a variante cinza, acrescentada junto com o Campeonato Brasileiro, usa dois tons de
+        cinza que já estavam na paleta. A troca é feita por variáveis CSS (<code>--cat-cor</code>,
         <code>--cat-fundo</code>), então as regras de estilo são as mesmas para todas as categorias;
         só os valores mudam.</p>
 
-      <p>O palpite ignora maiúsculas e acentos, e testa <code>liga nacional</code> e
-        <code>circuito nacional</code> <strong>antes</strong> de <code>tour</code>, por serem mais
-        específicas. Uma recaptura <strong>não</strong> mexe no tipo — se mexesse, apagaria a
-        correção feita à mão.</p>
+      <p>O preto é o cabeçalho mais forte do tema, e por isso ficou com o Campeonato Brasileiro.
+        “Outros Torneios”, que antes usava o preto, passou para o cinza — mais discreto, condizente
+        com o papel dele de recolher o que não é competição da OBD.</p>
+
+      <p>O palpite ignora maiúsculas e acentos, e testa <code>campeonato brasileiro</code>,
+        <code>liga nacional</code> e <code>circuito nacional</code> <strong>antes</strong> de
+        <code>tour</code>, por serem mais específicas. Uma recaptura <strong>não</strong> mexe no
+        tipo — se mexesse, apagaria a correção feita à mão.</p>
 
       <div class="nota">
-        <span class="tarja-rot">Quarta categoria</span>
-        <p>“Outros Torneios” recolhe o que não é nenhum dos três — Opens, campeonatos avulsos,
-          torneios comemorativos — para que nenhum campeão desapareça da tela. Ela só aparece quando
-          tem alguém dentro. As três categorias da OBD aparecem sempre, mesmo vazias, para a tela ter
+        <span class="tarja-rot">Última categoria</span>
+        <p>“Outros Torneios” recolhe o que não é nenhuma das quatro — Opens, torneios avulsos,
+          comemorativos — para que nenhum campeão desapareça da tela. Ela só aparece quando tem
+          alguém dentro. As quatro categorias da OBD aparecem sempre, mesmo vazias, para a tela ter
           estrutura previsível.</p>
       </div>
 
       <p>Tudo isso está definido num lugar só, <code>obd/core/tournament_categories.py</code>: os
-        nomes das categorias, os ícones, os padrões do palpite e a ordem de exibição. Acrescentar uma
-        categoria nova é acrescentar uma entrada nesse dicionário e gerar a migração do novo valor de
-        <code>choices</code>.</p>
+        nomes das categorias, as cores, os ícones, os padrões do palpite e a ordem de exibição.
+        Acrescentar uma categoria nova é acrescentar uma entrada nesse dicionário e gerar a migração
+        do novo valor de <code>choices</code>.</p>
+
+      <div class="alerta">
+        <span class="tarja-rot">Armadilha ao criar categoria</span>
+        <p><strong>O identificador tem que caber no campo.</strong> O slug vai para
+          <code>TournamentResult.category</code> e <code>League.category</code>, que são
+          <code>CharField</code>. Enquanto o limite era <code>max_length=20</code>,
+          <code>campeonato-brasileiro</code> (21 caracteres) seria <strong>truncado em
+          silêncio</strong> — e um valor truncado não casa com nenhuma categoria, então os campeões
+          cairiam em “Outros”. O limite foi para 40 quando essa categoria foi criada. Se um dia
+          precisar de um slug mais longo, aumente o campo junto.</p>
+      </div>
 
       <h3><span class="n">5.8</span>Por que o tipo mora na liga, e não só no torneio</h3>
 

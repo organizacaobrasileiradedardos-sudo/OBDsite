@@ -2,7 +2,7 @@
 
 **Organização Brasileira de Dardos — obdardos.com.br**
 
-Última revisão: 28 de setembro de 2026.
+Última revisão: 10 de novembro de 2026.
 
 Este documento descreve como o site funciona por dentro: quais telas existem, o que
 cada uma faz, de onde vêm os números que elas mostram e quais regras de negócio estão
@@ -389,13 +389,16 @@ canto superior direito. Ele aparece porque o modelo define `get_absolute_url`.
 
 ### 5.7 Categorias do Hall dos Campeões
 
-O Hall dos Campeões separa os títulos em três categorias, cada uma expandindo ao ser
+O Hall dos Campeões separa os títulos em quatro categorias, cada uma expandindo ao ser
 clicada. **A página abre com todas fechadas** — a contagem no cabeçalho já diz o que existe
-dentro de cada uma, e quem escolhe o que abrir é o usuário. As categorias são:
+dentro de cada uma, e quem escolhe o que abrir é o usuário. As categorias são, nesta ordem:
 
+- **Campeonato Brasileiro OBD**
 - **Liga Nacional OBD**
 - **Tour OBD**
 - **Circuito Nacional OBD**
+
+O Campeonato Brasileiro vem primeiro por ser o torneio mais importante do ano.
 
 **O tipo é um campo de verdade no banco, e mora em dois lugares.** `TournamentResult.category`
 é onde o administrador escolhe, na coluna *Tipo de Torneio* do painel de captura.
@@ -409,32 +412,45 @@ O palpite pelo nome existe, mas só como **valor inicial**: quando um torneio é
 pela primeira vez, e na migração que preencheu os torneios que já existiam. Depois disso,
 quem manda é o campo.
 
-| Categoria | Cor | Palpite inicial quando o nome contém |
-|---|---|---|
-| Liga Nacional OBD | dourado | `liga nacional` |
-| Tour OBD | verde | a palavra `tour` isolada |
-| Circuito Nacional OBD | vermelho | `circuito nacional` |
-| Outros Torneios | preto | nenhum dos anteriores |
+| Categoria | Cor | Ícone | Palpite inicial quando o nome contém |
+|---|---|---|---|
+| Campeonato Brasileiro OBD | preto | medalha | `campeonato brasileiro` |
+| Liga Nacional OBD | dourado | troféu | `liga nacional` |
+| Tour OBD | verde | globo | a palavra `tour` isolada |
+| Circuito Nacional OBD | vermelho | alfinete de mapa | `circuito nacional` |
+| Outros Torneios | cinza | estrela | nenhum dos anteriores |
 
 Cada categoria tem uma cor, usada no cabeçalho do bloco, no ícone, na contagem, na tarja
-do ano e no cabeçalho de cada card de campeão. São as **quatro variantes de
-`.card-header-dartboard` que o tema do site já define** — nenhuma cor foi inventada. A
-troca é feita por variáveis CSS (`--cat-cor`, `--cat-fundo`), então as regras de estilo
-são as mesmas para todas as categorias; só os valores mudam.
+do ano e no cabeçalho de cada card de campeão. São as **cinco variantes de
+`.card-header-dartboard` que o tema do site define** — nenhuma cor foi inventada: a
+variante cinza, acrescentada junto com o Campeonato Brasileiro, usa dois tons de cinza que
+já estavam na paleta. A troca é feita por variáveis CSS (`--cat-cor`, `--cat-fundo`), então
+as regras de estilo são as mesmas para todas as categorias; só os valores mudam.
 
-O palpite ignora maiúsculas e acentos, e testa `liga nacional` e `circuito nacional`
-**antes** de `tour`, por serem mais específicas. Uma recaptura **não** mexe no tipo — se
-mexesse, apagaria a correção feita à mão.
+O preto é o cabeçalho mais forte do tema, e por isso ficou com o Campeonato Brasileiro.
+"Outros Torneios", que antes usava o preto, passou para o cinza — mais discreto, condizente
+com o papel dele de recolher o que não é competição da OBD.
 
-> **A quarta categoria, "Outros Torneios",** recolhe o que não é nenhum dos três — Opens,
-> campeonatos avulsos, torneios comemorativos — para que nenhum campeão desapareça da
-> tela. Ela só aparece quando tem alguém dentro. As três categorias da OBD aparecem
-> sempre, mesmo vazias, para a tela ter estrutura previsível.
+O palpite ignora maiúsculas e acentos, e testa `campeonato brasileiro`, `liga nacional` e
+`circuito nacional` **antes** de `tour`, por serem mais específicas. Uma recaptura **não**
+mexe no tipo — se mexesse, apagaria a correção feita à mão.
+
+> **A última categoria, "Outros Torneios",** recolhe o que não é nenhuma das quatro — Opens,
+> torneios avulsos, comemorativos — para que nenhum campeão desapareça da tela. Ela só
+> aparece quando tem alguém dentro. As quatro categorias da OBD aparecem sempre, mesmo
+> vazias, para a tela ter estrutura previsível.
 
 Tudo isso está definido num lugar só, `obd/core/tournament_categories.py`: os nomes das
-categorias, os ícones, os padrões do palpite e a ordem de exibição. Acrescentar uma
-categoria nova é acrescentar uma entrada nesse dicionário e gerar a migração do novo
+categorias, as cores, os ícones, os padrões do palpite e a ordem de exibição. Acrescentar
+uma categoria nova é acrescentar uma entrada nesse dicionário e gerar a migração do novo
 valor de `choices`.
+
+> **Armadilha ao criar categoria: o identificador tem que caber no campo.** O slug vai para
+> `TournamentResult.category` e `League.category`, que são `CharField`. Enquanto o limite
+> era `max_length=20`, `campeonato-brasileiro` (21 caracteres) seria **truncado em
+> silêncio** — e um valor truncado não casa com nenhuma categoria, então os campeões
+> cairiam em "Outros". O limite foi para 40 quando essa categoria foi criada. Se um dia
+> precisar de um slug mais longo, aumente o campo junto.
 
 ### 5.8 Por que o tipo mora na liga, e não só no torneio
 

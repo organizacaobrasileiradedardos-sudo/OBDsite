@@ -13,6 +13,7 @@ import re
 import unicodedata
 from collections import OrderedDict
 
+CAMPEONATO_BRASILEIRO = 'campeonato-brasileiro'
 LIGA_NACIONAL = 'liga-nacional'
 TOUR = 'tour'
 CIRCUITO_NACIONAL = 'circuito-nacional'
@@ -20,11 +21,22 @@ OUTROS = 'outros'
 
 # A ordem deste dicionário é a ordem em que as categorias aparecem no Hall dos Campeões, e
 # `cor` escolhe qual das variantes de cabeçalho do tema cada uma usa (vermelho, verde,
-# dourado e preto — as quatro que já existem em dartboard-theme.css).
+# dourado, preto e cinza — as cinco que existem em dartboard-theme.css).
 # `prioridade` só é usada pelo palpite: define qual padrão vence quando um nome casa com
-# mais de um. "liga nacional" e "circuito nacional" ganham de "tour" por serem mais
-# específicas.
+# mais de um. "campeonato brasileiro", "liga nacional" e "circuito nacional" ganham de
+# "tour" por serem mais específicas.
+#
+# O Campeonato Brasileiro vem primeiro porque é o torneio mais importante do ano, e usa o
+# cabeçalho preto, o mais forte do tema. "Outros Torneios" foi para o cinza, mais discreto,
+# que combina com o papel dele de recolher o que não é de nenhuma das competições da OBD.
 CATEGORIAS = OrderedDict([
+    (CAMPEONATO_BRASILEIRO, {
+        'label': 'Campeonato Brasileiro OBD',
+        'cor': 'black',
+        'icone': 'bi-award-fill',
+        'padrao': re.compile(r'campeonato\s+brasileiro'),
+        'prioridade': 0,
+    }),
     (LIGA_NACIONAL, {
         'label': 'Liga Nacional OBD',
         'cor': 'gold',
@@ -48,7 +60,7 @@ CATEGORIAS = OrderedDict([
     }),
     (OUTROS, {
         'label': 'Outros Torneios',
-        'cor': 'black',
+        'cor': 'gray',
         'icone': 'bi-star-fill',
         'padrao': None,  # é o destino de quem não casa com nenhum padrão
         'prioridade': 99,

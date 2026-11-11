@@ -43,7 +43,9 @@ class League(models.Model):
     status = models.BooleanField(default=True)
     category = models.CharField(
         'Tipo de Torneio',
-        max_length=20,
+        # 40 e não 20: 'campeonato-brasileiro' tem 21 caracteres, e um identificador que
+        # não cabe no campo seria truncado — a categoria deixaria de ser reconhecida.
+        max_length=40,
         choices=tournament_categories.CHOICES,
         default=tournament_categories.OUTROS,
         help_text='Define em qual bloco do Hall dos Campeões os campeões desta liga aparecem. '

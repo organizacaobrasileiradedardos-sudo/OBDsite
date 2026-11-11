@@ -106,7 +106,7 @@ Description: Campeões separados por tipo de torneio, cada tipo expandindo ao se
         flex-shrink: 0;
     }
 
-    /* Uma cor por tipo de torneio, usando as quatro variantes que o tema do site
+    /* Uma cor por tipo de torneio, usando as cinco variantes que o tema do site
        já define. Cada bloco só troca as variáveis; as regras acima são as mesmas. */
     .cat-gold {
         --cat-cor: var(--dartboard-gold-dark);
@@ -129,10 +129,19 @@ Description: Campeões separados por tipo de torneio, cada tipo expandindo ao se
         --cat-texto-contagem: #fff;
     }
 
+    /* Preto: Campeonato Brasileiro, o cabeçalho mais forte do tema. */
     .cat-black {
-        --cat-cor: var(--dartboard-gray-dark);
+        --cat-cor: var(--dartboard-black);
         --cat-fundo: #EDEFF2;
         --cat-foco: rgba(31, 41, 55, .3);
+        --cat-texto-contagem: #fff;
+    }
+
+    /* Cinza: "Outros Torneios", o bloco que recolhe o que não é competição da OBD. */
+    .cat-gray {
+        --cat-cor: var(--dartboard-gray);
+        --cat-fundo: #F3F4F6;
+        --cat-foco: rgba(107, 114, 128, .3);
         --cat-texto-contagem: #fff;
     }
 
