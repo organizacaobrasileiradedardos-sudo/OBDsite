@@ -299,6 +299,28 @@ O número "Premiação Distribuída" da home vem de **duas** origens:
 obd_numbers['prize_total'] = order_of_merit_prize_total + standalone_prize_total
 ```
 
+**O número é do ano e zera na virada, à meia-noite de Brasília.** O rótulo na tela diz
+"Premiação Distribuída em *ano*". As duas fontes são filtradas cada uma pela sua data:
+
+- Order of Merit pela **data da etapa** (`League.start_date`), que vem da célula B2 da
+  planilha e nunca muda.
+- Premiação avulsa pela **data da primeira captura** (`created_at`), e **não** por `date`.
+  `date` é reescrito com "hoje" a cada recaptura (armadilha 9.11), e recapturar um torneio
+  do ano passado jogaria a premiação dele no ano novo. Consequência aceita: um torneio
+  jogado em 31/12 e capturado só em 1º/1 conta no ano novo.
+
+Até 11/11/2026 o número misturava os dois recortes — o Order of Merit de todos os anos com
+a premiação avulsa só do ano — e não era nem anual nem acumulado. A OBD decidiu que ele é
+anual.
+
+> **O ano é contado no horário de Brasília, não no do servidor.** O servidor roda em UTC
+> (`TIME_ZONE = 'UTC'`), e pelo relógio dele o ano vira às **21h de 31 de dezembro** em
+> Brasília. `_ano_corrente()`, em `core/views.py`, converte para `America/Sao_Paulo` antes
+> de pegar o ano, e devolve o começo e o fim do ano como instantes para filtrar
+> `created_at` — um filtro por `__year` num campo de data e hora usaria o ano em UTC de
+> novo. O fuso vem do `pytz`, que traz a própria tabela e não depende do container. O
+> "Torneios Realizados em *ano*" usa o mesmo ano, então também vira à meia-noite daqui.
+
 **Regra operacional:** nunca preencha `prize_value` numa etapa da Liga Nacional. O valor
 dela já entra pelo Order of Merit, e preencher os dois conta em dobro. O próprio campo
 avisa isso no `help_text`.
@@ -558,13 +580,13 @@ Aqui convivem recortes diferentes no mesmo bloco, e é o que mais engana:
 
 | Número | Recorte real | O rótulo combina? |
 |---|---|---|
-| Torneios Realizados em *ano* | Ano corrente, por `date`, só com `in_progress=False` | sim |
+| Torneios Realizados em *ano* | Ano corrente (horário de Brasília), por `date`, só com `in_progress=False` | sim |
 | Jogadores Cadastrados | Todos, de todos os tempos | sim, não cita ano |
 | Partidas Disputadas | Todas, de todos os tempos (soma de `matches_played` dividida por 2, porque cada jogo conta nas duas pontas) | sim, não cita ano |
 | 180s no ano | **Todos, de todos os tempos** — não há filtro de ano | **não** (ver 10) |
-| Premiação Distribuída | Order of Merit **de todos os tempos** + `prize_value` **do ano corrente** | **não**, é uma mistura (ver 10) |
+| Premiação Distribuída em *ano* | Ano corrente (horário de Brasília): Order of Merit pela data da etapa + `prize_value` pela data da primeira captura (ver 5.2) | sim |
 
-> **Os filtros de ano usam `date`, que é reescrito a cada recaptura** (armadilha 9.11).
+> **O de torneios realizados filtra o ano por `date`, que é reescrito a cada recaptura** (armadilha 9.11).
 > Recapturar um torneio antigo faz a data dele virar hoje, e ele passa a contar no ano
 > corrente. Não acontece na rotina normal — o agendamento só recaptura a etapa em
 > andamento — mas acontece se alguém colar à mão a URL de um torneio de outro ano.
@@ -1208,12 +1230,7 @@ Levantados ao longo do desenvolvimento e ainda não resolvidos:
    dos dois está errado, e qual deles depende do que a OBD quer mostrar: se é do ano,
    falta filtrar; se é de todos os tempos, o rótulo é que precisa mudar. Enquanto não se
    decide, o número exibido é o acumulado de sempre.
-2. **"Premiação Distribuída" mistura dois recortes.** O valor é a soma de todo o Order of
-   Merit, de todos os tempos, com os `prize_value` apenas do ano corrente (ver 5.2 e
-   5.10). O resultado não é nem do ano nem de todos os tempos. O rótulo não cita ano, o
-   que sugere que a intenção era o acumulado — nesse caso é o filtro de ano do
-   `prize_value` que está sobrando.
-3. **`stats.0010` não roda em SQLite** — ela usa `DROP COLUMN IF EXISTS`, sintaxe do
+2. **`stats.0010` não roda em SQLite** — ela usa `DROP COLUMN IF EXISTS`, sintaxe do
    PostgreSQL. Em produção já foi aplicada; o efeito é só atrapalhar quem quiser subir
    uma cópia local do banco em SQLite para testes.
 

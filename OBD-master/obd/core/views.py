@@ -1,5 +1,8 @@
+import datetime
 import re
 from urllib.parse import quote
+
+import pytz
 
 from django.contrib.auth.models import User
 from django.urls import reverse
@@ -8,6 +11,7 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required, permission_required
 from django.http import Http404
 from django.shortcuts import render, redirect, get_object_or_404
+from django.utils import timezone
 from obd.dashboards.administrators.leagues.models import OrderOfMeritEntry
 from django.db.models import Sum, Min, Q, Max, F
 
@@ -21,6 +25,25 @@ from obd.core.obdlib.webscraping.n01 import refresh_tournaments
 # Apelido: a implementação mora em core/tournament_categories.py, que é também de onde
 # o Hall dos Campeões lê a mesma regra.
 _tournament_event_key = tournament_categories.chave_do_evento
+
+
+# O servidor roda em UTC (TIME_ZONE em settings.py), e pelo relógio dele o ano vira às 21h
+# de 31 de dezembro no horário de Brasília. Os números "do ano" da tela inicial têm que virar
+# à meia-noite daqui, então o ano é contado no fuso de Brasília. O pytz traz a própria tabela
+# de fusos e não depende de ela estar instalada no container.
+FUSO_DA_OBD = pytz.timezone('America/Sao_Paulo')
+
+
+def _ano_corrente():
+    """Ano corrente no horário de Brasília, com o instante em que ele começa e termina.
+
+    O começo e o fim servem para filtrar campos de data e hora: um filtro por `__year`
+    usaria o ano em UTC, e um torneio capturado às 22h de 31/12 cairia no ano seguinte.
+    """
+    ano = timezone.now().astimezone(FUSO_DA_OBD).year
+    inicio = FUSO_DA_OBD.localize(datetime.datetime(ano, 1, 1))
+    fim = FUSO_DA_OBD.localize(datetime.datetime(ano + 1, 1, 1))
+    return ano, inicio, fim
 
 
 _DIVISION_LABEL_RE = re.compile(r'-\s*(divis[aã]o\b.*)$', re.IGNORECASE)
@@ -160,16 +183,26 @@ def index(request):
     stats_180 = _leaderboard('count_180', Sum)
 
     # === OBD em Números (estatísticas gerais) ===
-    current_year = timezone.now().year
+    current_year, inicio_do_ano, fim_do_ano = _ano_corrente()
     # "Realizados" = já encerrados; etapa em andamento ainda não conta.
     tournament_names_this_year = TournamentResult.objects.filter(
         date__year=current_year, in_progress=False
     ).values_list('name', flat=True)
     tournaments_count = len({_tournament_event_key(name) for name in tournament_names_this_year})
 
-    order_of_merit_prize_total = OrderOfMeritEntry.objects.aggregate(Sum('value'))['value__sum'] or 0
+    # Premiação Distribuída é do ano: zera na virada, à meia-noite de Brasília. Antes ela
+    # somava o Order of Merit de todos os anos com a premiação avulsa só do ano corrente, e
+    # o número não era nem uma coisa nem outra.
+    #
+    # Order of Merit pela data da etapa, que vem da célula B2 da planilha e nunca muda.
+    order_of_merit_prize_total = OrderOfMeritEntry.objects.filter(
+        league__start_date__year=current_year
+    ).aggregate(Sum('value'))['value__sum'] or 0
+    # Premiação avulsa pela data da PRIMEIRA captura (`created_at`), e não por `date`:
+    # `date` é reescrito com "hoje" a cada recaptura, e recapturar um torneio do ano passado
+    # jogaria a premiação dele no ano novo.
     standalone_prize_total = TournamentResult.objects.filter(
-        date__year=current_year
+        created_at__gte=inicio_do_ano, created_at__lt=fim_do_ano
     ).aggregate(Sum('prize_value'))['prize_value__sum'] or 0
 
     obd_numbers = {

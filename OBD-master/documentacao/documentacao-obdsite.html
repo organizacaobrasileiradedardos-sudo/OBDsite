@@ -753,6 +753,36 @@ counted_league_ids = {
 
       <pre><code>obd_numbers['prize_total'] = order_of_merit_prize_total + standalone_prize_total</code></pre>
 
+      <p><strong>O número é do ano e zera na virada, à meia-noite de Brasília.</strong> O rótulo na
+        tela diz “Premiação Distribuída em <em>ano</em>”. As duas fontes são filtradas cada uma pela
+        sua data:</p>
+
+      <ul>
+        <li>Order of Merit pela <strong>data da etapa</strong> (<code>League.start_date</code>), que
+          vem da célula B2 da planilha e nunca muda.</li>
+        <li>Premiação avulsa pela <strong>data da primeira captura</strong> (<code>created_at</code>),
+          e <strong>não</strong> por <code>date</code>. <code>date</code> é reescrito com “hoje” a cada
+          recaptura (armadilha 9.11), e recapturar um torneio do ano passado jogaria a premiação
+          dele no ano novo. Consequência aceita: um torneio jogado em 31/12 e capturado só em 1º/1
+          conta no ano novo.</li>
+      </ul>
+
+      <p>Até 11/11/2026 o número misturava os dois recortes — o Order of Merit de todos os anos com a
+        premiação avulsa só do ano — e não era nem anual nem acumulado. A OBD decidiu que ele é
+        anual.</p>
+
+      <div class="alerta">
+        <span class="tarja-rot">O ano é contado no horário de Brasília</span>
+        <p>Não no do servidor. O servidor roda em UTC (<code>TIME_ZONE = 'UTC'</code>), e pelo relógio
+          dele o ano vira às <strong>21h de 31 de dezembro</strong> em Brasília.
+          <code>_ano_corrente()</code>, em <code>core/views.py</code>, converte para
+          <code>America/Sao_Paulo</code> antes de pegar o ano, e devolve o começo e o fim do ano
+          como instantes para filtrar <code>created_at</code> — um filtro por <code>__year</code>
+          num campo de data e hora usaria o ano em UTC de novo. O fuso vem do <code>pytz</code>, que
+          traz a própria tabela e não depende do container. O “Torneios Realizados em
+          <em>ano</em>” usa o mesmo ano, então também vira à meia-noite daqui.</p>
+      </div>
+
       <div class="regra">
         <span class="tarja-rot">Regra operacional</span>
         <p>Nunca preencha <code>prize_value</code> numa etapa da Liga Nacional. O valor dela já entra
@@ -1040,17 +1070,17 @@ torneio : 'Open São Roque 2026 - OBD 21.02.2026'</code></pre>
         <table>
           <thead><tr><th>Número</th><th>Recorte real</th><th>O rótulo combina?</th></tr></thead>
           <tbody>
-            <tr><td>Torneios Realizados em <em>ano</em></td><td>Ano corrente, por <code>date</code>, só com <code>in_progress=False</code></td><td>sim</td></tr>
+            <tr><td>Torneios Realizados em <em>ano</em></td><td>Ano corrente (horário de Brasília), por <code>date</code>, só com <code>in_progress=False</code></td><td>sim</td></tr>
             <tr><td>Jogadores Cadastrados</td><td>Todos, de todos os tempos</td><td>sim, não cita ano</td></tr>
             <tr><td>Partidas Disputadas</td><td>Todas, de todos os tempos (soma de <code>matches_played</code> dividida por 2, porque cada jogo conta nas duas pontas)</td><td>sim, não cita ano</td></tr>
             <tr><td>180s no ano</td><td><strong>Todos, de todos os tempos</strong> — não há filtro de ano</td><td><strong>não</strong> (ver 10)</td></tr>
-            <tr><td>Premiação Distribuída</td><td>Order of Merit <strong>de todos os tempos</strong> + <code>prize_value</code> <strong>do ano corrente</strong></td><td><strong>não</strong>, é uma mistura (ver 10)</td></tr>
+            <tr><td>Premiação Distribuída em <em>ano</em></td><td>Ano corrente (horário de Brasília): Order of Merit pela data da etapa + <code>prize_value</code> pela data da primeira captura (ver 5.2)</td><td>sim</td></tr>
           </tbody>
         </table>
       </div>
 
       <div class="alerta">
-        <span class="tarja-rot">Os filtros de ano usam <code>date</code></span>
+        <span class="tarja-rot">O de torneios realizados filtra o ano por <code>date</code></span>
         <p>E <code>date</code> é reescrito a cada recaptura (armadilha 9.11). Recapturar um torneio
           antigo faz a data dele virar hoje, e ele passa a contar no ano corrente. Não acontece na
           rotina normal — o agendamento só recaptura a etapa em andamento — mas acontece se alguém
@@ -1825,11 +1855,6 @@ me.phpTournamentStats = me.phpSite + 'n01_stats_t.php';</code></pre>
           ano (ver 5.10). Um dos dois está errado, e qual deles depende do que a OBD quer mostrar: se
           é do ano, falta filtrar; se é de todos os tempos, o rótulo é que precisa mudar. Enquanto
           não se decide, o número exibido é o acumulado de sempre.</li>
-        <li><strong>“Premiação Distribuída” mistura dois recortes.</strong> O valor é a soma de todo
-          o Order of Merit, de todos os tempos, com os <code>prize_value</code> apenas do ano
-          corrente (ver 5.2 e 5.10). O resultado não é nem do ano nem de todos os tempos. O rótulo
-          não cita ano, o que sugere que a intenção era o acumulado — nesse caso é o filtro de ano
-          do <code>prize_value</code> que está sobrando.</li>
         <li><strong><code>stats.0010</code> não roda em SQLite</strong> — ela usa
           <code>DROP COLUMN IF EXISTS</code>, sintaxe do PostgreSQL. Em produção já foi aplicada; o
           efeito é só atrapalhar quem quiser subir uma cópia local do banco em SQLite para
