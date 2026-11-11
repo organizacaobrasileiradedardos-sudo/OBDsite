@@ -644,6 +644,9 @@ O robô identifica o torneio pelo **`id=` da URL**, não pelo texto da URL intei
 serve o mesmo torneio em endereços diferentes (`comp.php` e `t_stats.html`); colar
 qualquer um deles atualiza o mesmo registro, em vez de criar uma duplicata.
 
+Se a captura falhar com erro de endereço ou de certificado, não é o site: é o N01 que mudou
+o endereço da API dele. Ver 9.13.
+
 Para apagar uma captura, use o botão de lixeira no histórico. As estatísticas dos
 jogadores saem junto (`on_delete=CASCADE`).
 
@@ -1067,6 +1070,53 @@ que ainda não têm linha.
 **A regra agora:** linha de `ApelidoN01` que já existe **muda de dono** (`profile` passa
 a apontar para o destino). Só os nomes que ainda não têm linha — `nakka`, `nickname` e o
 nome completo — é que são criados.
+
+### 9.13 O N01 muda o endereço da API, e já quebrou a captura duas vezes
+
+O robô de captura não lê a página do torneio: ele chama duas rotas da API do N01
+(`n01_tournament.php`, para os dados do torneio e a lista de inscritos, e
+`n01_stats_t.php`, para as estatísticas). **O endereço dessas rotas não é fixo, e o N01
+já o mudou duas vezes.**
+
+Em novembro de 2026 a captura parou com esta mensagem:
+
+```
+hostname 'tk2-228-23746.vs.sakura.ne.jp' doesn't match 'lb2.n01darts.com'
+```
+
+Duas mudanças aconteceram ao mesmo tempo, e cada uma sozinha já teria quebrado:
+
+1. **O endereço saiu do HTML.** Antes a página do torneio trazia cada rota escrita por
+   extenso (`phpTournament: "//..."`), e o robô achava isso com uma expressão regular. Hoje
+   não traz mais nada disso — mudou para `n01_v2/js/n01_data.js`.
+2. **O formato virou base + concatenação.** O arquivo declara uma pasta única e monta as
+   rotas em cima dela:
+
+   ```js
+   me.phpSite = '//lbc.n01darts.com/n01/tournament/';
+   me.phpTournament = me.phpSite + 'n01_tournament.php';
+   me.phpTournamentStats = me.phpSite + 'n01_stats_t.php';
+   ```
+
+Com a busca falhando, o robô caía no endereço de reserva — que era o **host cru do
+servidor** do N01. Esse host continua existindo, mas o N01 pôs um balanceador na frente, e
+agora ele serve um certificado com outro nome. Daí o erro de SSL, que não diz nada a quem
+está no painel de captura.
+
+**Como ficou:** `base_da_api()` descobre a pasta a partir da página, tentando três
+formatos — a rota escrita no HTML (o formato antigo), a base declarada no HTML, e a base
+declarada no `n01_data.js` que a página carrega (a situação atual). Só se os três falharem
+é que o valor de reserva entra.
+
+> **Duas lições para a próxima vez.** Primeira: o valor de reserva precisa ser um endereço
+> **que funcione**, e o nome público (`lbc.n01darts.com`) é mais estável que o host do
+> servidor, porque tem certificado próprio. Segunda: a mensagem de erro da captura precisa
+> dizer **qual endereço foi usado** — é isso que transforma um rastro de SSL ilegível numa
+> pista de uma linha.
+
+Se a captura voltar a falhar com erro de endereço ou de certificado, o diagnóstico é curto:
+baixe a página do torneio, procure o `src` do `n01_data.js`, baixe esse arquivo e veja o
+que `phpSite` diz hoje.
 
 ---
 

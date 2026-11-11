@@ -5,7 +5,30 @@ from obd.core.models import TournamentResult, PlayerTournamentStat
 from obd.core.tournament_categories import adivinhar_categoria
 import re
 import json
+from urllib.parse import urljoin
 from obd.dashboards.administrators.champions.utils import get_or_create_player, get_or_create_league, register_champion
+
+
+# Pasta de onde o N01 serve os endpoints do torneio, usada **só** quando a página não diz
+# qual é a dela.
+#
+# Aqui havia o host cru do servidor do N01 (tk2-228-23746.vs.sakura.ne.jp). Quando eles
+# puseram um balanceador na frente, esse host passou a responder com um certificado de
+# outro nome, e a captura começou a falhar com erro de SSL — uma mensagem que não diz nada
+# a quem está no painel. Por isso o endereço de reserva agora é o nome público, que tem
+# certificado próprio, e a descoberta pela página virou o caminho principal.
+BASE_DA_API_RESERVA = 'https://lbc.n01darts.com/n01/tournament/'
+
+# Formato antigo: cada endpoint escrito inteiro dentro do HTML da página.
+_ENDPOINT_NO_HTML = re.compile(r'php(?:TournamentStats|Tournament)\s*:\s*["\']([^"\']+)["\']')
+
+# Formato atual: uma base única, de onde todos os endpoints são montados por concatenação.
+_BASE_DECLARADA = re.compile(r'phpSite\s*=\s*["\']([^"\']+)["\']')
+
+# O arquivo de configuração onde essa base passou a morar.
+_SCRIPT_DE_CONFIGURACAO = re.compile(r'src\s*=\s*["\']([^"\']*n01_data\.js[^"\']*)["\']')
+
+TEMPO_LIMITE = 30
 
 
 def tournament_id_from_url(url):
@@ -21,6 +44,9 @@ class N01TournamentScraper:
         # reabrir uma etapa por conta própria.
         self.url = url
         self.in_progress = in_progress
+        # A base dos endpoints é descoberta uma vez e reaproveitada: são duas chamadas
+        # (lista de inscritos e estatísticas) que saem da mesma pasta.
+        self._base_da_api = None
         self.session = requests.Session()
         self.session.headers.update({
             'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.114 Safari/537.36',
@@ -57,28 +83,58 @@ class N01TournamentScraper:
             print(f"Error fetching HTML: {e}")
             return None
 
+    @staticmethod
+    def _com_esquema(url):
+        """O N01 escreve os endereços sem `https:`, herdando o esquema da página."""
+        url = 'https:' + url if url.startswith('//') else url
+        return url if url.endswith('/') else url + '/'
+
+    def base_da_api(self, html):
+        """Pasta de onde sairão os endpoints do torneio, descoberta a partir da página.
+
+        Ler isso da página, em vez de fixar no código, é o que mantém a captura viva: o N01
+        já mudou o endereço duas vezes, e das duas o valor fixo aqui dentro foi o que
+        quebrou. São três formatos tentados, do mais antigo para o atual.
+        """
+        if self._base_da_api is None:
+            self._base_da_api = self._descobrir_base(html) or BASE_DA_API_RESERVA
+        return self._base_da_api
+
+    def _descobrir_base(self, html):
+        # 1. Formato antigo: o endpoint inteiro escrito na página. Fica em primeiro lugar
+        #    porque, se uma página ainda trouxer isso, é a informação mais direta.
+        achado = _ENDPOINT_NO_HTML.search(html)
+        if achado:
+            endpoint = self._com_esquema(achado.group(1)).rstrip('/')
+            return endpoint.rsplit('/', 1)[0] + '/'
+
+        # 2. A base declarada na própria página.
+        achado = _BASE_DECLARADA.search(html)
+        if achado:
+            return self._com_esquema(achado.group(1))
+
+        # 3. A base declarada no arquivo de configuração que a página carrega. É aqui que
+        #    ela está hoje: o N01 tirou os endereços do HTML e passou a montá-los a partir
+        #    de `phpSite`, em n01_v2/js/n01_data.js.
+        achado = _SCRIPT_DE_CONFIGURACAO.search(html)
+        if not achado:
+            return None
+        try:
+            resposta = self.session.get(urljoin(self.url, achado.group(1)), timeout=TEMPO_LIMITE)
+            resposta.raise_for_status()
+        except requests.RequestException as erro:
+            print(f'Não foi possível ler a configuração do N01: {erro}')
+            return None
+        achado = _BASE_DECLARADA.search(resposta.text)
+        return self._com_esquema(achado.group(1)) if achado else None
+
     def get_api_base(self, html):
-        # Try to find the PHP endpoint in the HTML (n01_data object)
-        # Look for: phpTournamentStats: "//tk2-..."
-        match = re.search(r'phpTournamentStats\s*:\s*["\']([^"\']+)["\']', html)
-        if match:
-            url = match.group(1)
-            if url.startswith('//'):
-                url = 'https:' + url
-            return url
-        # Fallback to the one we found
-        return 'https://tk2-228-23746.vs.sakura.ne.jp/n01/tournament/n01_stats_t.php'
+        """Endpoint das estatísticas dos jogadores."""
+        return self.base_da_api(html) + 'n01_stats_t.php'
 
     def get_entry_list_url(self, html):
-        # Look for: phpTournament: "//tk2-..."
-        match = re.search(r'phpTournament\s*:\s*["\']([^"\']+)["\']', html)
-        if match:
-            url = match.group(1)
-            if url.startswith('//'):
-                url = 'https:' + url
-            return url
-        # Fallback
-        return 'https://tk2-228-23746.vs.sakura.ne.jp/n01/tournament/n01_tournament.php'
+        """Endpoint dos dados do torneio e da lista de inscritos."""
+        return self.base_da_api(html) + 'n01_tournament.php'
 
     def run(self):
         tdid = self.get_tournament_id()
@@ -115,8 +171,15 @@ class N01TournamentScraper:
             response = self.session.post(entry_url, params={'cmd': 'get_entry_list', 'tdid': tdid})
             response.raise_for_status()
             entry_list = response.json()
-        except Exception as e:
-            return False, f"Failed to fetch entry list: {e}"
+        except Exception as erro:
+            # Esta mensagem é lida por quem está no painel, não por quem escreve código.
+            # Antes vinha um rastro de erro de SSL inteiro, que não dizia o que fazer.
+            return False, (
+                f'não foi possível ler a lista de inscritos do torneio. O endereço '
+                f'usado foi {entry_url} — se o N01 mudou a API de novo, é isso que '
+                f'precisa ser ajustado no site. Detalhe técnico: '
+                f'{type(erro).__name__}: {erro}'
+            )
 
         # Map ID -> Name
         # entry_list is a list of objects: [{"tpid": "...", "name": "..."}]
@@ -138,8 +201,12 @@ class N01TournamentScraper:
                  data = response.json()
                  if data and isinstance(data, dict):
                      stats_data = data
-        except Exception as e:
-            return False, f"Failed to fetch stats: {e}"
+        except Exception as erro:
+            return False, (
+                f'não foi possível ler as estatísticas do torneio. O endereço usado foi '
+                f'{stats_url} — se o N01 mudou a API de novo, é isso que precisa ser '
+                f'ajustado no site. Detalhe técnico: {type(erro).__name__}: {erro}'
+            )
 
         if not stats_data:
             return False, "No stats data found"
